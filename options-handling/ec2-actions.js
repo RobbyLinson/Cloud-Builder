@@ -18,7 +18,7 @@ import {
 
 // it's a slightly modified code from https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/ec2/actions
 // I guess we may use it as a starting point for async functions in provider like createInstance, createSubnet... from Appendix 2: AWS Provider Example Code
-
+ 
 const ec2Client = new EC2Client();
 
 // I'm not sure if it can describe all possible types of instances (e.g ec2, vpc, subnet..)
@@ -45,7 +45,7 @@ export const createInstance = async ({
 }) => {
 
     // this is an example of handling the optional output
-    const includedParams = {
+    let includedParams = {
         KeyName: keyPairName,
         SecurityGroupIds: [securityGroupId],
         ImageId: imageId,
