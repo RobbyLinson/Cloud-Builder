@@ -1,0 +1,14 @@
+{
+  "name": "options-handling",
+  "version": "1.0.0",
+  "description": "",
+  "main": "ec2-actions.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Yaroslav and Rohn",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1553.0"
+  }
+}
