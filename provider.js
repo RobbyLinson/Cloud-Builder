@@ -1,5 +1,4 @@
 
-import aws from 'aws-sdk';
 import { EC2Client, CreateVpcCommand, CreateSubnetCommand, RunInstancesCommand } from "@aws-sdk/client-ec2"; 
 
 
@@ -9,7 +8,7 @@ async function providerAws({
 	secretAccessKey
 }) {
 
-	async function() createVpc({
+	async function createVpc({
 		name,
 		cidrBlock,
 		...options
