@@ -118,7 +118,7 @@ async function providerAws({
 	}
 
 	return {
-		createResource,    
+		createResource: createResource
 	};
 }
 
