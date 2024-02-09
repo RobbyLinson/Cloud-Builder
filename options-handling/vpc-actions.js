@@ -2,20 +2,16 @@ import { EC2Client,
     CreateVpcCommand 
 } from "@aws-sdk/client-ec2";
 
-const ec2client = new EC2Client();
-
-const input = {
-    CidrBlock: "120.0.0.0/16",
-}
+// !!! This is just a playground for error handling !!! // 
 
 export const createVPC = async ({
     cidrBlock, 
-    amazonProvidedIpv6CidrBlock, // optional
-    dryRun // optional
+    ...options
 }) => {
-    
+
     const inputedParams = {
-        CidrBlock: cidrBlock
+        input,
+        dryRun: true
     }
 
     const command = new CreateVpcCommand(inputedParams);
