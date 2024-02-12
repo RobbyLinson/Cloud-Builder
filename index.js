@@ -5,23 +5,20 @@
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 const chalk = require('chalk');
+const fs = require("fs");
 //const boxen = require('boxen');
 
 
 //make logo
 
-
-
-
-
-
-
-
 console.log(chalk.blueBright("  ____ _                 _   _           _ _     _           "));
 console.log(chalk.blueBright(" / ___| | ___  _   _  __| | | |__  _   _(_) | __| | ___ _ __ "));
-console.log(chalk.blueBright("| |   | |/ _ \| | | |/ _` | | '_ \| | | | | |/ _` |/ _ \ '__|"));
+console.log(chalk.blueBright("| |   | |/ _ \\| | | |/ _` | | '_ \\| | | | | |/ _` |/ _ \\ '__|"));
 console.log(chalk.blueBright("| |___| | (_) | |_| | (_| | | |_) | |_| | | | (_| |  __/ |   "));
-console.log(chalk.blueBright(" \____|_|\___/ \__,_|\__,_| |_.__/ \__,_|_|_|\__,_|\___|_|   "));
+console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|\\__,_|\\___|_|   "));
+
+
+
 
 
 console.log("Welcome to cloud builder");
@@ -41,3 +38,8 @@ yargs(hideBin(process.argv))
     console.log(`Hello, ${argv.name}!`);
   })
   .parse();
+
+
+
+
+
