@@ -7,16 +7,7 @@ const awsProvider = await providerAws({
   secretAccessKey: secretAccessKey
 });
 
-const mainVpc = await awsProvider.createResource({
+const mainVpc = awsProvider.createResource({
   type: 'vpc',
-  CidrBlock: '10.0.1.0/24'
+  cidrBlock: '10.0.1.0/24',
 });
-
-const publicSubnet = await awsProvider.createResource({
-  type: 'subnet',
-  VpcId: mainVpc.Vpc.VpcId,
-  CidrBlock: '10.0.1.1/24'
-});
-
-// Reading some metadata for testing.
-console.log(publicSubnet.$metadata.attempts);
