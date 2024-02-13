@@ -21,7 +21,7 @@ export const createVPC = async ({
     });
 
     // validates input object
-    const validatedOpt = validateOptionsForVPC({...options})
+    const validatedOpt = validateVPCOptions({...options})
     try {
         // creates VPC
         const command = new CreateVpcCommand(validatedOpt);
@@ -37,7 +37,7 @@ export const createVPC = async ({
 // must be decoupled.
 // Validates input for CreateVpcOptions
 // Returns a validated and modified object to match https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/ec2/command/CreateVpcCommand/ 
-const validateOptionsForVPC = ({ ...input }) => {
+const validateVPCOptions = ({ ...input }) => {
     
     // list of expected inputs
     const expectedParams = [
@@ -62,56 +62,14 @@ const validateOptionsForVPC = ({ ...input }) => {
       throw new Error(`Unexpected parameter(s): ${unexpectedParams.join(", ")}`);
     }
   
-    // The entire block below might not be necessary, as AWS has pretty good error handling. 
+    
    
     // For error handling we have to ask John: 
     // What types of errors you ideally would like to be caught?
     // And also where they might appear: on what level?
-
-    const validatedInput = { ...input };
   
-    // DryRun type validation
-    if (validatedInput.hasOwnProperty("DryRun") && typeof validatedInput.DryRun !== "boolean") {
-      throw new Error("DryRun must be a boolean");
-    }
-  
-    // CidrBlock type validation
-    if (input.hasOwnProperty("CidrBlock") && typeof input.CidrBlock !== "string") {
-      throw new Error("CidrBlock must be string");
-    }
-  
-    // not sure if we have to include regEx test for CIDR
-    // if (!/^(\d{1,3}\.){3}\d{1,3}\/(0|[1-9]|1[0-9]|2[0-4])$/.test(input.CidrBlock)) {
-    //   throw new Error("Invalid CIDR block format");
-    // }
-  
-    // Ipv4IpamPoolId type validation
-    if (
-      validatedInput.hasOwnProperty("Ipv4IpamPoolId") &&
-      typeof validatedInput.Ipv4IpamPoolId !== "string"
-    ) {
-      throw new Error("Ipv4IpamPoolId must be a string");
-    }
-  
-    // Ipv4NetmaskLength type validation
-    if (
-      validatedInput.hasOwnProperty("Ipv4NetmaskLength") &&
-      typeof validatedInput.Ipv4NetmaskLength !== "number"
-    ) {
-      throw new Error("Ipv4NetmaskLength must be a number");
-    }
-  
-    // -------------------------------------------------- //
-    // !!! Ipv6 related validation is skipped for now !!! //
-    // -------------------------------------------------- //
-  
-    // InstanceTenancy type validation
-    if (
-      validatedInput.hasOwnProperty("InstanceTenancy") &&
-      !["default", "dedicated", "host"].includes(validatedInput.InstanceTenancy)
-    ) {
-      throw new Error("Invalid value for InstanceTenancy, explain in more detail");
-    }
+    // A line below might not be necessary, as AWS has pretty good error handling. 
+    const validatedInput = validateVPCtypes({...input});
   
     // Tags list type validation. This makes it easier to add a tag to the instance
     // After the validation it also ensures the input matches
@@ -151,8 +109,51 @@ const validateOptionsForVPC = ({ ...input }) => {
     }
   
     return validatedInput;
-  };
-  
+};
 
+const validateVPCtypes = ({ ...input }) => {
+   // DryRun type validation
+   if (input.hasOwnProperty("DryRun") && typeof input.DryRun !== "boolean") {
+    throw new Error("DryRun must be a boolean");
+  }
 
+  // CidrBlock type validation
+  if (input.hasOwnProperty("CidrBlock") && typeof input.CidrBlock !== "string") {
+    throw new Error("CidrBlock must be string");
+  }
 
+  // not sure if we have to include regEx test for CIDR
+  // if (!/^(\d{1,3}\.){3}\d{1,3}\/(0|[1-9]|1[0-9]|2[0-4])$/.test(input.CidrBlock)) {
+  //   throw new Error("Invalid CIDR block format");
+  // }
+
+  // Ipv4IpamPoolId type validation
+  if (
+    input.hasOwnProperty("Ipv4IpamPoolId") &&
+    typeof input.Ipv4IpamPoolId !== "string"
+  ) {
+    throw new Error("Ipv4IpamPoolId must be a string");
+  }
+
+  // Ipv4NetmaskLength type validation
+  if (
+    input.hasOwnProperty("Ipv4NetmaskLength") &&
+    typeof input.Ipv4NetmaskLength !== "number"
+  ) {
+    throw new Error("Ipv4NetmaskLength must be a number");
+  }
+
+  // -------------------------------------------------- //
+  // !!! Ipv6 related validation is skipped for now !!! //
+  // -------------------------------------------------- //
+
+  // InstanceTenancy type validation
+  if (
+    input.hasOwnProperty("InstanceTenancy") &&
+    !["default", "dedicated", "host"].includes(input.InstanceTenancy)
+  ) {
+    throw new Error("Invalid value for InstanceTenancy, explain in more detail");
+  }
+
+  return input;
+}
