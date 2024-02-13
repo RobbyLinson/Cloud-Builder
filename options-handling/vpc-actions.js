@@ -1,4 +1,8 @@
-import { EC2Client, 
+import creds from "../credentials.js" // temporary
+const { ACCESS_KEY, SECRET_ACCESS_KEY, REGION } = creds;
+
+import { 
+    EC2Client,
     CreateVpcCommand 
 } from "@aws-sdk/client-ec2";
 
@@ -6,15 +10,25 @@ import { EC2Client,
 
 export const createVPC = async ({
     ...options
-}, ec2client) => { // temporarily passed ec2client
+}) => { 
 
-    const validatedParams = validateOptionsForVPC({...options})
+    const ec2Client = new EC2Client({
+      region: REGION,
+      credentials: {
+        accessKeyId: ACCESS_KEY,
+        secretAccessKey: SECRET_ACCESS_KEY
+      }
+    });
 
-    const command = new CreateVpcCommand(validatedParams);
-    
+    // validates input object
+    const validatedOpt = validateOptionsForVPC({...options})
     try {
-        const { Response } = await ec2client.send(command);
-        console.log(Response);
+        // creates VPC
+        const command = new CreateVpcCommand(validatedOpt);
+
+        // response contain details of created VPC
+        const response = await ec2Client.send(command);
+        console.log(response.Vpc);
     } catch (err) {
         console.error(err);
     }
@@ -48,6 +62,12 @@ const validateOptionsForVPC = ({ ...input }) => {
       throw new Error(`Unexpected parameter(s): ${unexpectedParams.join(", ")}`);
     }
   
+    // The entire block below might not be necessary, as AWS has pretty good error handling. 
+   
+    // For error handling we have to ask John: 
+    // What types of errors you ideally would like to be caught?
+    // And also where they might appear: on what level?
+
     const validatedInput = { ...input };
   
     // DryRun type validation
@@ -60,7 +80,7 @@ const validateOptionsForVPC = ({ ...input }) => {
       throw new Error("CidrBlock must be string");
     }
   
-    // not sure if we have to include this types of error
+    // not sure if we have to include regEx test for CIDR
     // if (!/^(\d{1,3}\.){3}\d{1,3}\/(0|[1-9]|1[0-9]|2[0-4])$/.test(input.CidrBlock)) {
     //   throw new Error("Invalid CIDR block format");
     // }
@@ -85,15 +105,17 @@ const validateOptionsForVPC = ({ ...input }) => {
     // !!! Ipv6 related validation is skipped for now !!! //
     // -------------------------------------------------- //
   
-    // Tags list type validation. After the validation it also ensures the input matches
-    // expected structure for CreateVpcCommand function input
+    // InstanceTenancy type validation
     if (
       validatedInput.hasOwnProperty("InstanceTenancy") &&
       !["default", "dedicated", "host"].includes(validatedInput.InstanceTenancy)
     ) {
-      throw new Error("Invalid value for InstanceTenancy");
+      throw new Error("Invalid value for InstanceTenancy, explain in more detail");
     }
   
+    // Tags list type validation. This makes it easier to add a tag to the instance
+    // After the validation it also ensures the input matches
+    // expected structure for CreateVpcCommand function input
     if (validatedInput.hasOwnProperty("Tags")) {
       const tagList = validatedInput.Tags;
       if (!Array.isArray(tagList)) {
@@ -114,7 +136,7 @@ const validateOptionsForVPC = ({ ...input }) => {
       });
   
       // Automatically create TagSpecifications
-      validatedInput.TagSpecifications = tagList.map((tag, index) => ({
+      validatedInput.TagSpecifications = tagList.map((tag) => ({
         ResourceType: "vpc",
         Tags: [
           {
