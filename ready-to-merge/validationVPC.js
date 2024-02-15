@@ -88,6 +88,7 @@ const validateVPCtypes = ({ ...input }) => {
   return input;
 }
 
+// Tags list type validation
 const validateAndTransformTags = ({...input}) => {
     if (input.hasOwnProperty("Tags")) {
         const tagList = input.Tags;
