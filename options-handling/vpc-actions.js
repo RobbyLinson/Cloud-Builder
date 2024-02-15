@@ -8,6 +8,7 @@ import {
 
 // !!! This is just a playground for error handling !!! // 
 
+// example of createVPC function
 export const createVPC = async ({
     ...options
 }) => { 
@@ -34,7 +35,6 @@ export const createVPC = async ({
     }
 }
 
-// must be decoupled.
 // Validates input for CreateVpcOptions
 // Returns a validated and modified object to match https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/ec2/command/CreateVpcCommand/ 
 const validateVPCOptions = ({ ...input }) => {
@@ -111,6 +111,7 @@ const validateVPCOptions = ({ ...input }) => {
     return validatedInput;
 };
 
+// Handle type restrictions for VPC options
 const validateVPCtypes = ({ ...input }) => {
    // DryRun type validation
    if (input.hasOwnProperty("DryRun") && typeof input.DryRun !== "boolean") {
