@@ -1,6 +1,6 @@
 // Validates input for CreateVpcOptions
 // Returns a validated and modified object to match https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/ec2/command/CreateVpcCommand/ 
-export const validateVPCOptions = ({ ...input }) => {
+const validateVPCOptions = ({ ...input }) => {
     
     // list of expected inputs
     const expectedParams = [
@@ -30,7 +30,7 @@ export const validateVPCOptions = ({ ...input }) => {
     // And also where they might appear: on what level?
   
     // A line below might not be necessary, as AWS has pretty good error handling. 
-    const validatedInput = validateVPCtypes({...input});
+    let validatedInput = validateVPCtypes({...input});
   
     // Tags list type validation. This makes it easier to add a tag to the instance
     // After the validation it also ensures the input matches
@@ -125,3 +125,5 @@ const validateAndTransformTags = ({...input}) => {
     }
     return input;
 }
+
+module.exports = { validateVPCOptions }
