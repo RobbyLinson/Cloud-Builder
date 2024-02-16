@@ -1,5 +1,6 @@
-import { RunInstancesCommand } from "@aws-sdk/client-ec2"; 
+import { RunInstancesCommand, DescribeInstancesCommand } from "@aws-sdk/client-ec2"; 
 
+// Creates a new instance or runs existing instance depending on options
 export async function createInstance(ec2Client, {
 	name,
 	...options
@@ -8,4 +9,11 @@ export async function createInstance(ec2Client, {
 	const command = new RunInstancesCommand(options);
 	const response = await ec2Client.send(command);
 	return response;
+}
+
+// Returns information on instance based on InstanceId
+export async function describeInstances(ec2Client, instanceIds) {
+	const command = new describeInstances({InstanceIds: instanceIds});
+    const response = await ec2Client.send(command);
+    return response;
 }

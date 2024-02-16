@@ -1,8 +1,8 @@
 
-import { EC2Client } from "@aws-sdk/client-ec2"; //DescribeInstancesCommand
-import { createVpc } from './actions/vpc-actions.js';
-import { createSubnet } from './actions/subnet-actions.js';
-import { createInstance } from './actions/instance-actions.js';
+import { EC2Client } from "@aws-sdk/client-ec2";
+import { createVpc, describeVpcs } from './actions/vpc-actions.js';
+import { createSubnet, describeSubnets } from './actions/subnet-actions.js';
+import { createInstance, describeInstances } from './actions/instance-actions.js';
 
 async function providerAws({
 	region,
@@ -18,21 +18,23 @@ async function providerAws({
 		}
 	});
 	
-/*
-	async function describeInstances(
-		instanceIds
-	) {
-		const ec2Client = new EC2Client({
-			region,
-			credentials: {
-				accessKeyId,
-				secretAccessKey
-			}
-		});
-		const command = new DescribeInstancesCommand(instanceIds);
-		const response = await ec2Client.send(instanceIds);
-		return response;
-	}*/
+
+	async function describeResources({
+		type, resourceIds
+	}) {
+		switch (type) {
+		case 'vpc':
+			return describeVpcs(ec2Client, resourceIds);
+		case 'subnet':
+			return describeSubnets(ec2Client, resourceIds);
+		case 'instance':
+			return describeInstances(ec2Client, resourceIds);
+		default:
+			return {
+				error: `Unknown resource type: ${type}`
+			};
+		}
+	}
 
 	async function createResource({
 		type,
@@ -63,7 +65,7 @@ async function providerAws({
 	}
 
 	return {
-		createResource: createResource//, describeInstances: describeInstances
+		createResource: createResource, describeResources: describeResources
 	};
 }
 
