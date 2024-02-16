@@ -1,4 +1,4 @@
-import providerAws from './ready-to-merge/providerAws.js';
+import providerAws from './provider/aws/providerAws.js';
 import { accessKeyId, secretAccessKey } from './credentials.js'; // temporary, replace this asap
 
 const awsProvider = await providerAws({
@@ -22,20 +22,20 @@ const publicSubnet = await awsProvider.createResource({
 console.log(publicSubnet.$metadata.attempts);
 
 // Creating an instance
-/*
+
 const newInstance = await awsProvider.createResource({
   type: 'instance',
   SubnetId: publicSubnet.Subnet.SubnetId,
   MinCount: 1,
   MaxCount: 1,
-  //ImageId: // this is required but not sure where to get it.
+  ImageId: 'ami-0766b4b472db7e3b9'
 });
-
+/*
 // Describe an instance
 const description = await awsProvider.describeInstances(
 	[newInstance.Instances[0].InstanceId]
 );
-
-// Print some data from described instance.
-console.log(description.Reservations[0].OwnerId);
 */
+// Print some data from described instance.
+//console.log(description.Reservations[0].OwnerId);
+
