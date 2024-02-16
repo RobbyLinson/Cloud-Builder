@@ -11,5 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-ec2": "^3.509.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }
