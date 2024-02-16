@@ -1,5 +1,6 @@
 
 import { EC2Client, CreateVpcCommand, CreateSubnetCommand, RunInstancesCommand, DescribeInstancesCommand } from "@aws-sdk/client-ec2"; 
+import { validateVPCOptions } from './validationVPC.js';
 
 
 async function providerAws({
@@ -19,8 +20,8 @@ async function providerAws({
 				secretAccessKey
 			}
 		});
-		// validation of the options object can take place here
-		const command = new CreateVpcCommand(options);
+		const validatedOptions = await validateVPCOptions(options);
+		const command = new CreateVpcCommand(validatedOptions);
 		const response = await ec2Client.send(command);
 		return response;
 	}
@@ -59,9 +60,9 @@ async function providerAws({
 		return response;
 	}
 
-	async function describeInstance({
-		instID
-	}) {
+	async function describeInstances(
+		instanceIds
+	) {
 		const ec2Client = new EC2Client({
 			region,
 			credentials: {
@@ -69,9 +70,8 @@ async function providerAws({
 				secretAccessKey
 			}
 		});
-		// validation of the options object can take place here
-		const command = new DescribeInstancesCommand(options);
-		const response = await ec2Client.send(command);
+		const command = new DescribeInstancesCommand(instanceIds);
+		const response = await ec2Client.send(instanceIds);
 		return response;
 	}
 
@@ -104,7 +104,7 @@ async function providerAws({
 	}
 
 	return {
-		createResource: createResource, describeInstance: describeInstance
+		createResource: createResource, describeInstances: describeInstances
 	};
 }
 
