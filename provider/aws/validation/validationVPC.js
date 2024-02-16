@@ -35,9 +35,9 @@ const validateVPCOptions = ({ ...input }) => {
     // Tags list type validation. This makes it easier to add a tag to the instance
     // After the validation it also ensures the input matches
     // expected structure for CreateVpcCommand function input
-    validatedInput = validateAndTransformTags(validatedInput);
+    const validatedAndTransformedInput = validateAndTransformTags(validatedInput);
   
-    return validatedInput;
+    return validatedAndTransformedInput;
 };
 
 // Handle type restrictions for VPC options
