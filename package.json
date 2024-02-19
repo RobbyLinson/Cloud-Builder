@@ -20,7 +20,7 @@
     "jest": "^29.7.0"
   },
   "bin": {
-    "greet-Cli": "index.js"
+    "greet-Cli": "cli.js"
   },
   "repository": {
     "type": "git",
