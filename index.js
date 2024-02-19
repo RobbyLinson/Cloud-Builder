@@ -2,10 +2,10 @@
 
 // Import the yargs library
 
-const yargs = require('yargs/yargs');
-const { hideBin } = require('yargs/helpers');
-const chalk = require('chalk');
-const fs = require("fs");
+import yargs from 'yargs/yargs';
+import { hideBin } from 'yargs/helpers';
+import chalk from 'chalk';
+import fs from 'fs';
 //const boxen = require('boxen');
 
 
