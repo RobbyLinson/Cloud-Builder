@@ -1,8 +1,8 @@
 
 import { EC2Client } from "@aws-sdk/client-ec2";
-import { createVpc, describeVpcs } from './actions/vpc-actions.js';
+import { createVpc, describeVpcs, deleteVPC } from './actions/vpc-actions.js';
 import { createSubnet, describeSubnets } from './actions/subnet-actions.js';
-import { createInstance, describeInstances } from './actions/instance-actions.js';
+import { createInstance, describeInstances  } from './actions/instance-actions.js';
 
 async function providerAws({
 	region,
@@ -36,6 +36,18 @@ async function providerAws({
 		}
 	}
 
+	async function deleteInstance({type, instanceId}){
+		switch (type) {
+			case 'vpc':
+				return deleteVPC(ec2Client, instanceId);
+			default:
+				return {
+					error: `Unknown resource type: ${type}`
+				};
+		}
+		
+	}
+
 	async function createResource({
 		type,
 		name,
@@ -64,8 +76,12 @@ async function providerAws({
 		}
 	}
 
+
+
 	return {
-		createResource: createResource, describeResources: describeResources
+		createResource: createResource, 
+		describeResources: describeResources,
+		terminateInstance: deleteInstance
 	};
 }
 

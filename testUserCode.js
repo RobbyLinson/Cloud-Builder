@@ -14,11 +14,18 @@ const mainVpc = await awsProvider.createResource({
   CidrBlock: '10.0.1.0/24',
 });
 
-const publicSubnet = await awsProvider.createResource({
-  type: 'subnet',
-  VpcId: mainVpc.Vpc.VpcId,
-  CidrBlock: '10.0.1.1/24'
-});
+
+// Deletes VPC right after it is created
+awsProvider.terminateInstance({
+  type: 'vpc',
+  instanceId: mainVpc.Vpc.VpcId
+})
+
+// const publicSubnet = await awsProvider.createResource({
+//   type: 'subnet',
+//   VpcId: mainVpc.Vpc.VpcId,
+//   CidrBlock: '10.0.1.1/24'
+// });
 
 // Reading some metadata for testing.
 //console.log(publicSubnet.$metadata.attempts);
@@ -36,20 +43,20 @@ const newInstance = await awsProvider.createResource({
 
 // Describing testing //
 
-// Describe a VPC
-const vpcDescription = await awsProvider.describeResources({
-	type: 'vpc', resourceIds: [mainVpc.Vpc.VpcId]
-});
+// // Describe a VPC
+// const vpcDescription = await awsProvider.describeResources({
+// 	type: 'vpc', resourceIds: [mainVpc.Vpc.VpcId]
+// });
 
-// Read some VPC info after describing.
-console.log(vpcDescription.Vpcs.length);
-console.log(vpcDescription.Vpcs[0].CidrBlock);
+// // Read some VPC info after describing.
+// console.log(vpcDescription.Vpcs.length);
+// console.log(vpcDescription.Vpcs[0].CidrBlock);
 
-// Describe a Subnet
-const subnetDescription = await awsProvider.describeResources({
-	type: 'subnet', resourceIds: [publicSubnet.Subnet.SubnetId]
-});	
+// // Describe a Subnet
+// const subnetDescription = await awsProvider.describeResources({
+// 	type: 'subnet', resourceIds: [publicSubnet.Subnet.SubnetId]
+// });	
 
-// Read some Subnet info after describing.
-console.log(subnetDescription.Subnets[0].CidrBlock);
+// // Read some Subnet info after describing.
+// console.log(subnetDescription.Subnets[0].CidrBlock);
 

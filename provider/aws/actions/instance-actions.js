@@ -2,7 +2,6 @@ import { RunInstancesCommand, DescribeInstancesCommand } from "@aws-sdk/client-e
 
 // Creates a new instance or runs existing instance depending on options
 export async function createInstance(ec2Client, {
-	name,
 	...options
 }) {
 	// validation of the options object can take place here
@@ -13,7 +12,7 @@ export async function createInstance(ec2Client, {
 
 // Returns information on instance based on InstanceId
 export async function describeInstances(ec2Client, instanceIds) {
-	const command = new describeInstances({InstanceIds: instanceIds});
+	const command = new DescribeInstancesCommand({InstanceIds: instanceIds});
     const response = await ec2Client.send(command);
     return response;
 }

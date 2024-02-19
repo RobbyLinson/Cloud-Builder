@@ -1,6 +1,6 @@
 // Validates input for CreateVpcOptions
 // Returns a validated and modified object to match https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/ec2/command/CreateVpcCommand/ 
-const validateVPCOptions = ({ ...input }) => {
+export const validateVPCOptions = ({ ...input }) => {
     
     // list of expected inputs
     const expectedParams = [
@@ -126,4 +126,3 @@ const validateAndTransformTags = ({...input}) => {
     return input;
 }
 
-module.exports = { validateVPCOptions }
