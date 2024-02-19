@@ -10,9 +10,19 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chalk": "^4.1.2",
+    "fs": "^0.0.1-security",
     "yargs": "^17.7.2"
   },
   "bin": {
-    "greet-cli": "./index.js"
-  }
+    "greet-Cli": "index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobbyLinson/Cloud-Builder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RobbyLinson/Cloud-Builder/issues"
+  },
+  "homepage": "https://github.com/RobbyLinson/Cloud-Builder#readme"
 }
