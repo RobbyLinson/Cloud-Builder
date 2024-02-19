@@ -1,4 +1,4 @@
-const { validateVPCOptions } = require("./validationVPC.js");
+import { validateVPCOptions } from "./validationVPC";
 
 test("Returns input back if successful", () => {
     expect(validateVPCOptions({

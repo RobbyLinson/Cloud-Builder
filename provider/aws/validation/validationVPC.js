@@ -125,4 +125,3 @@ const validateAndTransformTags = ({...input}) => {
     }
     return input;
 }
-
