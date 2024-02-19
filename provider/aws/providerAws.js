@@ -36,7 +36,7 @@ async function providerAws({
 		}
 	}
 
-	async function deleteInstance({type, instanceId}){
+	async function terminateResource({type, instanceId}){
 		switch (type) {
 			case 'vpc':
 				return deleteVPC(ec2Client, instanceId);
@@ -81,7 +81,7 @@ async function providerAws({
 	return {
 		createResource: createResource, 
 		describeResources: describeResources,
-		terminateInstance: deleteInstance
+		terminateResource: terminateResource
 	};
 }
 

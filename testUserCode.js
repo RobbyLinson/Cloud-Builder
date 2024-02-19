@@ -16,7 +16,7 @@ const mainVpc = await awsProvider.createResource({
 
 
 // Deletes VPC right after it is created
-awsProvider.terminateInstance({
+awsProvider.terminateResource({
   type: 'vpc',
   instanceId: mainVpc.Vpc.VpcId
 })
