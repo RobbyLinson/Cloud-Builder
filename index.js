@@ -24,6 +24,7 @@ console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|
 console.log("Welcome to cloud builder");
 
 console.log("\n commands:\n greet-Cli  greet yourNameHere       Gives you a little greeting!")
+console.log("greet-Cli run testFileNameHere                  Runs given file.")
 
 // Use yargs to define commands and their callbacks
 yargs(hideBin(process.argv))
@@ -39,7 +40,27 @@ yargs(hideBin(process.argv))
   })
   .parse();
 
+  import { execSync } from 'child_process';
+  
+  
 
-
+  //run test file command 
+  // Define the yargs command
+  yargs(hideBin(process.argv))
+    .command('run <file>', 'execute a JavaScript file', (yargs) => {
+      return yargs.positional('file', {
+        describe: 'executes js file',
+        type: 'string'
+      });
+    }, (argv) => {
+      // Execute the provided JavaScript file
+      try {
+        execSync(`node ${argv.file}`, { stdio: 'inherit' });
+      } catch (error) {
+        console.error(error.message);
+      }
+    })
+    .parse();
+  
 
 
