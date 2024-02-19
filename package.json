@@ -8,7 +8,7 @@
   },
   "jest": {
     "transform": {}
-  }
+  },
   "type": "module",
   "keywords": [],
   "author": "",
