@@ -18,6 +18,7 @@ export async function describeSubnets(ec2Client, subnetIds) {
     return response;
 }
 
+// Deletes a subnet
 export async function deleteSubnet(ec2Client,subnetId) {      
     
     console.log(subnetId)
