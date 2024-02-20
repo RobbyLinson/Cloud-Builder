@@ -1,0 +1,36 @@
+{
+  "name": "cloud-builder",
+  "version": "1.0.0",
+  "description": "README",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "jest": {
+    "transform": {}
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "fs": "^0.0.1-security",
+    "yargs": "^17.7.2",
+    "@aws-sdk/client-ec2": "^3.509.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "bin": {
+    "greet-Cli": "cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobbyLinson/Cloud-Builder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RobbyLinson/Cloud-Builder/issues"
+  },
+  "homepage": "https://github.com/RobbyLinson/Cloud-Builder#readme"
+}
