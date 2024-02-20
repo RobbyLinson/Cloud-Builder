@@ -22,7 +22,6 @@ export async function describeVpcs(ec2Client, vpcIds) {
 // Terminates an instance by ID
 export async function deleteVPC(ec2Client,vpcId) {	  
 	
-	console.log(vpcId)
 	const command = new DeleteVpcCommand({
 		VpcId: vpcId
 	});

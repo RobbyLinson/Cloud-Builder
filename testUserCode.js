@@ -14,6 +14,7 @@ const mainVpc = await awsProvider.createResource({
   CidrBlock: '10.0.1.0/24',
 });
 
+console.log(mainVpc.Vpc)
 
 // Deletes VPC right after it is created
 awsProvider.terminateResource({
@@ -28,7 +29,7 @@ awsProvider.terminateResource({
 // });
 
 // Reading some metadata for testing.
-//console.log(publicSubnet.$metadata.attempts);
+// console.log(publicSubnet.Vpc);
 
 // Creating an instance
 /*
