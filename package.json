@@ -27,7 +27,7 @@
     "jest": "^29.7.0"
   },
   "bin": {
-    "greet-Cli": "cli.js"
+    "greet-Cli": "cli/cli.js"
   },
   "repository": {
     "type": "git",
