@@ -6,6 +6,7 @@ import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
 import fs from 'fs';
+import * as credentials from '../cliCred/credentials';
 //const boxen = require('boxen');
 
 
@@ -25,6 +26,8 @@ console.log("Welcome to cloud builder");
 
 console.log("\n commands:\n greet-Cli  greet yourNameHere       Gives you a little greeting!")
 console.log("greet-Cli run testFileNameHere                  Runs given file.")
+
+credentials.checkAndPopulate();
 
 // Use yargs to define commands and their callbacks
 yargs(hideBin(process.argv))
