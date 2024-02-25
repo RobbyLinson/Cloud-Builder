@@ -7,7 +7,9 @@ import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
 import fs from 'fs';
 //const boxen = require('boxen');
-
+//const yargs = require('yargs/yargs');
+//const { hideBin } = require('yargs/helpers');
+//const { exec } = require('child_process');
 
 //make logo
 
@@ -61,6 +63,24 @@ yargs(hideBin(process.argv))
       }
     })
     .parse();
+
+    // NEEDS CONNECTION TO TERRAFORM TO WORK !!!
+  yargs(hideBin(process.argv))
+    .command('create', 'Provision infrastructure using Terraform', () => {
+      console.log("Starting 'terraform apply' to provision infrastructure...");
+      // Replace '/path' with the actual path to terraform config files
+      execSync('terraform apply', { cwd: '/path' }, (err, stdout, stderr) => {
+        if (err) {
+          console.error('Error running terraform apply:', err);
+          return;
+        }
+        // Success
+        console.log(stdout);
+        console.error(stderr);
+      });
+    })
+    .parse();
   
+    
 
 
