@@ -17,10 +17,10 @@ const mainVpc = await awsProvider.createResource({
 console.log(mainVpc.Vpc)
 
 // Deletes VPC right after it is created
-awsProvider.terminateResource({
-  type: 'vpc',
-  instanceId: mainVpc.Vpc.VpcId
-})
+//await awsProvider.terminateResource({
+//  type: 'vpc',
+//  instanceId: mainVpc.Vpc.VpcId
+//})
 
 const publicSubnet = await awsProvider.createResource({
   type: 'subnet',
@@ -82,3 +82,13 @@ setTimeout(async () => {
 // // Read some Subnet info after describing.
 // console.log(subnetDescription.Subnets[0].CidrBlock);
 
+// Sending some requests with missing parameters to check error handling.
+await awsProvider.createResource({
+  type: 'vpc',
+});
+await awsProvider.createResource({
+  type: 'subnet',
+});
+await awsProvider.createResource({
+  type: 'instance',
+});

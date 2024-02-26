@@ -6,15 +6,23 @@ export async function createInstance(ec2Client, {
 }) {
 	// validation of the options object can take place here
 	const command = new RunInstancesCommand(options);
-	const response = await ec2Client.send(command);
-	return response;
+	try {
+		const response = await ec2Client.send(command);
+		return response;
+	} catch (err) {
+		console.warn(`Failed to run instance.`, err);
+	}
 }
 
 // Returns information on instance based on InstanceId
 export async function describeInstances(ec2Client, instanceIds) {
 	const command = new DescribeInstancesCommand({InstanceIds: instanceIds});
-    const response = await ec2Client.send(command);
-    return response;
+	try {
+		const response = await ec2Client.send(command);
+		return response;
+	} catch (err) {
+		console.warn(`Failed to describe instances.`, err);
+	}
 }
 
 // Deletes an instance, there must be a delay between deleting instance and subnet or you will
