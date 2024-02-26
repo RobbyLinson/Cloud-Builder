@@ -22,17 +22,17 @@ awsProvider.terminateResource({
   instanceId: mainVpc.Vpc.VpcId
 })
 
-// const publicSubnet = await awsProvider.createResource({
-//   type: 'subnet',
-//   VpcId: mainVpc.Vpc.VpcId,
-//   CidrBlock: '10.0.1.1/24'
-// });
+const publicSubnet = await awsProvider.createResource({
+  type: 'subnet',
+  VpcId: mainVpc.Vpc.VpcId,
+  CidrBlock: '10.0.1.1/24'
+});
 
 // Reading some metadata for testing.
-// console.log(publicSubnet.Vpc);
+ console.log(publicSubnet.Vpc);
 
 // Creating an instance
-/*
+
 const newInstance = await awsProvider.createResource({
   type: 'instance',
   SubnetId: publicSubnet.Subnet.SubnetId,
@@ -40,7 +40,28 @@ const newInstance = await awsProvider.createResource({
   MaxCount: 1,
   ImageId: 'ami-0766b4b472db7e3b9'
 });
-*/
+
+
+console.log(newInstance.Instances[0].InstanceId);
+
+awsProvider.terminateResource({
+  type : 'instance',
+  instanceId: newInstance.Instances[0].InstanceId
+});
+
+//There must be a delay between deleting instance and deleting subnet or you will get a dependency error
+setTimeout(async () => {
+  await awsProvider.terminateResource({
+    type: 'subnet',
+    instanceId: publicSubnet.Subnet.SubnetId
+  });
+
+  // Deletes VPC right after it is created
+  await awsProvider.terminateResource({
+    type: 'vpc',
+    instanceId: mainVpc.Vpc.VpcId
+  });
+}, 10000); // 10 seconds delay
 
 // Describing testing //
 
