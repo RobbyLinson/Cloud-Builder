@@ -26,13 +26,7 @@ test("Determines if createVpc returns a vpc object", async () => {
         "CidrBlock": "172.0.0.0"
     });
 
-    expect(vpc).toStrictEqual({
-        "Vpc": {
-            "AmazonProvidedIpv6CidrBlock": true,
-            "CidrBlock": "172.0.0.0",
-            "VpcId": "vpc-abc123"
-        }
-    });
+    expect(vpc).toStrictEqual("vpc-abc123");
 })
 
 test("Determines if describeVpcs returns a list of vpcs corresponding to inputted vpcIds", async () => {
@@ -87,7 +81,7 @@ test("Determines if describeVpcs returns a list of vpcs corresponding to inputte
         "CidrBlock": "174.0.0.0"
     });
     const vpcList = await describeVpcs(ec2Mock,
-        [vpc1.Vpc.VpcId, vpc2.Vpc.VpcId]);
+        [vpc1, vpc2]);
 
     expect(vpcList).toStrictEqual({
         "Vpcs": [
@@ -139,16 +133,9 @@ test("Determines if createSubnet returns a subnet object", async () => {
     });
     const subnet = await createSubnet(ec2Mock, {
         "CidrBlock": "172.0.0.0",
-        "VpcId": vpc.Vpc.VpcId
+        "VpcId": vpc
     })
-    expect(subnet).toStrictEqual({
-        "Subnet": {
-            "AvailabilityZone": "eu-north-1",
-            "CidrBlock": "172.0.0.0",
-            "SubnetId": "subnet-abc123",
-            "VpcId": "vpc-abc123"
-        }
-    })
+    expect(subnet).toStrictEqual("subnet-abc123")
 })
 
 test("Determines if describeSubnets returns a list of subnets corresponding to inputted subnetIds", async () => {
@@ -230,14 +217,14 @@ test("Determines if describeSubnets returns a list of subnets corresponding to i
     });
     const subnet1 = await createSubnet(ec2Mock, {
         "CidrBlock": "172.0.0.0",
-        "VpcId": vpc1.Vpc.VpcId
+        "VpcId": vpc1
     });
     const subnet2 = await createSubnet(ec2Mock, {
         "CidrBlock": "174.0.0.0",
-        "VpcId": vpc2.Vpc.VpcId
+        "VpcId": vpc2
     });
     const subnetList = await describeSubnets(ec2Mock,
-        [subnet1.Subnet.SubnetId, subnet2.Subnet.SubnetId]);
+        [subnet1, subnet2]);
     expect(subnetList).toStrictEqual({
         Subnets: [
             {
