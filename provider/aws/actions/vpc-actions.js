@@ -8,18 +8,26 @@ export async function createVpc(ec2Client, {
 }) {
 	const validatedOptions = await validateVPCOptions(options);
 	const command = new CreateVpcCommand(validatedOptions);
-	const response = await ec2Client.send(command);
-	return response;
+	try {
+		const response = await ec2Client.send(command);
+		return response.Vpc.VpcId;
+	} catch (err) {
+		console.warn(`Failed to create VPC.`, err);
+	}
 }
 
 // Returns information on VPC based on VpcId
 export async function describeVpcs(ec2Client, vpcIds) {
 	const command = new DescribeVpcsCommand({VpcIds: vpcIds});
-    const response = await ec2Client.send(command);
-    return response;
+	try {
+		const response = await ec2Client.send(command);
+		return response;
+	} catch (err) {
+		console.warn(`Failed to describe VPCs.`, err);
+	}
 }
 
-// Terminates an instance by ID
+// Deletes a VPC by ID
 export async function deleteVPC(ec2Client,vpcId) {	  
 	
 	const command = new DeleteVpcCommand({
