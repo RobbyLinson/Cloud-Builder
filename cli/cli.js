@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 // Import the yargs library
-
+import providerAws from '../provider/aws/providerAws.js';
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
@@ -65,22 +65,55 @@ yargs(hideBin(process.argv))
     .parse();
 
     // NEEDS CONNECTION TO TERRAFORM TO WORK !!!
-  yargs(hideBin(process.argv))
-    .command('create', 'Provision infrastructure using Terraform', () => {
-      console.log("Starting 'terraform apply' to provision infrastructure...");
-      // Replace '/path' with the actual path to terraform config files
-      execSync('terraform apply', { cwd: '/path' }, (err, stdout, stderr) => {
-        if (err) {
-          console.error('Error running terraform apply:', err);
-          return;
-        }
-        // Success
-        console.log(stdout);
-        console.error(stderr);
-      });
-    })
-    .parse();
+//  yargs(hideBin(process.argv))
+//    .command('create', 'Provision infrastructure using Terraform', () => {
+//      console.log("Starting 'terraform apply' to provision infrastructure...");
+//      // Replace '/path' with the actual path to terraform config files
+//      execSync('terraform apply', { cwd: '/path' }, (err, stdout, stderr) => {
+//        if (err) {
+//          console.error('Error running terraform apply:', err);
+//          return;
+//        }
+//        // Success
+//       console.log(stdout);
+//        console.error(stderr);
+//      });
+//    })
+//    .parse();
   
-    
+// Updated 'create' command to use providerAws.createResource
+yargs(hideBin(process.argv))
+.command('create <type> <name> [options]', 'Create AWS resource', (yargs) => {
+  yargs.positional('type', {
+    describe: 'Type of resource to create (e.g., vpc, subnet, instance)',
+    type: 'string'
+  }).positional('name', {
+    describe: 'Name for the resource',
+    type: 'string'
+  }).option('options', {
+    describe: 'Additional options in key=value format',
+    type: 'array'
+  });
+}, async (argv) => {
+  try {
+    const options = argv.options.reduce((acc, option) => {
+      const [key, value] = option.split('=');
+      acc[key] = value;
+      return acc;
+    }, {});
+
+    const result = await providerAws.createResource({
+      type: argv.type,
+      name: argv.name,
+      ...options
+    });
+
+    console.log('Resource creation result:', result);
+  } catch (error) {
+    console.error('Error creating resource:', error.message);
+  }
+})
+.parse();
+
 
 
