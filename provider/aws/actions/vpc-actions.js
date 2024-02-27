@@ -10,7 +10,7 @@ export async function createVpc(ec2Client, {
 	const command = new CreateVpcCommand(validatedOptions);
 	try {
 		const response = await ec2Client.send(command);
-		return response;
+		return response.Vpc.VpcId;
 	} catch (err) {
 		console.warn(`Failed to create VPC.`, err);
 	}

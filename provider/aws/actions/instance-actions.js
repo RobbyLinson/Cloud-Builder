@@ -8,7 +8,7 @@ export async function createInstance(ec2Client, {
 	const command = new RunInstancesCommand(options);
 	try {
 		const response = await ec2Client.send(command);
-		return response;
+		return response.Instances[0].InstanceId;
 	} catch (err) {
 		console.warn(`Failed to run instance.`, err);
 	}

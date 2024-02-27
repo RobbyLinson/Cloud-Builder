@@ -24,42 +24,36 @@ console.log(mainVpc.Vpc)
 
 const publicSubnet = await awsProvider.createResource({
   type: 'subnet',
-  VpcId: mainVpc.Vpc.VpcId,
+  VpcId: mainVpc,
   CidrBlock: '10.0.1.1/24'
 });
-
-// Reading some metadata for testing.
- console.log(publicSubnet.Vpc);
 
 // Creating an instance
 
 const newInstance = await awsProvider.createResource({
   type: 'instance',
-  SubnetId: publicSubnet.Subnet.SubnetId,
+  SubnetId: publicSubnet,
   MinCount: 1,
   MaxCount: 1,
   ImageId: 'ami-0766b4b472db7e3b9'
 });
 
-
-console.log(newInstance.Instances[0].InstanceId);
-
-awsProvider.terminateResource({
+await awsProvider.terminateResource({
   type : 'instance',
-  instanceId: newInstance.Instances[0].InstanceId
+  instanceId: newInstance
 });
 
 //There must be a delay between deleting instance and deleting subnet or you will get a dependency error
 setTimeout(async () => {
   await awsProvider.terminateResource({
     type: 'subnet',
-    instanceId: publicSubnet.Subnet.SubnetId
+    instanceId: publicSubnet
   });
 
   // Deletes VPC right after it is created
   await awsProvider.terminateResource({
     type: 'vpc',
-    instanceId: mainVpc.Vpc.VpcId
+    instanceId: mainVpc
   });
 }, 10000); // 10 seconds delay
 
@@ -67,7 +61,7 @@ setTimeout(async () => {
 
 // // Describe a VPC
 // const vpcDescription = await awsProvider.describeResources({
-// 	type: 'vpc', resourceIds: [mainVpc.Vpc.VpcId]
+// 	type: 'vpc', resourceIds: [mainVpc]
 // });
 
 // // Read some VPC info after describing.
@@ -76,13 +70,14 @@ setTimeout(async () => {
 
 // // Describe a Subnet
 // const subnetDescription = await awsProvider.describeResources({
-// 	type: 'subnet', resourceIds: [publicSubnet.Subnet.SubnetId]
+// 	type: 'subnet', resourceIds: [publicSubnet]
 // });	
 
 // // Read some Subnet info after describing.
 // console.log(subnetDescription.Subnets[0].CidrBlock);
 
 // Sending some requests with missing parameters to check error handling.
+/*
 await awsProvider.createResource({
   type: 'vpc',
 });
@@ -92,3 +87,4 @@ await awsProvider.createResource({
 await awsProvider.createResource({
   type: 'instance',
 });
+*/

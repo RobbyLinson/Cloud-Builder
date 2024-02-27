@@ -9,10 +9,10 @@ export async function createSubnet(ec2Client, {
 	const command = new CreateSubnetCommand(options);
 	try {
 		const response = await ec2Client.send(command);
-		return response;
+		return response.Subnet.SubnetId;
 	} catch (err) {
 		console.warn(`Failed to create subnet.`, err);
-	}	
+	}
 }
 
 // Returns information on subnet based on SubnetId
