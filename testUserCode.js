@@ -12,37 +12,32 @@ const awsProvider = await providerAws({
 // ------------------
 // Scenario 1
 
-for (let i = 0; i < 4; i++){
-  await awsProvider.createResource({
-    type: "vpc",
-    CidrBlock: "10.0.1.0/24",
-    Tags: [{Name: `VPC${i}`}]
-  })
-}
+// for (let i = 0; i < 4; i++){
+//   await awsProvider.createResource({
+//     type: "vpc",
+//     CidrBlock: "10.0.1.0/24",
+//     Tags: [{Name: `VPC${i}`}]
+//   })
+// }
 
-terminateAllVpcsWithoutDependencies()
+// terminateAllVpcsWithoutDependencies()
 
 // ------------------
 
+// ------------------
+// Scenario 2
 
 // const mainVpc = await awsProvider.createResource({
 //   type: 'vpc',
 //   CidrBlock: '10.0.1.0/24',
+//   Tags: [{Name: "MainVPC"}]
 // });
-
-// Deletes VPC right after it is created
-// await awsProvider.terminateResource({
-//  type: 'vpc',
-//  instanceId: mainVpc
-// })
 
 // const publicSubnet = await awsProvider.createResource({
 //   type: 'subnet',
 //   VpcId: mainVpc,
 //   CidrBlock: '10.0.1.1/24'
 // });
-
-// Creating an instance
 
 // const newInstance = await awsProvider.createResource({
 //   type: 'instance',
@@ -53,6 +48,31 @@ terminateAllVpcsWithoutDependencies()
 // });
 
 
+// await awsProvider.terminateResource({
+//     type: "instance",
+//     instanceId: newInstance
+// })
+// await awsProvider.terminateResource({
+//     type: "subnet",
+//     instanceId: publicSubnet
+// })
+// await awsProvider.terminateResource({
+//   type: "vpc",
+//   instanceId: mainVpc
+// })
+
+
+// ------------------
+
+// ------------------
+// User interaction with CLI
+
+
+// cloud-builder create vpc VPC713 CidrBlock='10.0.1.1/24'
+// cloud-builder delete VPC713
+
+
+// ------------------
 
 // Describing testing //
 
@@ -92,8 +112,6 @@ async function terminateAllVpcsWithoutDependencies() {
 
       const terminationPromises = allInstances.Vpcs.map(async (vpc) => {
         const id = vpc.VpcId;
-        console.log(`Terminating VPC ${id}...`);
-
         try {
           await awsProvider.terminateResource({
             type: 'vpc',
@@ -112,5 +130,5 @@ async function terminateAllVpcsWithoutDependencies() {
       console.log('All termination requests completed.');
   } catch (error) {
     console.error('Error fetching VPCs:', error);
-  }
+    }
 }

@@ -9,12 +9,10 @@ export async function createVpc(ec2Client, {
 	const validatedOptions = await validateVPCOptions(options);
 	const command = new CreateVpcCommand(validatedOptions);
 	try {
-		const response = await ec2Client.send(command).then(response => {
-			console.log(`✅ Instance with ID ${response.Vpc.vpcId} created.\n`);
-			return response.Vpc.VpcId;
-		});
+		const response = await ec2Client.send(command)
 
-
+		await console.log(`✅ Instance with ID ${response.Vpc.vpcId} created.\n`);
+		return response.Vpc.VpcId;
 	} catch (err) {
 		console.warn(`Failed to create VPC.`, err);
 	}
@@ -44,7 +42,7 @@ export async function deleteVPC(ec2Client,vpcId) {
 	// 		{ client: ec2Client },
 	// 		{ InstanceIds: [instanceI] },
 	//   );
-	  console.log(`🧹 Instance with ID ${vpcId} terminated.\n`);
+	  console.log(`\n🧹 Instance with ID ${vpcId} terminated.\n`);
 	} catch (err) {
 	  console.warn(`Failed to terminate instance ${vpcId}.`, err);
 	}

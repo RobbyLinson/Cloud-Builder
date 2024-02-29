@@ -24,10 +24,10 @@ console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|
 
 console.log("Welcome to Cloud Builder");
 
-console.log("\n commands:\n greet-Cli  greet yourNameHere       Gives you a little greeting!")
-console.log("greet-Cli run testFileNameHere                  Runs given file.")
+console.log("\ncommands:\n\tgreet-Cli greet yourNameHere\n\t\tGives you a little greeting!\n")
+console.log("\tgreet-Cli run testFileNameHere\n\t\tRuns given file.\n")
 const filePath = os.homedir();
-console.log(filePath + " and the opereating system is "+ os.type());
+// console.log(filePath + " and the opereating system is "+ os.type());
 checkAndPopulate();
 
 // Temporary: load hardcoded provider credentials file
@@ -212,7 +212,7 @@ yargs(hideBin(process.argv))
 	console.log(split_options);
     const result = await awsProvider.createResource({
       type: argv.type,
-      name: argv.name,
+      Tags: [{Name: argv.name}],
       ...split_options
     });
 
@@ -355,7 +355,7 @@ function writeMapToFile(map, filename) {
       console.error('Error writing file:', err);
       return;
     }
-    console.log('Map data has been written to', filename);
+    // console.log('Map data has been written to', filename);
   });
 }
 
