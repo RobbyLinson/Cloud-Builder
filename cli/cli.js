@@ -22,8 +22,10 @@ console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|
 
 console.log("Welcome to cloud builder");
 
-console.log("\n commands:\n greet-Cli  greet yourNameHere       Gives you a little greeting!")
-console.log("greet-Cli run testFileNameHere                  Runs given file.")
+console.log("\ncommands:\ncloud-Builder greet <name>           Gives you a little greeting!")
+console.log("cloud-builder run <file name>        Runs given file.");
+console.log("cloud-builder create <type> <name>   creates aws resource of given type");
+console.log("cloud-builder destroy <name>         destroys aws resource of given name \n");
 
 // Temporary: load hardcoded provider credentials file
 const awsProvider = await providerAws({
@@ -232,7 +234,7 @@ function writeMapToFile(map, filename) {
       console.error('Error writing file:', err);
       return;
     }
-    console.log('Map data has been written to', filename);
+    //console.log('Map data has been written to', filename);
   });
 }
 
