@@ -9,8 +9,12 @@ export async function createVpc(ec2Client, {
 	const validatedOptions = await validateVPCOptions(options);
 	const command = new CreateVpcCommand(validatedOptions);
 	try {
-		const response = await ec2Client.send(command);
-		return response.Vpc.VpcId;
+		const response = await ec2Client.send(command).then(response => {
+			console.log(`✅ Instance with ID ${response.Vpc.vpcId} created.\n`);
+			return response.Vpc.VpcId;
+		});
+
+
 	} catch (err) {
 		console.warn(`Failed to create VPC.`, err);
 	}

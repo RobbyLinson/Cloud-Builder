@@ -9,6 +9,7 @@ import fs from 'fs';
 import os from 'os';
 import read from 'readline';
 
+import { region, accessKeyId, secretAccessKey } from '../credentials.js'; // temporary, replace this asap
 //make logo
 
 console.log(chalk.blueBright("  ____ _                 _   _           _ _     _           "));

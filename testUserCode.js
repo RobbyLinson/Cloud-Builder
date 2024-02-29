@@ -9,53 +9,50 @@ const awsProvider = await providerAws({
   secretAccessKey: secretAccessKey
 });
 
-const mainVpc = await awsProvider.createResource({
-  type: 'vpc',
-  CidrBlock: '10.0.1.0/24',
-});
+// ------------------
+// Scenario 1
 
-console.log(mainVpc.Vpc)
+for (let i = 0; i < 4; i++){
+  await awsProvider.createResource({
+    type: "vpc",
+    CidrBlock: "10.0.1.0/24",
+    Tags: [{Name: `VPC${i}`}]
+  })
+}
+
+terminateAllVpcsWithoutDependencies()
+
+// ------------------
+
+
+// const mainVpc = await awsProvider.createResource({
+//   type: 'vpc',
+//   CidrBlock: '10.0.1.0/24',
+// });
 
 // Deletes VPC right after it is created
-//await awsProvider.terminateResource({
+// await awsProvider.terminateResource({
 //  type: 'vpc',
-//  instanceId: mainVpc.Vpc.VpcId
-//})
+//  instanceId: mainVpc
+// })
 
-const publicSubnet = await awsProvider.createResource({
-  type: 'subnet',
-  VpcId: mainVpc,
-  CidrBlock: '10.0.1.1/24'
-});
+// const publicSubnet = await awsProvider.createResource({
+//   type: 'subnet',
+//   VpcId: mainVpc,
+//   CidrBlock: '10.0.1.1/24'
+// });
 
 // Creating an instance
 
-const newInstance = await awsProvider.createResource({
-  type: 'instance',
-  SubnetId: publicSubnet,
-  MinCount: 1,
-  MaxCount: 1,
-  ImageId: 'ami-0766b4b472db7e3b9'
-});
+// const newInstance = await awsProvider.createResource({
+//   type: 'instance',
+//   SubnetId: publicSubnet,
+//   MinCount: 1,
+//   MaxCount: 1,
+//   ImageId: 'ami-0766b4b472db7e3b9'
+// });
 
-await awsProvider.terminateResource({
-  type : 'instance',
-  instanceId: newInstance
-});
 
-//There must be a delay between deleting instance and deleting subnet or you will get a dependency error
-setTimeout(async () => {
-  await awsProvider.terminateResource({
-    type: 'subnet',
-    instanceId: publicSubnet
-  });
-
-  // Deletes VPC right after it is created
-  await awsProvider.terminateResource({
-    type: 'vpc',
-    instanceId: mainVpc
-  });
-}, 10000); // 10 seconds delay
 
 // Describing testing //
 
@@ -88,3 +85,32 @@ await awsProvider.createResource({
   type: 'instance',
 });
 */
+
+async function terminateAllVpcsWithoutDependencies() {
+  try {
+    const allInstances = await awsProvider.describeResources({ type: 'vpc' });
+
+      const terminationPromises = allInstances.Vpcs.map(async (vpc) => {
+        const id = vpc.VpcId;
+        console.log(`Terminating VPC ${id}...`);
+
+        try {
+          await awsProvider.terminateResource({
+            type: 'vpc',
+            instanceId: id,
+          });
+
+          console.log(`Termination request for VPC ${id} submitted.`);
+        } catch (error) {
+          console.error(`Failed to terminate VPC ${id}. It might have a dependecy`);
+        }
+      });
+
+      // Wait for all termination promises to be fulfilled
+      await Promise.all(terminationPromises);
+
+      console.log('All termination requests completed.');
+  } catch (error) {
+    console.error('Error fetching VPCs:', error);
+  }
+}
