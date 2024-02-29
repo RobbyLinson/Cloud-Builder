@@ -10,6 +10,7 @@ import fs from 'fs';
 //const yargs = require('yargs/yargs');
 //const { hideBin } = require('yargs/helpers');
 //const { exec } = require('child_process');
+import { region, accessKeyId, secretAccessKey } from '../credentials.js'; // temporary
 
 //make logo
 
@@ -27,6 +28,13 @@ console.log("Welcome to cloud builder");
 
 console.log("\n commands:\n greet-Cli  greet yourNameHere       Gives you a little greeting!")
 console.log("greet-Cli run testFileNameHere                  Runs given file.")
+
+// Temporary: load hardcoded provider credentials file
+const awsProvider = await providerAws({
+	region: region,
+	accessKeyId: accessKeyId,
+	secretAccessKey: secretAccessKey
+});
 
 // Use yargs to define commands and their callbacks
 yargs(hideBin(process.argv))
@@ -63,23 +71,6 @@ yargs(hideBin(process.argv))
       }
     })
     .parse();
-
-    // NEEDS CONNECTION TO TERRAFORM TO WORK !!!
-//  yargs(hideBin(process.argv))
-//    .command('create', 'Provision infrastructure using Terraform', () => {
-//      console.log("Starting 'terraform apply' to provision infrastructure...");
-//      // Replace '/path' with the actual path to terraform config files
-//      execSync('terraform apply', { cwd: '/path' }, (err, stdout, stderr) => {
-//        if (err) {
-//          console.error('Error running terraform apply:', err);
-//          return;
-//        }
-//        // Success
-//       console.log(stdout);
-//        console.error(stderr);
-//      });
-//    })
-//    .parse();
   
 // Updated 'create' command to use providerAws.createResource
 yargs(hideBin(process.argv))
@@ -102,7 +93,7 @@ yargs(hideBin(process.argv))
       return acc;
     }, {});
 
-    const result = await providerAws.createResource({
+    const result = await awsProvider.createResource({
       type: argv.type,
       name: argv.name,
       ...options
