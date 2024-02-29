@@ -124,9 +124,9 @@ async function main(){
             duplicateArr[i+1]=duplicateArr[i+1] + arr[i];
         }
         const outputString = duplicateArr.join("\n");
-        await wrtieFileAsync(awsFilePath+"credentials.ini",outputString);
-        const stringToConfig="[default]\nregion=eu-west-1\noutput=json";
-        await wrtieFileAsync(awsFilePath+"config.ini",stringToConfig);
+        await wrtieFileAsync(awsFilePath+"credentials",outputString);
+        const stringToConfig="[default]\nregion=eu-west-1";
+        await wrtieFileAsync(awsFilePath+"config",stringToConfig);
     } catch {
         console.error("problem");
     }
@@ -166,11 +166,11 @@ async function checkAndPopulate()
                 let cred = false;
                 for(const val of filesInAWS)
                 {
-                    if(val == 'credentials.ini')
+                    if(val == 'credentials')
                     {
                         cred = true;
                     }
-                    else if (val == 'config.ini')
+                    else if (val == 'config')
                     {
                         config=true;
                     }
