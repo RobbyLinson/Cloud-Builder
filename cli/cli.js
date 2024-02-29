@@ -156,8 +156,9 @@ yargs(hideBin(process.argv))
 
         // Get the instanceId from the map based on the name
         const instanceId = currentInstances.get(argv.name);
-		const type = instanceId.split("-")[0];
-
+		let type = instanceId.split("-")[0];
+		if (type === "i") type = "instance";
+		
         // Call awsProvider.terminateResource to destroy the AWS resource
         const result = await awsProvider.terminateResource({
           type: type,
