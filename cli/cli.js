@@ -119,6 +119,69 @@ yargs(hideBin(process.argv))
 
 
 
+//destroy method
+//takes user inputted name, searches instances.json's map for the key then returns the value(the id)
+
+
+//to test i reccomend using create to create a resource, see instances.json to see the the mapped values and then call delete on the name
+//of the value you made
+
+//currently just manually plugged in vpc for the type , as that was the last state destroy was working for me( i was trying to implement a switch case
+//for the other types)
+
+
+
+const filename = 'cli\\instances.json';  //it'll make this file for you if it isnt there.
+
+yargs(hideBin(process.argv))
+  .command('Destroy <name>', 'Destroy AWS resource', (yargs)=> {
+    yargs.positional('name', {
+      describe: 'Name of resource to destroy (e.g., vpc, subnet, instance)',
+      type: 'string'
+    })
+  }, async (argv) => {
+    try {
+      // Read the map from file to get the instanceId
+      readMapFromFile(filename, async (err, currentInstances) => {
+        if (err) {
+          console.error('Error reading map from file:', err);
+          return;
+        }
+
+        // Check if the provided name exists in the map
+        if (!currentInstances.has(argv.name)) {
+          console.error(`Resource with name '${argv.name}' not found.`);
+          return;
+        }
+
+        // Get the instanceId from the map based on the name
+        const instanceId = currentInstances.get(argv.name);
+
+        // Call awsProvider.terminateResource to destroy the AWS resource
+        const result = await awsProvider.terminateResource({
+          type: 'vpc', // You might want to change this to the actual type
+          instanceId: instanceId
+        });
+
+        console.log('Resource destruction result:', result);
+
+        // Remove the entry from the map after destroying the resource
+        currentInstances.delete(argv.name);
+
+        // Write the updated map back to the file
+        writeMapToFile(currentInstances, filename);
+      });
+      
+    } catch (error) {
+      console.error('Error destroying resource:', error.message);
+    }
+  })
+  .parse();
+
+
+
+
+
 
 // Function to read map data from file
 function readMapFromFile(filename, callback) {
@@ -173,8 +236,7 @@ function writeMapToFile(map, filename) {
   });
 }
 
-// create instances file
-const filename = 'cli\\instanceIDS.json';
+
 
 // Read the map from file or create a new one if file doesn't exist
 readMapFromFile(filename, (err, currentInstances) => {
