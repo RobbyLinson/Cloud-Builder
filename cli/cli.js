@@ -20,7 +20,7 @@ console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|
 
 
 
-console.log("Welcome to cloud builder");
+console.log("Welcome to Cloud Builder");
 
 console.log("\n commands:\n greet-Cli  greet yourNameHere       Gives you a little greeting!")
 console.log("greet-Cli run testFileNameHere                  Runs given file.")
@@ -70,29 +70,29 @@ yargs(hideBin(process.argv))
   
 //Updated 'create' command to use providerAws.createResource
 yargs(hideBin(process.argv))
-.command('create <type> <name> [options]', 'Create AWS resource', (yargs) => {
+.command('create <type> <name> [options..]', 'Create AWS resource', (yargs) => {
   yargs.positional('type', {
     describe: 'Type of resource to create (e.g., vpc, subnet, instance)',
     type: 'string'
   }).positional('name', {
     describe: 'Name for the resource',
     type: 'string'
-  }).option('options', {
+  }).options('options', {
     describe: 'Additional options in key=value format',
     type: 'array'
   });
 }, async (argv) => {
   try {
-    const options = argv.options.reduce((acc, option) => {
-      const [key, value] = option.split('=');
-      acc[key] = value;
-      return acc;
-    }, {});
-
+	var split_options = {};
+    argv.options.forEach((opt) => {
+      const [key, value] = opt.split('=');
+      split_options[key] = value;
+    });
+	console.log(split_options);
     const result = await awsProvider.createResource({
       type: argv.type,
       name: argv.name,
-      ...options
+      ...split_options
     });
 
     console.log('Resource creation result:', result);
@@ -165,7 +165,7 @@ yargs(hideBin(process.argv))
           instanceId: instanceId
         });
 
-        console.log('Resource deletion result:', result);
+        //console.log('Resource deletion result:', result);
 
         // Remove the entry from the map after destroying the resource
         currentInstances.delete(argv.name);
