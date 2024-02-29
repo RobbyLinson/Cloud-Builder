@@ -134,9 +134,9 @@ yargs(hideBin(process.argv))
 const filename = 'cli\\instances.json';  //it'll make this file for you if it isnt there.
 
 yargs(hideBin(process.argv))
-  .command('Destroy <name>', 'Destroy AWS resource', (yargs)=> {
+  .command('delete <name>', 'Delete AWS resource', (yargs)=> {
     yargs.positional('name', {
-      describe: 'Name of resource to destroy (e.g., vpc, subnet, instance)',
+      describe: 'Name of resource to delete (e.g., vpc, subnet, instance)',
       type: 'string'
     })
   }, async (argv) => {
@@ -156,14 +156,15 @@ yargs(hideBin(process.argv))
 
         // Get the instanceId from the map based on the name
         const instanceId = currentInstances.get(argv.name);
+		const type = instanceId.split("-")[0];
 
         // Call awsProvider.terminateResource to destroy the AWS resource
         const result = await awsProvider.terminateResource({
-          type: 'vpc', // You might want to change this to the actual type
+          type: type,
           instanceId: instanceId
         });
 
-        console.log('Resource destruction result:', result);
+        console.log('Resource deletion result:', result);
 
         // Remove the entry from the map after destroying the resource
         currentInstances.delete(argv.name);
@@ -173,7 +174,7 @@ yargs(hideBin(process.argv))
       });
       
     } catch (error) {
-      console.error('Error destroying resource:', error.message);
+      console.error('Error deleting resource:', error.message);
     }
   })
   .parse();
