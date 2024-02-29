@@ -22,12 +22,12 @@ console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|
 
 
 
-console.log("Welcome to Cloud Builder");
+console.log("Welcome to Cloud-Builder");
 
-console.log("\ncommands:\ncloud-builder greet <name>           Gives you a little greeting!")
-console.log("cloud-builder run <file name>        Runs given file.");
-console.log("cloud-builder create <type> <name>   creates aws resource of given type");
-console.log("cloud-builder destroy <name>         destroys aws resource of given name \n");
+console.log("\nCommands:\ncloud-builder greet <name>           Gives you a little greeting!")
+console.log("cloud-builder run <file name>        Runs given builder script.");
+console.log("cloud-builder create <type> <name>   Creates aws resource of given type.");
+console.log("cloud-builder delete <name>          Deletes aws resource of given name.\n");
 
 const filePath = os.homedir();
 // console.log(filePath + " and the opereating system is "+ os.type());
