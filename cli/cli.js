@@ -6,10 +6,6 @@ import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
 import fs from 'fs';
-//const boxen = require('boxen');
-//const yargs = require('yargs/yargs');
-//const { hideBin } = require('yargs/helpers');
-//const { exec } = require('child_process');
 import { region, accessKeyId, secretAccessKey } from '../credentials.js'; // temporary
 
 //make logo
@@ -72,7 +68,7 @@ yargs(hideBin(process.argv))
     })
     .parse();
   
-// Updated 'create' command to use providerAws.createResource
+//Updated 'create' command to use providerAws.createResource
 yargs(hideBin(process.argv))
 .command('create <type> <name> [options]', 'Create AWS resource', (yargs) => {
   yargs.positional('type', {
@@ -100,11 +96,106 @@ yargs(hideBin(process.argv))
     });
 
     console.log('Resource creation result:', result);
+    
+      // Read the map from file or create a new one if file doesn't exist
+      readMapFromFile(filename, (err, currentInstances) => {
+        if (err) {
+          console.error('Error reading map from file:', err);
+          return;
+        }
+
+        // Add/update data in the map based on user input
+        currentInstances.set(argv.name, result);
+
+        // Write the updated map back to the file
+        writeMapToFile(currentInstances, filename);
+      });
+    
   } catch (error) {
     console.error('Error creating resource:', error.message);
   }
 })
 .parse();
+
+
+
+
+// Function to read map data from file
+function readMapFromFile(filename, callback) {
+  fs.readFile(filename, 'utf8', (err, data) => {
+    if (err) {
+      if (err.code === 'ENOENT') {
+        console.log('Instances file not found. Creating new file.');
+        return callback(null, new Map()); // Return a new Map if file doesn't exist
+      } else {
+        console.error('Error reading instances file:', err);
+        return callback(err, null);
+      }
+    }
+    try {
+      // If file exists but is empty, return an empty Map
+      if (!data) {
+        return callback(null, new Map());
+      }
+
+      const parsedData = JSON.parse(data);
+      // Convert object to a Map
+      const objectToMap = new Map();
+      for (let key in parsedData) {
+        objectToMap.set(key, parsedData[key]);
+      }
+      callback(null, objectToMap);
+    } catch (error) {
+      console.error('Error parsing JSON:', error);
+      callback(error, null);
+    }
+  });
+}
+
+// Function to write map data to file
+function writeMapToFile(map, filename) {
+  // Convert map to a regular object (key-value pairs)
+  const mapToObject = {};
+  for (let [key, value] of map) {
+    mapToObject[key] = value;
+  }
+
+  // Convert object to JSON
+  const jsonData = JSON.stringify(mapToObject, null, 2);
+
+  // Write data to a file
+  fs.writeFile(filename, jsonData, (err) => {
+    if (err) {
+      console.error('Error writing file:', err);
+      return;
+    }
+    console.log('Map data has been written to', filename);
+  });
+}
+
+// create instances file
+const filename = 'cli\\instanceIDS.json';
+
+// Read the map from file or create a new one if file doesn't exist
+readMapFromFile(filename, (err, currentInstances) => {
+  if (err) {
+    console.error('Error reading map from file:', err);
+    return;
+  }
+
+  // Add/update data in the map based on user input
+
+  // Write the updated map back to the file
+  writeMapToFile(currentInstances, filename);
+});
+
+
+
+
+
+
+
+
 
 
 
