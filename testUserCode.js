@@ -17,36 +17,51 @@ const mainVpc = await awsProvider.createResource({
 console.log(mainVpc.Vpc)
 
 // Deletes VPC right after it is created
-awsProvider.terminateResource({
-  type: 'vpc',
-  instanceId: mainVpc.Vpc.VpcId
-})
+//await awsProvider.terminateResource({
+//  type: 'vpc',
+//  instanceId: mainVpc.Vpc.VpcId
+//})
 
-// const publicSubnet = await awsProvider.createResource({
-//   type: 'subnet',
-//   VpcId: mainVpc.Vpc.VpcId,
-//   CidrBlock: '10.0.1.1/24'
-// });
-
-// Reading some metadata for testing.
-// console.log(publicSubnet.Vpc);
+const publicSubnet = await awsProvider.createResource({
+  type: 'subnet',
+  VpcId: mainVpc,
+  CidrBlock: '10.0.1.1/24'
+});
 
 // Creating an instance
-/*
+
 const newInstance = await awsProvider.createResource({
   type: 'instance',
-  SubnetId: publicSubnet.Subnet.SubnetId,
+  SubnetId: publicSubnet,
   MinCount: 1,
   MaxCount: 1,
   ImageId: 'ami-0766b4b472db7e3b9'
 });
-*/
+
+await awsProvider.terminateResource({
+  type : 'instance',
+  instanceId: newInstance
+});
+
+//There must be a delay between deleting instance and deleting subnet or you will get a dependency error
+setTimeout(async () => {
+  await awsProvider.terminateResource({
+    type: 'subnet',
+    instanceId: publicSubnet
+  });
+
+  // Deletes VPC right after it is created
+  await awsProvider.terminateResource({
+    type: 'vpc',
+    instanceId: mainVpc
+  });
+}, 10000); // 10 seconds delay
 
 // Describing testing //
 
 // // Describe a VPC
 // const vpcDescription = await awsProvider.describeResources({
-// 	type: 'vpc', resourceIds: [mainVpc.Vpc.VpcId]
+// 	type: 'vpc', resourceIds: [mainVpc]
 // });
 
 // // Read some VPC info after describing.
@@ -55,9 +70,21 @@ const newInstance = await awsProvider.createResource({
 
 // // Describe a Subnet
 // const subnetDescription = await awsProvider.describeResources({
-// 	type: 'subnet', resourceIds: [publicSubnet.Subnet.SubnetId]
+// 	type: 'subnet', resourceIds: [publicSubnet]
 // });	
 
 // // Read some Subnet info after describing.
 // console.log(subnetDescription.Subnets[0].CidrBlock);
 
+// Sending some requests with missing parameters to check error handling.
+/*
+await awsProvider.createResource({
+  type: 'vpc',
+});
+await awsProvider.createResource({
+  type: 'subnet',
+});
+await awsProvider.createResource({
+  type: 'instance',
+});
+*/
