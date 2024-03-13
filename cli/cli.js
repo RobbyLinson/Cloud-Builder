@@ -8,6 +8,8 @@ import chalk from 'chalk';
 import fs from 'fs';
 import os from 'os';
 import read from 'readline';
+import { execSync } from 'child_process';
+const filename = 'cli\\instances.json';  //it'll make this file for you if it isnt there.
 
 import { region, accessKeyId, secretAccessKey } from '../credentials.js'; // temporary, replace this asap
 //make logo
@@ -52,29 +54,109 @@ yargs(hideBin(process.argv))
   }, (argv) => {
     console.log(`Hello, ${argv.name}!`);
   })
-  .parse();
-
-  import { execSync } from 'child_process';
-  
-  
-
-  //run test file command 
-  // Define the yargs command
-  yargs(hideBin(process.argv))
-    .command('run <file>', 'execute a JavaScript file', (yargs) => {
-      return yargs.positional('file', {
-        describe: 'executes js file',
-        type: 'string'
+  .command('run <file>', 'execute a JavaScript file', (yargs) => {
+    return yargs.positional('file', {
+      describe: 'executes js file',
+      type: 'string'
+    });
+  }, (argv) => {
+    // Execute the provided JavaScript file
+    try {
+      execSync(`node ${argv.file}`, { stdio: 'inherit' });
+    } catch (error) {
+      console.error(error.message);
+    }
+  })
+  .command('create <type> <name> [options..]', 'Create AWS resource', (yargs) => {
+    yargs.positional('type', {
+      describe: 'Type of resource to create (e.g., vpc, subnet, instance)',
+      type: 'string'
+    }).positional('name', {
+      describe: 'Name for the resource',
+      type: 'string'
+    }).options('options', {
+      describe: 'Additional options in key=value format',
+      type: 'array'
+    });
+  }, async (argv) => {
+    try {
+    var split_options = {};
+      argv.options.forEach((opt) => {
+        const [key, value] = opt.split('=');
+        split_options[key] = value;
       });
-    }, (argv) => {
-      // Execute the provided JavaScript file
-      try {
-        execSync(`node ${argv.file}`, { stdio: 'inherit' });
-      } catch (error) {
-        console.error(error.message);
-      }
+    console.log(split_options);
+      const result = await awsProvider.createResource({
+        type: argv.type,
+        Tags: [{Name: argv.name}],
+        ...split_options
+      });
+  
+      console.log('Resource creation result:', result);
+      
+        // Read the map from file or create a new one if file doesn't exist
+        readMapFromFile(filename, (err, currentInstances) => {
+          if (err) {
+            console.error('Error reading map from file:', err);
+            return;
+          }
+  
+          // Add/update data in the map based on user input
+          currentInstances.set(argv.name, result);
+  
+          // Write the updated map back to the file
+          writeMapToFile(currentInstances, filename);
+        });
+      
+    } catch (error) {
+      console.error('Error creating resource:', error.message);
+    }
+  })
+  .command('delete <name>', 'Delete AWS resource', (yargs)=> {
+    yargs.positional('name', {
+      describe: 'Name of resource to delete (e.g., vpc, subnet, instance)',
+      type: 'string'
     })
-    .parse();
+  }, async (argv) => {
+    try {
+      // Read the map from file to get the instanceId
+      readMapFromFile(filename, async (err, currentInstances) => {
+        if (err) {
+          console.error('Error reading map from file:', err);
+          return;
+        }
+
+        // Check if the provided name exists in the map
+        if (!currentInstances.has(argv.name)) {
+          console.error(`Resource with name '${argv.name}' not found.`);
+          return;
+        }
+
+        // Get the instanceId from the map based on the name
+        const instanceId = currentInstances.get(argv.name);
+		let type = instanceId.split("-")[0];
+		if (type === "i") type = "instance";
+		
+        // Call awsProvider.terminateResource to destroy the AWS resource
+        const result = await awsProvider.terminateResource({
+          type: type,
+          instanceId: instanceId
+        });
+
+        //console.log('Resource deletion result:', result);
+
+        // Remove the entry from the map after destroying the resource
+        currentInstances.delete(argv.name);
+
+        // Write the updated map back to the file
+        writeMapToFile(currentInstances, filename);
+      });
+      
+    } catch (error) {
+      console.error('Error deleting resource:', error.message);
+    }
+  })
+  .parse();
   
 function readDir(filePath,callback){
     fs.readdir(filePath,(err,file) =>{
@@ -192,117 +274,6 @@ async function checkAndPopulate()
     });
 }
 
-//Updated 'create' command to use providerAws.createResource
-yargs(hideBin(process.argv))
-.command('create <type> <name> [options..]', 'Create AWS resource', (yargs) => {
-  yargs.positional('type', {
-    describe: 'Type of resource to create (e.g., vpc, subnet, instance)',
-    type: 'string'
-  }).positional('name', {
-    describe: 'Name for the resource',
-    type: 'string'
-  }).options('options', {
-    describe: 'Additional options in key=value format',
-    type: 'array'
-  });
-}, async (argv) => {
-  try {
-	var split_options = {};
-    argv.options.forEach((opt) => {
-      const [key, value] = opt.split('=');
-      split_options[key] = value;
-    });
-	console.log(split_options);
-    const result = await awsProvider.createResource({
-      type: argv.type,
-      Tags: [{Name: argv.name}],
-      ...split_options
-    });
-
-    console.log('Resource creation result:', result);
-    
-      // Read the map from file or create a new one if file doesn't exist
-      readMapFromFile(filename, (err, currentInstances) => {
-        if (err) {
-          console.error('Error reading map from file:', err);
-          return;
-        }
-
-        // Add/update data in the map based on user input
-        currentInstances.set(argv.name, result);
-
-        // Write the updated map back to the file
-        writeMapToFile(currentInstances, filename);
-      });
-    
-  } catch (error) {
-    console.error('Error creating resource:', error.message);
-  }
-})
-.parse();
-
-
-
-//destroy method
-//takes user inputted name, searches instances.json's map for the key then returns the value(the id)
-
-
-//to test i reccomend using create to create a resource, see instances.json to see the the mapped values and then call delete on the name
-//of the value you made
-
-//currently just manually plugged in vpc for the type , as that was the last state destroy was working for me( i was trying to implement a switch case
-//for the other types)
-
-
-
-const filename = 'cli\\instances.json';  //it'll make this file for you if it isnt there.
-
-yargs(hideBin(process.argv))
-  .command('delete <name>', 'Delete AWS resource', (yargs)=> {
-    yargs.positional('name', {
-      describe: 'Name of resource to delete (e.g., vpc, subnet, instance)',
-      type: 'string'
-    })
-  }, async (argv) => {
-    try {
-      // Read the map from file to get the instanceId
-      readMapFromFile(filename, async (err, currentInstances) => {
-        if (err) {
-          console.error('Error reading map from file:', err);
-          return;
-        }
-
-        // Check if the provided name exists in the map
-        if (!currentInstances.has(argv.name)) {
-          console.error(`Resource with name '${argv.name}' not found.`);
-          return;
-        }
-
-        // Get the instanceId from the map based on the name
-        const instanceId = currentInstances.get(argv.name);
-		let type = instanceId.split("-")[0];
-		if (type === "i") type = "instance";
-		
-        // Call awsProvider.terminateResource to destroy the AWS resource
-        const result = await awsProvider.terminateResource({
-          type: type,
-          instanceId: instanceId
-        });
-
-        //console.log('Resource deletion result:', result);
-
-        // Remove the entry from the map after destroying the resource
-        currentInstances.delete(argv.name);
-
-        // Write the updated map back to the file
-        writeMapToFile(currentInstances, filename);
-      });
-      
-    } catch (error) {
-      console.error('Error deleting resource:', error.message);
-    }
-  })
-  .parse();
 
 
 
@@ -378,3 +349,132 @@ readMapFromFile(filename, (err, currentInstances) => {
 });
 
 
+ //run test file command 
+  // Define the yargs command
+  // yargs(hideBin(process.argv))
+  //   .command('run <file>', 'execute a JavaScript file', (yargs) => {
+  //     return yargs.positional('file', {
+  //       describe: 'executes js file',
+  //       type: 'string'
+  //     });
+  //   }, (argv) => {
+  //     // Execute the provided JavaScript file
+  //     try {
+  //       execSync(`node ${argv.file}`, { stdio: 'inherit' });
+  //     } catch (error) {
+  //       console.error(error.message);
+  //     }
+  //   })
+  //   .parse();
+
+  //Updated 'create' command to use providerAws.createResource
+// yargs(hideBin(process.argv))
+// .command('create <type> <name> [options..]', 'Create AWS resource', (yargs) => {
+//   yargs.positional('type', {
+//     describe: 'Type of resource to create (e.g., vpc, subnet, instance)',
+//     type: 'string'
+//   }).positional('name', {
+//     describe: 'Name for the resource',
+//     type: 'string'
+//   }).options('options', {
+//     describe: 'Additional options in key=value format',
+//     type: 'array'
+//   });
+// }, async (argv) => {
+//   try {
+// 	var split_options = {};
+//     argv.options.forEach((opt) => {
+//       const [key, value] = opt.split('=');
+//       split_options[key] = value;
+//     });
+// 	console.log(split_options);
+//     const result = await awsProvider.createResource({
+//       type: argv.type,
+//       Tags: [{Name: argv.name}],
+//       ...split_options
+//     });
+
+//     console.log('Resource creation result:', result);
+    
+//       // Read the map from file or create a new one if file doesn't exist
+//       readMapFromFile(filename, (err, currentInstances) => {
+//         if (err) {
+//           console.error('Error reading map from file:', err);
+//           return;
+//         }
+
+//         // Add/update data in the map based on user input
+//         currentInstances.set(argv.name, result);
+
+//         // Write the updated map back to the file
+//         writeMapToFile(currentInstances, filename);
+//       });
+    
+//   } catch (error) {
+//     console.error('Error creating resource:', error.message);
+//   }
+// })
+// .parse();
+
+
+
+//destroy method
+//takes user inputted name, searches instances.json's map for the key then returns the value(the id)
+
+
+//to test i reccomend using create to create a resource, see instances.json to see the the mapped values and then call delete on the name
+//of the value you made
+
+//currently just manually plugged in vpc for the type , as that was the last state destroy was working for me( i was trying to implement a switch case
+//for the other types)
+
+
+
+
+
+// yargs(hideBin(process.argv))
+//   .command('delete <name>', 'Delete AWS resource', (yargs)=> {
+//     yargs.positional('name', {
+//       describe: 'Name of resource to delete (e.g., vpc, subnet, instance)',
+//       type: 'string'
+//     })
+//   }, async (argv) => {
+//     try {
+//       // Read the map from file to get the instanceId
+//       readMapFromFile(filename, async (err, currentInstances) => {
+//         if (err) {
+//           console.error('Error reading map from file:', err);
+//           return;
+//         }
+
+//         // Check if the provided name exists in the map
+//         if (!currentInstances.has(argv.name)) {
+//           console.error(`Resource with name '${argv.name}' not found.`);
+//           return;
+//         }
+
+//         // Get the instanceId from the map based on the name
+//         const instanceId = currentInstances.get(argv.name);
+// 		let type = instanceId.split("-")[0];
+// 		if (type === "i") type = "instance";
+		
+//         // Call awsProvider.terminateResource to destroy the AWS resource
+//         const result = await awsProvider.terminateResource({
+//           type: type,
+//           instanceId: instanceId
+//         });
+
+//         //console.log('Resource deletion result:', result);
+
+//         // Remove the entry from the map after destroying the resource
+//         currentInstances.delete(argv.name);
+
+//         // Write the updated map back to the file
+//         writeMapToFile(currentInstances, filename);
+//       });
+      
+//     } catch (error) {
+//       console.error('Error deleting resource:', error.message);
+//     }
+//   })
+//   .parse();
