@@ -12,13 +12,18 @@ const awsProvider = await providerAws({
 // ------------------
 // Scenario 1
 
-// for (let i = 0; i < 4; i++){
-//   await awsProvider.createResource({
-//     type: "vpc",
-//     CidrBlock: "10.0.1.0/24",
-//     Tags: [{Name: `VPC${i}`}]
-//   })
-// }
+for (let i = 0; i < 1; i++){
+  const vpc = await awsProvider.createResource({
+    type: "vpc",
+    CidrBlock: "10.0.1.0/24",
+    Name: `VPC${i}`
+  });
+  const vpcDescription = await awsProvider.describeResources({
+    type: 'vpc',
+    resoureIds: [vpc]
+  });
+  console.log(vpcDescription);
+}
 
 // terminateAllVpcsWithoutDependencies()
 

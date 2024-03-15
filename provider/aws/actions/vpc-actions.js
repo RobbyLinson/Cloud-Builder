@@ -3,7 +3,6 @@ import { validateVPCOptions } from "../validation/validationVPC.js"
 
 // Creates a new VPC
 export async function createVpc(ec2Client, {
-	name,
 	...options
 }) {
 	const validatedOptions = await validateVPCOptions(options);
@@ -11,7 +10,7 @@ export async function createVpc(ec2Client, {
 	try {
 		const response = await ec2Client.send(command)
 
-		await console.log(`✅ Instance with ID ${response.Vpc.vpcId} created.\n`);
+		if (response) {console.log(`✅ Instance with ID ${response.Vpc.vpcId} created.\n`);}
 		return response.Vpc.VpcId;
 	} catch (err) {
 		console.warn(`Failed to create VPC.`, err);

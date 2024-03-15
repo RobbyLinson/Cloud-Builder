@@ -54,23 +54,19 @@ async function providerAws({
 
 	async function createResource({
 		type,
-		name,
 		...options
 	}) {
 		switch (type) {
 		case 'vpc':
 			return createVpc(ec2Client, {
-				name,
 				...options
 			});
 		case 'subnet':
 			return createSubnet(ec2Client, {
-				name,
 				...options
 			});
 		case 'instance':
 			return createInstance(ec2Client, {
-				name,
 				...options
 			});
 		default:
