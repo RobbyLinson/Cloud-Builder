@@ -26,10 +26,12 @@ console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|
 
 console.log("Welcome to Cloud-Builder");
 
-console.log("\nCommands:\ncloud-builder greet <name>           Gives you a little greeting!")
-console.log("cloud-builder run <file name>        Runs given builder script.");
-console.log("cloud-builder create <type> <name>   Creates aws resource of given type.");
-console.log("cloud-builder delete <name>          Deletes aws resource of given name.\n");
+// console.log("\nCommands:\ncloud-builder greet <name>           Gives you a little greeting!")
+// console.log("cloud-builder run <file name>        Runs given builder script.");
+// console.log("cloud-builder create <type> <name>   Creates aws resource of given type.");
+// console.log("cloud-builder delete <name>          Deletes aws resource of given name.\n");
+
+console.log("clb help     for list of commands!");
 
 const filePath = os.homedir();
 // console.log(filePath + " and the opereating system is "+ os.type());
@@ -44,7 +46,7 @@ const awsProvider = await providerAws({
 
 // Use yargs to define commands and their callbacks
 yargs(hideBin(process.argv))
-  .command('greet [name]', 'greet a user by name', (yargs) => {
+  .command('greet <name>', 'greet a user by name', (yargs) => {
     console.clear();
     return yargs.positional('name', {
       describe: 'name to greet',
@@ -54,7 +56,7 @@ yargs(hideBin(process.argv))
   }, (argv) => {
     console.log(`Hello, ${argv.name}!`);
   })
-  .command('run <file>', 'execute a JavaScript file', (yargs) => {
+  .command('run <file>', 'executes a JavaScript file', (yargs) => {
     return yargs.positional('file', {
       describe: 'executes js file',
       type: 'string'
@@ -112,7 +114,7 @@ yargs(hideBin(process.argv))
       console.error('Error creating resource:', error.message);
     }
   })
-  .command('delete <name>', 'Delete AWS resource', (yargs)=> {
+  .command('delete <name>', 'Deletes AWS resource', (yargs)=> {
     yargs.positional('name', {
       describe: 'Name of resource to delete (e.g., vpc, subnet, instance)',
       type: 'string'
