@@ -25,6 +25,35 @@ export async function describeInstances(ec2Client, instanceIds) {
 	}
 }
 
+export async function getInstanceState(ec2Client, instanceId) {
+	const command = new DescribeInstancesCommand({
+	  InstanceIds: [instanceId],
+	});
+  
+	try {
+	  const response = await ec2Client.send(command);
+  
+	  if (response.Reservations && response.Reservations.length > 0) {
+		for (const reservation of response.Reservations) {
+		  for (const instance of reservation.Instances) {
+			const currentInstanceId = instance.InstanceId;
+			const state = instance.State.Name;
+  
+			if (currentInstanceId === instanceId) {
+			  return state;
+			}
+		  }
+		}
+	  }
+  
+	  // If instance not found or no instances in the response, return null
+	  return null;
+	} catch (err) {
+	  console.error(`Failed to describe instances.`, err);
+	  throw err;
+	}
+  }
+
 // Deletes an instance, there must be a delay between deleting instance and subnet or you will
 // get a dependency error
 export async function deleteInstance(ec2Client,instanceId) {      
@@ -34,8 +63,16 @@ export async function deleteInstance(ec2Client,instanceId) {
   });
 
   try {
-      await ec2Client.send(command);
-    console.log(`🧹 Instance with ID ${instanceId} terminated.\n`);
+    await ec2Client.send(command);
+	
+	let currentState = await getInstanceState(ec2Client, instanceId);
+	while (currentState !== "terminated") {
+		console.log(`Waiting for instance ${instanceId} to reach terminated state...`);
+		await new Promise((resolve) => setTimeout(resolve, 5000)); // 5 seconds delay  
+		currentState = await getInstanceState(ec2Client, instanceId);
+	}
+    
+	console.log(`\n🧹 Instance with ID ${instanceId} terminated.\n`);
   } catch (err) {
     console.warn(`Failed to terminate instance ${instanceId}.`, err);
   }
