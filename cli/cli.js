@@ -88,7 +88,7 @@ yargs(hideBin(process.argv))
     console.log(split_options);
       const result = await awsProvider.createResource({
         type: argv.type,
-        Tags: [{Name: argv.name}],
+        Name: argv.name,
         ...split_options
       });
   
