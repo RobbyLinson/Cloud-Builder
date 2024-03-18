@@ -9,6 +9,8 @@ export async function createSubnet(ec2Client, {
 	const command = new CreateSubnetCommand(options);
 	try {
 		const response = await ec2Client.send(command);
+		
+		if (response) {console.log(`✅ Subnet with ID ${response.Subnet.SubnetId} created.\n`);}
 		return response.Subnet.SubnetId;
 	} catch (err) {
 		console.warn(`Failed to create subnet.`, err);
