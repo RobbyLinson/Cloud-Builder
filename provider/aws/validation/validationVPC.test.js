@@ -11,16 +11,16 @@ test("Returns input back if successful", () => {
         "AmazonProvidedIpv6CidrBlock": true,
         "CidrBlock": "172.0.0.0",
         "Name": "abc123",
-        "TagSpecifications": Array [
-             Object {
+        "TagSpecifications": [
+            {
                "ResourceType": "vpc",
-               "Tags": Array [
-                    Object {
+               "Tags": [
+                    {
                        "Key": "Name",
-                       "Value": "abc123",
+                       "Value": "abc123"
                     },
                 ],
-             },
-         ],
+            },
+        ],
     });
 })
