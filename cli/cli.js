@@ -33,7 +33,7 @@ console.log("cloud-builder delete <name>          Deletes aws resource of given 
 
 const filePath = os.homedir();
 // console.log(filePath + " and the opereating system is "+ os.type());
-checkAndPopulate();
+checkAwsFolder();
 
 // Temporary: load hardcoded provider credentials file
 const awsProvider = await providerAws({
@@ -162,7 +162,7 @@ function readDir(filePath,callback){
     fs.readdir(filePath,(err,file) =>{
         if(err)
         {
-            console.error("error occured",err)
+            console.error("Error while reading directory: ",err)
             callback([]);
         }
         callback(file);
@@ -192,7 +192,7 @@ async function createObjectForIni (){
 }
 
 
-async function wrtieFileAsync(path,data){
+async function writeFileAsync(path,data){
     return new Promise((resolve,reject)=>{
         fs.writeFile(path,data,(err)=>{
             if(err){
@@ -204,7 +204,7 @@ async function wrtieFileAsync(path,data){
     });
 }
 
-async function main(){
+async function populateAwsFolder(){
     try{
         const arr= await createObjectForIni();
         const awsFilePath =filePath+(os.type()==='Windows_NT' ? "\\.aws\\" : "/.aws/"); //what os type
@@ -214,17 +214,17 @@ async function main(){
             duplicateArr[i+1]=duplicateArr[i+1] + arr[i];
         }
         const outputString = duplicateArr.join("\n");
-        await wrtieFileAsync(awsFilePath+"credentials",outputString);
+        await writeFileAsync(awsFilePath+"credentials",outputString);
         const stringToConfig="[default]\nregion=eu-west-1";
-        await wrtieFileAsync(awsFilePath+"config",stringToConfig);
+        await writeFileAsync(awsFilePath+"config",stringToConfig);
     } catch {
-        console.error("problem");
+        console.error("Error while populating AWS folder.");
     }
 }
 
-function createAwsFoulder(){
-    const creationOfFoldier = filePath+(os.type()==='Windows_NT' ? "\\.aws" : "/.aws");
-    fs.mkdir(creationOfFoldier,(err)=>{
+function createAwsFolder(){
+    const folderPath = filePath+(os.type()==='Windows_NT' ? "\\.aws" : "/.aws");
+    fs.mkdir(folderPath,(err)=>{
         if(err)
         {
             return console.error(err);
@@ -232,7 +232,7 @@ function createAwsFoulder(){
     });
 }
 
-async function checkAndPopulate()
+async function checkAwsFolder()
 { 
     readDir(filePath,function(files){
         let exists = false;
@@ -245,16 +245,16 @@ async function checkAndPopulate()
         }
         if(!exists)
         {
-            createAwsFoulder();
-            main();
+            createAwsFolder();
+            populateAwsFolder();
         }
         else
         {
-            const awsFouilderPath = filePath+(os.type()==='Windows_NT' ? "\\.aws" : "/.aws");
-            readDir(awsFouilderPath,function(filesInAWS){
+            const awsFolderPath = filePath + (os.type()==='Windows_NT' ? "\\.aws" : "/.aws");
+            readDir(awsFolderPath, function(filesInAWS){
                 let config = false;
                 let cred = false;
-                for(const val of filesInAWS)
+                for (const val of filesInAWS)
                 {
                     if(val == 'credentials')
                     {
@@ -262,12 +262,12 @@ async function checkAndPopulate()
                     }
                     else if (val == 'config')
                     {
-                        config=true;
+                        config = true;
                     }
                 }
                 if(!cred && !config)
                 {
-                    main();
+                    populateAwsFolder();
                 }
             });
         }
@@ -334,7 +334,7 @@ function writeMapToFile(map, filename) {
 }
 
 
-
+/*
 // Read the map from file or create a new one if file doesn't exist
 readMapFromFile(filename, (err, currentInstances) => {
   if (err) {
@@ -347,7 +347,7 @@ readMapFromFile(filename, (err, currentInstances) => {
   // Write the updated map back to the file
   writeMapToFile(currentInstances, filename);
 });
-
+*/
 
  //run test file command 
   // Define the yargs command
