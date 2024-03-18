@@ -10,7 +10,6 @@ test("Returns input back if successful", () => {
         "DryRun": true,
         "AmazonProvidedIpv6CidrBlock": true,
         "CidrBlock": "172.0.0.0",
-        "Name": "abc123",
         "TagSpecifications": [
             {
                "ResourceType": "vpc",
