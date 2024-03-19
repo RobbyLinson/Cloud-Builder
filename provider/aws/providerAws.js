@@ -1,14 +1,16 @@
 
 
 import { EC2Client } from "@aws-sdk/client-ec2";
-import { createVpc, describeVpcs, deleteVPC } from './actions/vpc-actions.js';
+import { createVpc, describeVpcs, deleteVPC, updateVpcName } from './actions/vpc-actions.js';
 import { createSubnet, describeSubnets, deleteSubnet } from './actions/subnet-actions.js';
 import { createInstance, describeInstances, deleteInstance } from './actions/instance-actions.js';
+import { readMapFromFile, writeMapToFile } from '../../cli/state.js';
 
 async function providerAws({
 	region,
 	accessKeyId,
-	secretAccessKey
+	secretAccessKey,
+	stateFile
 }) {
 	
 	const ec2Client = new EC2Client({
@@ -37,52 +39,100 @@ async function providerAws({
 		}
 	}
 
-	async function terminateResource({type, instanceId}){
+	async function terminateResource({type, instanceId, name=""}){
 		switch (type) {
 			case 'vpc':
-				return deleteVPC(ec2Client, instanceId);
+				await deleteVPC(ec2Client, instanceId);
+				break;
 			case 'subnet':
-				return deleteSubnet(ec2Client, instanceId);
+				await deleteSubnet(ec2Client, instanceId);
+				break;
 			case 'instance':
-                return deleteInstance(ec2Client, instanceId);
+                await deleteInstance(ec2Client, instanceId);
+				break;
 			default:
 				return {
 					error: `Unknown resource type: ${type}`
 				};
 		}
 		
+		if (name !== "") {
+			readMapFromFile(stateFile, (err, currentInstances) => {
+				if (err) {
+					console.error('Error reading map from file:', err);
+					return;
+				}
+			  
+				// Add/update data in the map based on new resources
+				currentInstances.delete(name);
+			  
+				// Write the updated map back to the file
+				writeMapToFile(currentInstances, stateFile);
+			});
+		}
 	}
 
 	async function createResource({
 		type,
+		Name,
 		...options
 	}) {
+		var newId;
+		
 		switch (type) {
 		case 'vpc':
-			return createVpc(ec2Client, {
-				...options
+			newId = await createVpc(ec2Client, {
+				Name, ...options
 			});
+			break;
 		case 'subnet':
-			return createSubnet(ec2Client, {
-				...options
+			newId = await createSubnet(ec2Client, {
+				Name, ...options
 			});
+			break;
 		case 'instance':
-			return createInstance(ec2Client, {
-				...options
+			newId = await createInstance(ec2Client, {
+				Name, ...options
 			});
+			break;
 		default:
 			return {
 				error: `Unknown resource type: ${type}`
 			};
 		}
+		
+		readMapFromFile(stateFile, (err, currentInstances) => {
+			if (err) {
+				console.error('Error reading map from file:', err);
+				return;
+			}
+
+			// Add/update data in the map based on new resources
+			currentInstances.set(Name, newId);
+	  
+			// Write the updated map back to the file
+			writeMapToFile(currentInstances, stateFile);
+        });
+		return newId;
 	}
 
+	async function updateResource({
+		type,
+		id,
+		name
+	}){
+		switch (type){
+			case 'vpc':
+				return updateVpcName(ec2Client, {id, name})
+		}
+	}
 
 
 	return {
 		createResource: createResource, 
 		describeResources: describeResources,
-		terminateResource: terminateResource
+		terminateResource: terminateResource,
+		updateResource: updateResource
 	};
 }
 

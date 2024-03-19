@@ -1,4 +1,4 @@
-import { CreateVpcCommand, DescribeVpcsCommand, DeleteVpcCommand } from "@aws-sdk/client-ec2"; 
+import { CreateVpcCommand, DescribeVpcsCommand, DeleteVpcCommand, CreateTagsCommand } from "@aws-sdk/client-ec2"; 
 import { validateVPCOptions } from "../validation/validationVPC.js"
 
 // Creates a new VPC
@@ -10,10 +10,28 @@ export async function createVpc(ec2Client, {
 	try {
 		const response = await ec2Client.send(command)
 
-		if (response) {console.log(`✅ Instance with ID ${response.Vpc.vpcId} created.\n`);}
+		if (response) {console.log(`✅ VPC with ID ${response.Vpc.VpcId} created.\n`);}
 		return response.Vpc.VpcId;
 	} catch (err) {
 		console.warn(`Failed to create VPC.`, err);
+	}
+}
+
+export async function updateVpcName(ec2Client, {id, name}){
+	
+	const input = {
+        Resources: [id],
+        Tags: [{ Key: "Name", Value: name }]
+    };
+
+	// const validatedInput = await validateVPCOptions(input);
+	const command = new CreateTagsCommand(input)
+	try {
+		const response = await ec2Client.send(command);
+		return response
+
+	} catch (err) {
+		console.warn(`Failed to update VPC.`, err);
 	}
 }
 
@@ -41,8 +59,8 @@ export async function deleteVPC(ec2Client,vpcId) {
 	// 		{ client: ec2Client },
 	// 		{ InstanceIds: [instanceI] },
 	//   );
-	  console.log(`\n🧹 Instance with ID ${vpcId} terminated.\n`);
+	  console.log(`\n🧹 VPC with ID ${vpcId} terminated.\n`);
 	} catch (err) {
-	  console.warn(`Failed to terminate instance ${vpcId}.`, err);
+	  console.warn(`Failed to terminate VPC ${vpcId}.`, err);
 	}
 };

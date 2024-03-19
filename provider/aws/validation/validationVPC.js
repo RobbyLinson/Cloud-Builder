@@ -16,6 +16,7 @@ export const validateVPCOptions = ({ ...input }) => {
       "Ipv6CidrBlockNetworkBorderGroup",
       "InstanceTenancy",
       "Name",
+      "VpcId"
     ];
     
     // list of inputs which don't match any known expected input, it is also case sensitive
