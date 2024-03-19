@@ -1,7 +1,7 @@
 
 
 import { EC2Client } from "@aws-sdk/client-ec2";
-import { createVpc, describeVpcs, deleteVPC } from './actions/vpc-actions.js';
+import { createVpc, describeVpcs, deleteVPC, updateVpcName } from './actions/vpc-actions.js';
 import { createSubnet, describeSubnets, deleteSubnet } from './actions/subnet-actions.js';
 import { createInstance, describeInstances, deleteInstance } from './actions/instance-actions.js';
 import { readMapFromFile, writeMapToFile } from '../../cli/state.js';
@@ -116,12 +116,23 @@ async function providerAws({
 		return newId;
 	}
 
+	async function updateResource({
+		type,
+		id,
+		name
+	}){
+		switch (type){
+			case 'vpc':
+				return updateVpcName(ec2Client, {id, name})
+		}
+	}
 
 
 	return {
 		createResource: createResource, 
 		describeResources: describeResources,
-		terminateResource: terminateResource
+		terminateResource: terminateResource,
+		updateResource: updateResource
 	};
 }
 

@@ -1,6 +1,5 @@
 import providerAws from './provider/aws/providerAws.js';
 import { accessKeyId, secretAccessKey } from './credentials.js'; // temporary, replace this asap
-
 // Creation testing //
 
 const awsProvider = await providerAws({
@@ -12,20 +11,24 @@ const awsProvider = await providerAws({
 // ------------------
 // Scenario 1
 
+terminateAllVpcsWithoutDependencies()
+
 for (let i = 0; i < 1; i++){
   const vpc = await awsProvider.createResource({
     type: "vpc",
     CidrBlock: "10.0.1.0/24",
     Name: `VPC${i}`
   });
-  const vpcDescription = await awsProvider.describeResources({
-    type: 'vpc',
-    resoureIds: [vpc]
-  });
-  console.log(vpcDescription);
+
+  const id = vpc.Vpc.VpcId;
+  console.log(id)
+  // await new Promise((resolve) => setTimeout(resolve, 1000)); 
+
+  await awsProvider.updateResource({type: 'vpc', id: id, name: "NewTag"});
 }
 
-// terminateAllVpcsWithoutDependencies()
+
+
 
 // ------------------
 
