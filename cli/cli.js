@@ -8,7 +8,7 @@ import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
 import { execSync } from 'child_process';
-const stateFile = process.cwd() + '/instances.json';  //it'll make this file for you if it isn't there.
+const stateFile = process.cwd() + '/cli/instances.json';  //it'll make this file for you if it isn't there.
 
 import { region, accessKeyId, secretAccessKey } from '../credentials.js'; // temporary, replace this asap
 //make logo

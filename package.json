@@ -27,7 +27,7 @@
     "jest": "^29.7.0"
   },
   "bin": {
-    "cloud-builder": "cli/cli.js"
+    "clb": "cli/cli.js"
   },
   "repository": {
     "type": "git",

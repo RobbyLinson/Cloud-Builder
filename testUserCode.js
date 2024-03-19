@@ -5,7 +5,8 @@ import { accessKeyId, secretAccessKey } from './credentials.js'; // temporary, r
 const awsProvider = await providerAws({
   region: 'eu-west-1',
   accessKeyId: accessKeyId,
-  secretAccessKey: secretAccessKey
+  secretAccessKey: secretAccessKey,
+  stateFile: process.cwd() + '/cli/instances.json'
 });
 
 // ------------------
