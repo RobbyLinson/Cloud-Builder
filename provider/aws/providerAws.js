@@ -4,6 +4,7 @@ import { EC2Client } from "@aws-sdk/client-ec2";
 import { createVpc, describeVpcs, deleteVPC, updateVpcName } from './actions/vpc-actions.js';
 import { createSubnet, describeSubnets, deleteSubnet } from './actions/subnet-actions.js';
 import { createInstance, describeInstances, deleteInstance } from './actions/instance-actions.js';
+import { createNatGateway } from "./actions/natgateway-actions.js";
 import { readMapFromFile, writeMapToFile } from '../../cli/state.js';
 
 async function providerAws({
@@ -32,6 +33,8 @@ async function providerAws({
 			return describeSubnets(ec2Client, resourceIds);
 		case 'instance':
 			return describeInstances(ec2Client, resourceIds);
+		case 'natgateway':
+			return describeNatGateways(ec2Client, resourceIds);
 		default:
 			return {
 				error: `Unknown resource type: ${type}`
@@ -92,6 +95,11 @@ async function providerAws({
 			break;
 		case 'instance':
 			newId = await createInstance(ec2Client, {
+				Name, ...options
+			});
+			break;
+		case 'natgateway':
+			newId = await createNatGateway(ec2Client, {
 				Name, ...options
 			});
 			break;

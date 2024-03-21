@@ -9,24 +9,24 @@ const awsProvider = await providerAws({
   stateFile: process.cwd() + '/cli/instances.json'
 });
 
-// ------------------
-// Scenario 1
+// // ------------------
+// // Scenario 1
 
-terminateAllVpcsWithoutDependencies()
+// terminateAllVpcsWithoutDependencies()
 
-for (let i = 0; i < 1; i++){
-  const vpc = await awsProvider.createResource({
-    type: "vpc",
-    CidrBlock: "10.0.1.0/24",
-    Name: `VPC${i}`
-  });
+// for (let i = 0; i < 1; i++){
+//   const vpc = await awsProvider.createResource({
+//     type: "vpc",
+//     CidrBlock: "10.0.1.0/24",
+//     Name: `VPC${i}`
+//   });
 
-  const id = vpc.Vpc.VpcId;
-  console.log(id)
-  // await new Promise((resolve) => setTimeout(resolve, 1000)); 
+//   const id = vpc.Vpc.VpcId;
+//   console.log(id)
+//   // await new Promise((resolve) => setTimeout(resolve, 1000)); 
 
-  await awsProvider.updateResource({type: 'vpc', id: id, name: "NewTag"});
-}
+//   await awsProvider.updateResource({type: 'vpc', id: id, name: "NewTag"});
+// }
 
 
 
@@ -36,17 +36,32 @@ for (let i = 0; i < 1; i++){
 // ------------------
 // Scenario 2
 
-// const mainVpc = await awsProvider.createResource({
-//   type: 'vpc',
-//   CidrBlock: '10.0.1.0/24',
-//   Tags: [{Name: "MainVPC"}]
-// });
+const mainVpc = await awsProvider.createResource({
+  type: 'vpc',
+  CidrBlock: '10.0.1.0/24',
+  Name: "MainVPC"
+});
 
-// const publicSubnet = await awsProvider.createResource({
-//   type: 'subnet',
-//   VpcId: mainVpc,
-//   CidrBlock: '10.0.1.1/24'
-// });
+
+const publicSubnet = await awsProvider.createResource({
+  type: 'subnet',
+  VpcId: mainVpc,
+  CidrBlock: '10.0.1.1/24'
+});
+
+const newNatGateway = await awsProvider.createResource({
+  type: 'natgateway',
+  SubnetId: publicSubnet,
+  //AllocationId: 'eipalloc-0e37779e6f029dfb4',
+  ConnectivityType: 'private'
+})
+
+// const newNatGateway = await awsProvider.createResource({
+//   type: 'natgateway',
+//   SubnetId: publicSubnet,
+//   // no AllocationId needed if ConnectivityType: 'private'
+//   ConnectivityType: 'private'
+// })
 
 // const newInstance = await awsProvider.createResource({
 //   type: 'instance',
@@ -115,29 +130,29 @@ await awsProvider.createResource({
 });
 */
 
-async function terminateAllVpcsWithoutDependencies() {
-  try {
-    const allInstances = await awsProvider.describeResources({ type: 'vpc' });
+// async function terminateAllVpcsWithoutDependencies() {
+//   try {
+//     const allInstances = await awsProvider.describeResources({ type: 'vpc' });
 
-      const terminationPromises = allInstances.Vpcs.map(async (vpc) => {
-        const id = vpc.VpcId;
-        try {
-          await awsProvider.terminateResource({
-            type: 'vpc',
-            instanceId: id,
-          });
+//       const terminationPromises = allInstances.Vpcs.map(async (vpc) => {
+//         const id = vpc.VpcId;
+//         try {
+//           await awsProvider.terminateResource({
+//             type: 'vpc',
+//             instanceId: id,
+//           });
 
-          console.log(`Termination request for VPC ${id} submitted.`);
-        } catch (error) {
-          console.error(`Failed to terminate VPC ${id}. It might have a dependecy`);
-        }
-      });
+//           console.log(`Termination request for VPC ${id} submitted.`);
+//         } catch (error) {
+//           console.error(`Failed to terminate VPC ${id}. It might have a dependecy`);
+//         }
+//       });
 
-      // Wait for all termination promises to be fulfilled
-      await Promise.all(terminationPromises);
+//       // Wait for all termination promises to be fulfilled
+//       await Promise.all(terminationPromises);
 
-      console.log('All termination requests completed.');
-  } catch (error) {
-    console.error('Error fetching VPCs:', error);
-    }
-}
+//       console.log('All termination requests completed.');
+//   } catch (error) {
+//     console.error('Error fetching VPCs:', error);
+//     }
+// }
