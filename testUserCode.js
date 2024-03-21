@@ -56,10 +56,10 @@ const newNatGateway = await awsProvider.createResource({
   ConnectivityType: 'private'
 })
 
-await awsProvider.terminateResource({
-    type: "natgateway",
-    instanceId: newNatGateway
-})
+// await awsProvider.terminateResource({
+//     type: "natgateway",
+//     instanceId: newNatGateway
+// })
 
 // const newNatGateway = await awsProvider.createResource({
 //   type: 'natgateway',
@@ -81,6 +81,16 @@ await awsProvider.terminateResource({
 //     type: "instance",
 //     instanceId: newInstance
 // })
+const natgatewayDescription = await awsProvider.describeResources({
+  type: 'natgateway',
+  resourceIds: [newNatGateway]
+})
+
+console.log(natgatewayDescription);
+await awsProvider.terminateResource({
+  type: "natgateway",
+  instanceId: newNatGateway
+})
 await awsProvider.terminateResource({
     type: "subnet",
     instanceId: publicSubnet

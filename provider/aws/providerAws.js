@@ -4,7 +4,7 @@ import { EC2Client } from "@aws-sdk/client-ec2";
 import { createVpc, describeVpcs, deleteVPC, updateVpcName } from './actions/vpc-actions.js';
 import { createSubnet, describeSubnets, deleteSubnet } from './actions/subnet-actions.js';
 import { createInstance, describeInstances, deleteInstance } from './actions/instance-actions.js';
-import { createNatGateway, deleteNatGateway } from "./actions/natgateway-actions.js";
+import { createNatGateway, describeNatGateways, deleteNatGateway } from "./actions/natgateway-actions.js";
 import { readMapFromFile, writeMapToFile } from '../../cli/state.js';
 
 async function providerAws({

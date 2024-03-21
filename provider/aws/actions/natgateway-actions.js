@@ -1,4 +1,4 @@
-import { CreateNatGatewayCommand, DeleteNatGatewayCommand } from "@aws-sdk/client-ec2";
+import { CreateNatGatewayCommand, DescribeNatGatewaysCommand, DeleteNatGatewayCommand} from "@aws-sdk/client-ec2";
 
 export async function createNatGateway(ec2Client, {
     name,
@@ -13,6 +13,16 @@ export async function createNatGateway(ec2Client, {
 		return response.NatGateway.NatGatewayId;
 	} catch (err) {
 		console.warn(`Failed to create NatGateway.`, err);
+	}
+}
+
+export async function describeNatGateways(ec2Client, nategatewayIds) {
+	const command = new DescribeNatGatewaysCommand({NatGatewayIds: nategatewayIds});
+	try {
+		const response = await ec2Client.send(command);
+		return response;
+	} catch (err) {
+		console.warn(`Failed to describe NatGateways.`, err);
 	}
 }
 
