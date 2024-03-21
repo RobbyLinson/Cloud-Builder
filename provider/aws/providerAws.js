@@ -4,7 +4,7 @@ import { EC2Client } from "@aws-sdk/client-ec2";
 import { createVpc, describeVpcs, deleteVPC, updateVpcName } from './actions/vpc-actions.js';
 import { createSubnet, describeSubnets, deleteSubnet } from './actions/subnet-actions.js';
 import { createInstance, describeInstances, deleteInstance } from './actions/instance-actions.js';
-import { createNatGateway } from "./actions/natgateway-actions.js";
+import { createNatGateway, deleteNatGateway } from "./actions/natgateway-actions.js";
 import { readMapFromFile, writeMapToFile } from '../../cli/state.js';
 
 async function providerAws({
@@ -52,6 +52,9 @@ async function providerAws({
 				break;
 			case 'instance':
                 await deleteInstance(ec2Client, instanceId);
+				break;
+			case 'natgateway':
+				await deleteNatGateway(ec2Client, instanceId);
 				break;
 			default:
 				return {
