@@ -15,8 +15,7 @@ export const validateVPCOptions = ({ ...input }) => {
       "Ipv6NetmaskLength",
       "Ipv6CidrBlockNetworkBorderGroup",
       "InstanceTenancy",
-      "Name",
-      "VpcId"
+      "Name"
     ];
     
     // list of inputs which don't match any known expected input, it is also case sensitive
@@ -26,13 +25,14 @@ export const validateVPCOptions = ({ ...input }) => {
       throw new Error(`Unexpected parameter(s): ${unexpectedParams.join(", ")}`);
     }
   
-    let validatedInput = validateVPCtypes({...input});
+    let validatedInput = validateVPCOptionTypes({...input});
+    validatedInput = handleName({type: 'vpc', input: input});
   
     return validatedInput;
 };
 
 // Handle type restrictions for VPC options
-const validateVPCtypes = ({ ...input }) => {
+const validateVPCOptionTypes = ({ ...input }) => {
    // DryRun type validation
    if (input.hasOwnProperty("DryRun") && typeof input.DryRun !== "boolean") {
     throw new Error("DryRun must be a boolean");
@@ -76,23 +76,25 @@ const validateVPCtypes = ({ ...input }) => {
     throw new Error("Invalid value for InstanceTenancy, explain in more detail");
   }
 
-  // Name converts to proper structure according to expected input for CreateVPC
-  if (input.hasOwnProperty("Name") && typeof input.Name === "string") {
-    
-    // Automatically create TagSpecifications
-    input.TagSpecifications = [
-    ({
-      ResourceType: "vpc",
-      Tags: [{Key: "Name", Value: input.Name}],
-    })];
-
-    // Remove the individual Name property as it's no longer needed
-    delete input.Name;
-  } else {
-    throw new Error("Name must be a string");
-  }
-
   return input;
 }
 
-
+// Handles conversion from name to TagsSpecifications for aws sdk api input
+export const handleName = (
+  {
+    type, // type of resource, the same as for awsProvider *Resource methods
+    input // inputed options inside our create* methods
+  }) => {
+  if (input.hasOwnProperty("Name")) {
+    if (typeof input.Name === "string") {
+      input.TagSpecifications = [{
+        ResourceType: type,
+        Tags: [{Key: "Name", Value: input.Name}],
+      }];
+      delete input.Name;
+    } else {
+      throw new Error("Name must be a string");
+    }
+  }
+  return input;
+}

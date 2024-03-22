@@ -1,13 +1,16 @@
 import { RunInstancesCommand, DescribeInstancesCommand, TerminateInstancesCommand} from "@aws-sdk/client-ec2"; 
+import { handleName } from "../validation/validation.js";
 
 // Creates a new instance or runs existing instance depending on options
 export async function createInstance(ec2Client, {
 	...options
 }) {
 	// validation of the options object can take place here
-	const command = new RunInstancesCommand(options);
+	const handledOpt = handleName({type: 'instance', input: options});
+	const command = new RunInstancesCommand(handledOpt);
 	try {
 		const response = await ec2Client.send(command);
+		if (response) {console.log(`✅ EC2 Instance with ID ${response.Instances[0].InstanceId} created.\n`);}
 		return response.Instances[0].InstanceId;
 	} catch (err) {
 		console.warn(`Failed to run instance.`, err);

@@ -1,5 +1,5 @@
 import { CreateVpcCommand, DescribeVpcsCommand, DeleteVpcCommand, CreateTagsCommand } from "@aws-sdk/client-ec2"; 
-import { validateVPCOptions } from "../validation/validationVPC.js"
+import { validateVPCOptions } from "../validation/validation.js"
 
 // Creates a new VPC
 export async function createVpc(ec2Client, {

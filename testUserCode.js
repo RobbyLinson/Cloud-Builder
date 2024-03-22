@@ -29,8 +29,6 @@ const awsProvider = await providerAws({
 // }
 
 
-
-
 // ------------------
 
 // ------------------
@@ -38,23 +36,35 @@ const awsProvider = await providerAws({
 
 const mainVpc = await awsProvider.createResource({
   type: 'vpc',
-  CidrBlock: '10.0.1.0/24',
-  Name: "MainVPC"
+  Name: "MainVPC",
+  CidrBlock: '10.0.1.0/24'
 });
 
 
 const publicSubnet = await awsProvider.createResource({
   type: 'subnet',
+  Name: 'privateSub',
   VpcId: mainVpc,
   CidrBlock: '10.0.1.1/24'
 });
 
-const newNatGateway = await awsProvider.createResource({
-  type: 'natgateway',
-  SubnetId: publicSubnet,
-  //AllocationId: 'eipalloc-0e37779e6f029dfb4',
-  ConnectivityType: 'private'
-})
+// const newInstance = await awsProvider.createResource({
+//   type: 'instance',
+//   Name: "TestInstance",
+//   InstanceType: "t2.micro",
+//   SubnetId: publicSubnet,
+//   MinCount: 1,
+//   MaxCount: 1,
+//   ImageId: 'ami-0766b4b472db7e3b9'
+// });
+
+
+// const newNatGateway = await awsProvider.createResource({
+//   type: 'natgateway',
+//   SubnetId: publicSubnet,
+//   //AllocationId: 'eipalloc-0e37779e6f029dfb4',
+//   ConnectivityType: 'private'
+// })
 
 // await awsProvider.terminateResource({
 //     type: "natgateway",
@@ -68,29 +78,22 @@ const newNatGateway = await awsProvider.createResource({
 //   ConnectivityType: 'private'
 // })
 
-// const newInstance = await awsProvider.createResource({
-//   type: 'instance',
-//   SubnetId: publicSubnet,
-//   MinCount: 1,
-//   MaxCount: 1,
-//   ImageId: 'ami-0766b4b472db7e3b9'
-// });
 
 
 // await awsProvider.terminateResource({
 //     type: "instance",
 //     instanceId: newInstance
 // })
-const natgatewayDescription = await awsProvider.describeResources({
-  type: 'natgateway',
-  resourceIds: [newNatGateway]
-})
+// const natgatewayDescription = await awsProvider.describeResources({
+//   type: 'natgateway',
+//   resourceIds: [newNatGateway]
+// })
 
-console.log(natgatewayDescription);
-await awsProvider.terminateResource({
-  type: "natgateway",
-  instanceId: newNatGateway
-})
+// console.log(natgatewayDescription);
+// await awsProvider.terminateResource({
+//   type: "natgateway",
+//   instanceId: newNatGateway
+// })
 await awsProvider.terminateResource({
     type: "subnet",
     instanceId: publicSubnet
