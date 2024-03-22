@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import providerAws from '../provider/aws/providerAws.js';
+//import providerAws from '../provider/aws/providerAws.js';
+import { ProviderManager } from '../provider/providerManager.js';
 import { checkAwsFolder } from './awsConfig.js';
 import { readMapFromFile, writeMapToFile } from './state.js';
 // Import the yargs library
@@ -12,6 +13,9 @@ const stateFile = process.cwd() + '/cli/instances.json';  //it'll make this file
 
 import { region, accessKeyId, secretAccessKey } from '../credentials.js'; // temporary, replace this asap
 //make logo
+
+const providers = await new ProviderManager();
+await providers.loadProviderConfig();
 
 console.log(chalk.blueBright("  ____ _                 _   _           _ _     _           "));
 console.log(chalk.blueBright(" / ___| | ___  _   _  __| | | |__  _   _(_) | __| | ___ _ __ "));
@@ -35,7 +39,7 @@ console.log("clb help     for list of commands!");
 checkAwsFolder();
 
 // Temporary: load hardcoded provider credentials file
-const awsProvider = await providerAws({
+const awsProvider = await providers.aws({
 	region: region,
 	accessKeyId: accessKeyId,
 	secretAccessKey: secretAccessKey,
