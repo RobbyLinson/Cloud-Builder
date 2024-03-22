@@ -1,11 +1,11 @@
 import { CreateNatGatewayCommand, DescribeNatGatewaysCommand, DeleteNatGatewayCommand} from "@aws-sdk/client-ec2";
 
 export async function createNatGateway(ec2Client, {
-    name,
 	...options
 }) {
-	// validation of the options object can take place here
-	const command = new CreateNatGatewayCommand(options);
+	
+	const validatedOpt = handleName({type: 'natgateway', input: options})
+	const command = new CreateNatGatewayCommand(validatedOpt);
 	try {
 		const response = await ec2Client.send(command);
 		

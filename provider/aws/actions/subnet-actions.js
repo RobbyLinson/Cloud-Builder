@@ -1,12 +1,13 @@
 import { CreateSubnetCommand, DescribeSubnetsCommand, DeleteSubnetCommand} from "@aws-sdk/client-ec2"; 
+import { handleName } from "../validation/validation.js";
 
 // Creates a new subnet
 export async function createSubnet(ec2Client, {
-	name,
 	...options
 }) {
-	// validation of the options object can take place here
-	const command = new CreateSubnetCommand(options);
+
+	const validatedOpt = handleName({type: 'subnet', input: options})
+	const command = new CreateSubnetCommand(validatedOpt);
 	try {
 		const response = await ec2Client.send(command);
 		
