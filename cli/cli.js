@@ -59,12 +59,15 @@ yargs(hideBin(process.argv))
       describe: 'executes js file',
       type: 'string'
     });
-  }, (argv) => {
-    // Execute the provided JavaScript file
-    try {
-      execSync(`node ${argv.file}`, { stdio: 'inherit' });
-    } catch (error) {
-      console.error(error.message);
+  }, async (argv) => {
+    if (await previewFileContent(argv.file)) {
+      try {
+        execSync(`node ${argv.file}`, { stdio: 'inherit' });
+      } catch (error) {
+        console.error(error.message);
+      }
+    } else {
+      console.log('Action cancelled by user.');
     }
   })
   .command('create <type> <name> [options..]', 'Create AWS resource', (yargs) => {
@@ -165,3 +168,29 @@ yargs(hideBin(process.argv))
     }
   })
   .parse();
+
+
+
+  function previewFileContent(filePath) {
+    try {
+      const content = fs.readFileSync(filePath, 'utf8');
+      console.log(chalk.yellow('Preview of file content:'));
+      console.log(chalk.gray('------------------------------------------------'));
+      console.log(content);
+      console.log(chalk.gray('------------------------------------------------'));
+      // Confirm with the user to proceed
+      const readlineInterface = read.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
+      return new Promise((resolve) => {
+        readlineInterface.question(chalk.green('Do you want to proceed with this action? (y/n) '), (answer) => {
+          readlineInterface.close();
+          resolve(answer.toLowerCase() === 'y');
+        });
+      });
+    } catch (error) {
+      console.error(chalk.red(`Error reading file '${filePath}':`), error.message);
+      return Promise.resolve(false);
+    }
+  }
