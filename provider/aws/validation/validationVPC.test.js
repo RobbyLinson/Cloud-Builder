@@ -1,4 +1,4 @@
-import { validateVPCOptions } from "./validationVPC";
+import { validateVPCOptions } from "./validation";
 
 test("Returns input back if successful", () => {
     expect(validateVPCOptions({
