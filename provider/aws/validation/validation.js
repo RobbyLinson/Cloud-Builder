@@ -15,7 +15,7 @@ export const validateVPCOptions = ({ ...input }) => {
       "Ipv6NetmaskLength",
       "Ipv6CidrBlockNetworkBorderGroup",
       "InstanceTenancy",
-      "Tags",
+      "Name"
     ];
     
     // list of inputs which don't match any known expected input, it is also case sensitive
@@ -25,23 +25,14 @@ export const validateVPCOptions = ({ ...input }) => {
       throw new Error(`Unexpected parameter(s): ${unexpectedParams.join(", ")}`);
     }
   
-    // For error handling we have to ask John: 
-    // What types of errors you ideally would like to be caught?
-    // And also where they might appear: on what level?
+    let validatedInput = validateVPCOptionTypes({...input});
+    validatedInput = handleName({type: 'vpc', input: input});
   
-    // A line below might not be necessary, as AWS has pretty good error handling. 
-    let validatedInput = validateVPCtypes({...input});
-  
-    // Tags list type validation. This makes it easier to add a tag to the instance
-    // After the validation it also ensures the input matches
-    // expected structure for CreateVpcCommand function input
-    const validatedAndTransformedInput = validateAndTransformTags(validatedInput);
-  
-    return validatedAndTransformedInput;
+    return validatedInput;
 };
 
 // Handle type restrictions for VPC options
-const validateVPCtypes = ({ ...input }) => {
+const validateVPCOptionTypes = ({ ...input }) => {
    // DryRun type validation
    if (input.hasOwnProperty("DryRun") && typeof input.DryRun !== "boolean") {
     throw new Error("DryRun must be a boolean");
@@ -88,40 +79,22 @@ const validateVPCtypes = ({ ...input }) => {
   return input;
 }
 
-// Tags list type validation
-const validateAndTransformTags = ({...input}) => {
-    if (input.hasOwnProperty("Tags")) {
-        const tagList = input.Tags;
-        if (!Array.isArray(tagList)) {
-          throw new Error("Tags must be an array");
-        }
-    
-        tagList.forEach((tag, index) => {
-          if (typeof tag !== "object" || tag === null) {
-            throw new Error(`Tag at index ${index} must be an object`);
-          }
-    
-          const tagName = Object.keys(tag)[0];
-          const tagValue = tag[tagName];
-    
-          if (typeof tagName !== "string" || typeof tagValue !== "string") {
-            throw new Error(`Tag key and value at index ${index} must be strings`);
-          }
-        });
-    
-        // Automatically create TagSpecifications
-        input.TagSpecifications = tagList.map((tag) => ({
-          ResourceType: "vpc",
-          Tags: [
-            {
-              Key: Object.keys(tag)[0],
-              Value: tag[Object.keys(tag)[0]],
-            },
-          ],
-        }));
-    
-        // Remove the individual Tags property as it's no longer needed
-        delete input.Tags;
+// Handles conversion from name to TagsSpecifications for aws sdk api input
+export const handleName = (
+  {
+    type, // type of resource, the same as for awsProvider *Resource methods
+    input // inputed options inside our create* methods
+  }) => {
+  if (input.hasOwnProperty("Name")) {
+    if (typeof input.Name === "string") {
+      input.TagSpecifications = [{
+        ResourceType: type,
+        Tags: [{Key: "Name", Value: input.Name}],
+      }];
+      delete input.Name;
+    } else {
+      throw new Error("Name must be a string");
     }
-    return input;
+  }
+  return input;
 }
