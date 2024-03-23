@@ -11,10 +11,11 @@ import chalk from 'chalk';
 import { execSync } from 'child_process';
 const stateFile = process.cwd() + '/cli/instances.json';  //it'll make this file for you if it isn't there.
 
+//state related imports
+import { previewFileContent, writeResourceStateToFile } from './state.js';
+
 import { region, accessKeyId, secretAccessKey } from '../credentials.js'; // temporary, replace this asap
 //make logo
-import fs from 'fs';
-import read from 'readline';
 
 const providers = await new ProviderManager();
 await providers.loadProviderConfig();
@@ -69,6 +70,9 @@ yargs(hideBin(process.argv))
     if (await previewFileContent(argv.file)) {
       try {
         execSync(`node ${argv.file}`, { stdio: 'inherit' });
+
+        // creates a state.json, which should represent list of all resources in a ec2 client in a current working directory
+        writeResourceStateToFile();
       } catch (error) {
         console.error(error.message);
       }
@@ -94,7 +98,6 @@ yargs(hideBin(process.argv))
         const [key, value] = opt.split('=');
         split_options[key] = value;
       });
-    console.log(split_options);
 	
       const result = await awsProvider.createResource({
         type: argv.type,
@@ -174,29 +177,3 @@ yargs(hideBin(process.argv))
     }
   })
   .parse();
-
-
-
-  function previewFileContent(filePath) {
-    try {
-      const content = fs.readFileSync(filePath, 'utf8');
-      console.log(chalk.yellow('Preview of file content:'));
-      console.log(chalk.gray('------------------------------------------------'));
-      console.log(content);
-      console.log(chalk.gray('------------------------------------------------'));
-      // Confirm with the user to proceed
-      const readlineInterface = read.createInterface({
-        input: process.stdin,
-        output: process.stdout
-      });
-      return new Promise((resolve) => {
-        readlineInterface.question(chalk.green('Do you want to proceed with this action? (y/n) '), (answer) => {
-          readlineInterface.close();
-          resolve(answer.toLowerCase() === 'y');
-        });
-      });
-    } catch (error) {
-      console.error(chalk.red(`Error reading file '${filePath}':`), error.message);
-      return Promise.resolve(false);
-    }
-  }

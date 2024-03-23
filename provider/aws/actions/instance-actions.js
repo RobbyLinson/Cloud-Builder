@@ -17,7 +17,7 @@ export async function createInstance(ec2Client, {
 	}
 }
 
-// Returns information on instance based on InstanceId
+// Returns information on instance based on InstanceId 
 export async function describeInstances(ec2Client, instanceIds) {
 	const command = new DescribeInstancesCommand({InstanceIds: instanceIds});
 	try {
@@ -28,7 +28,23 @@ export async function describeInstances(ec2Client, instanceIds) {
 	}
 }
 
-export async function getInstanceState(ec2Client, instanceId) {
+// Returns only active instances
+export async function describeInstancesWithState(ec2Client, states) {
+    try {
+        const command = new DescribeInstancesCommand({
+            Filters: [
+                { Name: 'instance-state-name', Values: states }
+            ]
+        });
+        const response = await ec2Client.send(command);
+        return response.Reservations.flatMap(reservation => reservation.Instances);
+    } catch (err) {
+        console.error('Failed to describe instances:', err);
+        return [];
+    }
+}
+
+async function getInstanceState(ec2Client, instanceId) {
 	const command = new DescribeInstancesCommand({
 	  InstanceIds: [instanceId],
 	});
@@ -39,6 +55,7 @@ export async function getInstanceState(ec2Client, instanceId) {
 	  if (response.Reservations && response.Reservations.length > 0) {
 		for (const reservation of response.Reservations) {
 		  for (const instance of reservation.Instances) {
+			
 			const currentInstanceId = instance.InstanceId;
 			const state = instance.State.Name;
   

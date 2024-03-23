@@ -1,4 +1,8 @@
 import fs from 'fs';
+import read from 'readline';
+import chalk from 'chalk';
+import { EC2Client } from '@aws-sdk/client-ec2';
+import { describeAllResources } from '../provider/aws/actions/general-actions.js';
 
 // Function to read map data from file
 export function readMapFromFile(filename, callback) {
@@ -51,4 +55,91 @@ export function writeMapToFile(map, filename) {
     }
     // console.log('Map data has been written to', filename);
   });
+}
+
+// specify the maximum number of empty lines allowed between code lines
+const MAX_NUMBER_OF_EMPTY_LINES = 2;
+
+// Function to read file specified in clb run <filename> and console log it to user
+export function previewFileContent(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    
+    // this block excludes unnecessary lines like comments or empty lines 
+    const lines = content.split('\n');
+    let nonCommentedContent = '';
+    let consecutiveEmptyLines = 0;
+    let insideMultilineComment = false;
+
+    for (let line of lines) {
+      if (insideMultilineComment) {
+        if (line.includes('*/')) {
+          insideMultilineComment = false;
+        }
+        continue;
+      }
+
+      if (line.trim().startsWith('//')) {
+        continue; // Ignore single line comments
+      } else if (line.trim().startsWith('/*')) {
+        insideMultilineComment = true;
+        continue; // Ignore multiline comments
+      } else if (line === '') {
+        consecutiveEmptyLines++;
+        if (consecutiveEmptyLines > MAX_NUMBER_OF_EMPTY_LINES) {
+          continue; // Ignore if more than MAX_NUMBER_OF_EMPTY_LINES consecutive empty lines
+        }
+      } else {
+        consecutiveEmptyLines = 0; // Reset consecutive empty lines counter
+      }
+
+      nonCommentedContent += line + '\n';
+    }
+
+
+    console.log(chalk.yellow('Preview of file content:'));
+    console.log(chalk.gray('------------------------------------------------'));
+    console.log(nonCommentedContent);
+    console.log(chalk.gray('------------------------------------------------'));
+    // Confirm with the user to proceed
+    const readlineInterface = read.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+    return new Promise((resolve) => {
+      readlineInterface.question(chalk.green('Do you want to proceed with this action? (y/n) '), (answer) => {
+        readlineInterface.close();
+        resolve(answer.toLowerCase() === 'y');
+      });
+    });
+  } catch (error) {
+    console.error(chalk.red(`Error reading file '${filePath}':`), error.message);
+    return Promise.resolve(false);
+  }
+}
+
+export async function writeResourceStateToFile() {
+  try {
+    const ec2Client = new EC2Client();
+    const allResources = await describeAllResources(ec2Client);
+
+    const jsonData = {
+      metadata: {
+        created_at: new Date().toISOString(), // Add a timestamp for creation
+      },
+      resources: allResources
+    };
+
+    const jsonString = JSON.stringify(jsonData, null, 2); // Convert object to JSON string
+
+    fs.writeFile('state.json', jsonString, (err) => {
+        if (err) {
+          console.error('Error writing resource state JSON file:', err);
+        } else {
+          console.log('state.json was updated');
+        }
+    });
+  } catch (err) {
+    console.error('Failed to fetch or write resource state:', err);
+  }
 }

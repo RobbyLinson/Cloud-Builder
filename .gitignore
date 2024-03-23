@@ -2,3 +2,4 @@ node_modules
 db
 credentials.js
 instances.json
+state.json
