@@ -50,6 +50,7 @@ const awsProvider = await providers.aws({
 
 // Use yargs to define commands and their callbacks
 yargs(hideBin(process.argv))
+  .scriptName("clb")
   .command('greet <name>', 'greet a user by name', (yargs) => {
     console.clear();
     return yargs.positional('name', {
