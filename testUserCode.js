@@ -58,42 +58,11 @@ const publicSubnet = await awsProvider.createResource({
 //   ImageId: 'ami-0766b4b472db7e3b9'
 // });
 
-
-// const newNatGateway = await awsProvider.createResource({
-//   type: 'natgateway',
-//   SubnetId: publicSubnet,
-//   //AllocationId: 'eipalloc-0e37779e6f029dfb4',
-//   ConnectivityType: 'private'
-// })
-
-// await awsProvider.terminateResource({
-//     type: "natgateway",
-//     instanceId: newNatGateway
-// })
-
-// const newNatGateway = await awsProvider.createResource({
-//   type: 'natgateway',
-//   SubnetId: publicSubnet,
-//   // no AllocationId needed if ConnectivityType: 'private'
-//   ConnectivityType: 'private'
-// })
-
-
-
 // await awsProvider.terminateResource({
 //     type: "instance",
 //     instanceId: newInstance
 // })
-// const natgatewayDescription = await awsProvider.describeResources({
-//   type: 'natgateway',
-//   resourceIds: [newNatGateway]
-// })
 
-// console.log(natgatewayDescription);
-// await awsProvider.terminateResource({
-//   type: "natgateway",
-//   instanceId: newNatGateway
-// })
 await awsProvider.terminateResource({
     type: "subnet",
     instanceId: publicSubnet
@@ -112,41 +81,6 @@ await awsProvider.terminateResource({
 
 // cloud-builder create vpc VPC713 CidrBlock='10.0.1.1/24'
 // cloud-builder delete VPC713
-
-
-// ------------------
-
-// Describing testing //
-
-// // Describe a VPC
-// const vpcDescription = await awsProvider.describeResources({
-// 	type: 'vpc', resourceIds: [mainVpc]
-// });
-
-// // Read some VPC info after describing.
-// console.log(vpcDescription.Vpcs.length);
-// console.log(vpcDescription.Vpcs[0].CidrBlock);
-
-// // Describe a Subnet
-// const subnetDescription = await awsProvider.describeResources({
-// 	type: 'subnet', resourceIds: [publicSubnet]
-// });	
-
-// // Read some Subnet info after describing.
-// console.log(subnetDescription.Subnets[0].CidrBlock);
-
-// Sending some requests with missing parameters to check error handling.
-/*
-await awsProvider.createResource({
-  type: 'vpc',
-});
-await awsProvider.createResource({
-  type: 'subnet',
-});
-await awsProvider.createResource({
-  type: 'instance',
-});
-*/
 
 // async function terminateAllVpcsWithoutDependencies() {
 //   try {
