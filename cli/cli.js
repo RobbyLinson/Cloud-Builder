@@ -13,6 +13,8 @@ const stateFile = process.cwd() + '/cli/instances.json';  //it'll make this file
 
 import { region, accessKeyId, secretAccessKey } from '../credentials.js'; // temporary, replace this asap
 //make logo
+import fs from 'fs';
+import read from 'readline';
 
 const providers = await new ProviderManager();
 await providers.loadProviderConfig();
