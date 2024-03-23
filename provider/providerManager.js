@@ -6,6 +6,12 @@ export class ProviderManager {
 	 
   async loadProviderConfig(path=process.cwd() + '/providers.json') {
     const config = JSON.parse(fs.readFileSync(path));
+	
+	if (config.length <= 0) {
+		console.log(`No providers have been installed.`);
+		return;
+	}
+	
     for (let provider in config) {
        await this.loadProvider(config, provider);
     }
