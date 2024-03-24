@@ -9,8 +9,15 @@ const awsProvider = await providerAws({
   stateFile: process.cwd() + '/cli/instances.json'
 });
 
-// // ------------------
-// // Scenario 1
+
+// restrictions for clb run <file> in mode 2 ( when we care about the state)
+/*
+  1. functions which use awsProvider are not allowed. (might be fixed later)
+  2. only for loops are allowed for awsProvider usage 
+*/
+
+// ------------------
+// Scenario 1
 
 // terminateAllVpcsWithoutDependencies()
 
