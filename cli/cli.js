@@ -12,7 +12,7 @@ import { execSync } from 'child_process';
 const stateFile = process.cwd() + '/cli/instances.json';  //it'll make this file for you if it isn't there.
 
 //state related imports
-import { previewFileContent, writeResourceStateToFile } from './state.js';
+import { previewFileContent, writeResourceStateToFile, userFileCountNumberOfResourcesByType, StateCountNumberOfResourcesByType, compareCounts } from './state.js';
 
 import { region, accessKeyId, secretAccessKey } from '../credentials.js'; // temporary, replace this asap
 //make logo
@@ -67,17 +67,49 @@ yargs(hideBin(process.argv))
       type: 'string'
     });
   }, async (argv) => {
-    if (await previewFileContent(argv.file)) {
-      try {
-        execSync(`node ${argv.file}`, { stdio: 'inherit' });
 
-        // creates a state.json, which should represent list of all resources in a ec2 client in a current working directory
-        writeResourceStateToFile();
+    // get objects with number of resources on ec2 client and in user defined file
+    const userFileCounts = await userFileCountNumberOfResourcesByType(argv.file);
+    const stateFileCounts = await StateCountNumberOfResourcesByType();
+  
+    // Compare counts from user file and state file
+    const matchCounts = compareCounts(userFileCounts, stateFileCounts);
+    
+    // for now we don't care if state differs from filename from clb run <filename>
+    if (matchCounts) {
+      console.log(chalk.gray('------------------------------------------------'));
+      console.log(chalk.green('The number of resources match, which means we do some action?'));
+      console.log(chalk.gray('------------------------------------------------'));
+      try {
+        if (await previewFileContent(argv.file)) {
+          execSync(`node ${argv.file}`, { stdio: 'inherit' });
+          // creates a state.json, which should represent list of all resources in a ec2 client in a current working directory
+          writeResourceStateToFile();
+        } else {
+          console.log(chalk.gray('------------------------------------------------'));
+          console.log(chalk.red('Action cancelled by user.'));
+          console.log(chalk.gray('------------------------------------------------'));
+        }
       } catch (error) {
         console.error(error.message);
       }
     } else {
-      console.log('Action cancelled by user.');
+      console.log(chalk.gray('------------------------------------------------'));
+      console.log(chalk.yellow('The number of resources DOES NOT match, which means we do some action'));
+      console.log(chalk.gray('------------------------------------------------'));
+      try {
+        if (await previewFileContent(argv.file)) {
+          execSync(`node ${argv.file}`, { stdio: 'inherit' });
+          // creates a state.json, which should represent list of all resources in a ec2 client in a current working directory
+          writeResourceStateToFile();
+        } else {
+          console.log(chalk.gray('------------------------------------------------'));
+          console.log(chalk.red('Action cancelled by user.'));
+          console.log(chalk.gray('------------------------------------------------'));
+        }
+      } catch (error) {
+        console.error(error.message);
+      }
     }
   })
   .command('create <type> <name> [options..]', 'Create AWS resource', (yargs) => {

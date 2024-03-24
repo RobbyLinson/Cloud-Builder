@@ -14,39 +14,32 @@ const awsProvider = await providerAws({
 
 // terminateAllVpcsWithoutDependencies()
 
-// for (let i = 0; i < 1; i++){
+// for (let i = 0; i < 4; i++){
 //   const vpc = await awsProvider.createResource({
 //     type: "vpc",
 //     CidrBlock: "10.0.1.0/24",
 //     Name: `VPC${i}`
 //   });
-
-//   const id = vpc.Vpc.VpcId;
-//   console.log(id)
-//   // await new Promise((resolve) => setTimeout(resolve, 1000)); 
-
-//   await awsProvider.updateResource({type: 'vpc', id: id, name: "NewTag"});
 // }
-
 
 // ------------------
 
 // ------------------
 // Scenario 2
 
-const mainVpc = await awsProvider.createResource({
-  type: 'vpc',
-  Name: "MainVPC",
-  CidrBlock: '10.0.1.0/24'
-});
+// const mainVpc = await awsProvider.createResource({
+//   type: 'vpc',
+//   Name: "MainVPC",
+//   CidrBlock: '10.0.1.0/24'
+// });
 
 
-const publicSubnet = await awsProvider.createResource({
-  type: 'subnet',
-  Name: 'privateSub',
-  VpcId: mainVpc,
-  CidrBlock: '10.0.1.1/24'
-});
+// const publicSubnet = await awsProvider.createResource({
+//   type: 'subnet',
+//   Name: 'privateSub',
+//   VpcId: mainVpc,
+//   CidrBlock: '10.0.1.1/24'
+// });
 
 // const newInstance = await awsProvider.createResource({
 //   type: 'instance',
@@ -63,14 +56,14 @@ const publicSubnet = await awsProvider.createResource({
 //     instanceId: newInstance
 // })
 
-await awsProvider.terminateResource({
-    type: "subnet",
-    instanceId: publicSubnet
-})
-await awsProvider.terminateResource({
-  type: "vpc",
-  instanceId: mainVpc
-})
+// await awsProvider.terminateResource({
+//     type: "subnet",
+//     instanceId: publicSubnet
+// })
+// await awsProvider.terminateResource({
+//   type: "vpc",
+//   instanceId: mainVpc
+// })
 
 
 // ------------------
@@ -96,7 +89,7 @@ await awsProvider.terminateResource({
 
 //           console.log(`Termination request for VPC ${id} submitted.`);
 //         } catch (error) {
-//           console.error(`Failed to terminate VPC ${id}. It might have a dependecy`);
+//           console.error(`Failed to terminate VPC ${id}. It might have a dependency`);
 //         }
 //       });
 
