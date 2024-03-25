@@ -119,3 +119,35 @@ export async function checkAwsFolder()
         }
     });
 }
+
+export async function getCredentials() {
+    const awsFolderPath = filePath + (os.type()==='Windows_NT' ? "\\.aws" : "/.aws");
+	var credentials = {};
+	var files = ['credentials', 'config'];
+    for (const val of files)
+    {
+		const stream = await fs.createReadStream(awsFolderPath + '/' + val);
+		const rl = await read.createInterface({
+			input: stream,
+			crlfDelay: Infinity
+		});
+			
+		for await (const line of rl) {
+			let keyvalue = line.split('=');
+			switch (keyvalue[0]) {
+				case 'aws_access_key_id':
+					credentials.accessKeyId = keyvalue[1]; 
+					break;
+				case 'aws_secret_access_key':
+					credentials.secretAccessKey = keyvalue[1];
+					break;
+				case 'region':
+					credentials.region = keyvalue[1];
+					break;
+				default:
+					break;
+			}
+		}
+    }
+	return credentials;
+}

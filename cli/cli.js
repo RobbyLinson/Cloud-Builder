@@ -2,7 +2,8 @@
 
 //import providerAws from '../provider/aws/providerAws.js';
 import { ProviderManager } from '../provider/providerManager.js';
-import { checkAwsFolder } from './awsConfig.js';
+import { checkAwsFolder, getCredentials } from './awsConfig.js';
+import { readMapFromFile, writeMapToFile } from './state.js';
 // Import the yargs library
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
@@ -19,6 +20,7 @@ import { region, accessKeyId, secretAccessKey } from '../credentials.js'; // tem
 const providers = await new ProviderManager();
 await providers.loadProviderConfig();
 
+//make logo
 console.log(chalk.blueBright("  ____ _                 _   _           _ _     _           "));
 console.log(chalk.blueBright(" / ___| | ___  _   _  __| | | |__  _   _(_) | __| | ___ _ __ "));
 console.log(chalk.blueBright("| |   | |/ _ \\| | | |/ _` | | '_ \\| | | | | |/ _` |/ _ \\ '__|"));
@@ -38,17 +40,19 @@ console.log("\nWelcome to Cloud-Builder\n");
 
 console.log("clb help     for list of commands!");
 
-checkAwsFolder();
+await checkAwsFolder();
+const awsCredentials = await getCredentials();
 
 // Temporary: load hardcoded provider credentials file
 const awsProvider = await providers.aws({
-	region: region,
-	accessKeyId: accessKeyId,
-	secretAccessKey: secretAccessKey
+	region: awsCredentials.region,
+	accessKeyId: awsCredentials.accessKeyId,
+	secretAccessKey: awsCredentials.secretAccessKey
 });
 
 // Use yargs to define commands and their callbacks
 yargs(hideBin(process.argv))
+  .scriptName("clb")
   .command('greet <name>', 'greet a user by name', (yargs) => {
     console.clear();
     return yargs.positional('name', {
