@@ -3,7 +3,7 @@
 //import providerAws from '../provider/aws/providerAws.js';
 import { ProviderManager } from '../provider/providerManager.js';
 import { checkAwsFolder, getCredentials } from './awsConfig.js';
-import { readMapFromFile, writeMapToFile } from './state.js';
+
 // Import the yargs library
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
@@ -13,8 +13,6 @@ import { execSync } from 'child_process';
 //state related imports
 import { previewFileContent, updateStateFile, userFileCountNumberOfResourcesByType, StateCountNumberOfResourcesByType, compareCounts, getResourceTypeAndIdByName } from './state.js';
 
-
-import { region, accessKeyId, secretAccessKey } from '../credentials.js'; // temporary, replace this asap
 //make logo
 
 const providers = await new ProviderManager();
