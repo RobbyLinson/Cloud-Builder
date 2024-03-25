@@ -3,7 +3,6 @@ import { createVpc, describeVpcs, deleteVPC, updateVpcName } from './actions/vpc
 import { createSubnet, describeSubnets, deleteSubnet } from './actions/subnet-actions.js';
 import { createInstance, describeInstances, deleteInstance } from './actions/instance-actions.js';
 import { createNatGateway, describeNatGateways, deleteNatGateway } from "./actions/natgateway-actions.js";
-import { readMapFromFile, writeMapToFile } from '../../cli/state.js';
 import { describeAllResources } from "./actions/general-actions.js";
 
 
