@@ -4,59 +4,6 @@ import chalk from 'chalk';
 import { EC2Client } from '@aws-sdk/client-ec2';
 import { describeAllResources } from '../provider/aws/actions/general-actions.js';
 
-// Function to read map data from file
-export function readMapFromFile(filename, callback) {
-  fs.readFile(filename, 'utf8', (err, data) => {
-    if (err) {
-      if (err.code === 'ENOENT') {
-        console.log('Instances file not found. Creating new file.');
-        return callback(null, new Map()); // Return a new Map if file doesn't exist
-      } else {
-        console.error('Error reading instances file:', err);
-        return callback(err, null);
-      }
-    }
-    try {
-      // If file exists but is empty, return an empty Map
-      if (!data) {
-        return callback(null, new Map());
-      }
-
-      const parsedData = JSON.parse(data);
-      // Convert object to a Map
-      const objectToMap = new Map();
-      for (let key in parsedData) {
-        objectToMap.set(key, parsedData[key]);
-      }
-      callback(null, objectToMap);
-    } catch (error) {
-      console.error('Error parsing JSON:', error);
-      callback(error, null);
-    }
-  });
-}
-
-// Function to write map data to file
-export function writeMapToFile(map, filename) {
-  // Convert map to a regular object (key-value pairs)
-  const mapToObject = {};
-  for (let [key, value] of map) {
-    mapToObject[key] = value;
-  }
-
-  // Convert object to JSON
-  const jsonData = JSON.stringify(mapToObject, null, 2);
-
-  // Write data to a file
-  fs.writeFile(filename, jsonData, (err) => {
-    if (err) {
-      console.error('Error writing file:', err);
-      return;
-    }
-    // console.log('Map data has been written to', filename);
-  });
-}
-
 // specify the maximum number of empty lines allowed between code lines
 const MAX_NUMBER_OF_EMPTY_LINES = 2;
 
@@ -91,7 +38,35 @@ export function previewFileContent(filePath) {
   }
 }
 
-export async function writeResourceStateToFile() {
+export async function getResourceTypeAndIdByName(resourceName) {
+  const filePath = process.cwd() + '/state.json';
+  const stateFile = fs.readFileSync(filePath, 'utf8');
+  
+  try {       
+    const state = JSON.parse(stateFile);
+
+    for (const resourceType in state.resources) {
+      for (const resource of state.resources[resourceType]) {
+        // Check if the resource name matches the provided resourceName
+        if (resource.Tags && resource.Tags.some(tag => tag.Key === 'Name' && tag.Value === resourceName)) {
+          // If the name matches, return the resource type and id
+          return {
+            type: resourceType.slice(0,-1),
+            id: resource.VpcId || resource.SubnetId || resource.InstanceId || resource.NatGatewayId // Adjust based on actual keys in your state.json
+          };
+        }
+      }
+    }
+    // If the resource with the given name is not found, return null
+    console.log(chalk.red("\nResource with specified name is not found, delete does nothing"))
+    return null;
+  } catch (err) {
+    console.error(err)
+    return null;
+  }
+}
+
+export async function updateStateFile() {
   try {
     const ec2Client = new EC2Client();
     const allResources = await describeAllResources(ec2Client);
@@ -109,9 +84,9 @@ export async function writeResourceStateToFile() {
         if (err) {
           console.error('Error writing resource state JSON file:', err);
         } else {
-          console.log('\nstate.json was updated');
+          console.log('\nFile state.json was updated');
           StateCountNumberOfResourcesByType().then((counts) => {
-            console.log('Resource counts by type:', counts);
+            console.log('\tCurrent number of active resources:', counts);
           });
         }
     });
@@ -145,8 +120,18 @@ export function compareCounts(userCounts, stateCounts) {
 // counts the number of running resources written in a state file
 export async function StateCountNumberOfResourcesByType(){
   try {
+
     // Read the contents of the state.json file
-    const jsonData = fs.readFileSync('state.json', 'utf-8');
+    const jsonData = fs.readFileSync('state.json', 'utf-8', (err) => {
+      if (err) {
+        if (err.code === 'ENOENT') {
+          return {}
+        } else {
+          console.error('Error reading state file:', err);
+          return {}
+        };
+      }
+    });
 
     // Parse the JSON content to extract resource information
     const resources = JSON.parse(jsonData).resources;
@@ -163,7 +148,7 @@ export async function StateCountNumberOfResourcesByType(){
     // Return the resource counts object
     return resourceCounts;
   } catch (err) {
-    console.error('Failed to count number of resources by type:', err);
+    // console.error('Failed to count number of resources by type:', err);
     return {};
   }
 }

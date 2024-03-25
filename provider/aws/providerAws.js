@@ -10,8 +10,7 @@ import { describeAllResources } from "./actions/general-actions.js";
 async function providerAws({
 	region,
 	accessKeyId,
-	secretAccessKey,
-	stateFile
+	secretAccessKey
 }) {
 	
 	const ec2Client = new EC2Client({
@@ -44,7 +43,7 @@ async function providerAws({
 		}
 	}
 
-	async function terminateResource({type, instanceId, name=""}){
+	async function terminateResource({type, instanceId}){
 		switch (type) {
 			case 'vpc':
 				await deleteVPC(ec2Client, instanceId);
@@ -62,21 +61,6 @@ async function providerAws({
 				return {
 					error: `Unknown resource type: ${type}`
 				};
-		}
-		
-		if (name !== "") {
-			readMapFromFile(stateFile, (err, currentInstances) => {
-				if (err) {
-					console.error('Error reading map from file:', err);
-					return;
-				}
-			  
-				// Add/update data in the map based on new resources
-				currentInstances.delete(name);
-			  
-				// Write the updated map back to the file
-				writeMapToFile(currentInstances, stateFile);
-			});
 		}
 	}
 
@@ -113,19 +97,6 @@ async function providerAws({
 				error: `Unknown resource type: ${type}`
 			};
 		}
-		
-		readMapFromFile(stateFile, (err, currentInstances) => {
-			if (err) {
-				console.error('Error reading map from file:', err);
-				return;
-			}
-
-			// Add/update data in the map based on new resources
-			currentInstances.set(Name, newId);
-	  
-			// Write the updated map back to the file
-			writeMapToFile(currentInstances, stateFile);
-        });
 		return newId;
 	}
 

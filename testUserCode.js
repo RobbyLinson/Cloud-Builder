@@ -5,8 +5,7 @@ import { accessKeyId, secretAccessKey } from './credentials.js'; // temporary, r
 const awsProvider = await providerAws({
   region: 'eu-west-1',
   accessKeyId: accessKeyId,
-  secretAccessKey: secretAccessKey,
-  stateFile: process.cwd() + '/cli/instances.json'
+  secretAccessKey: secretAccessKey
 });
 
 
@@ -21,7 +20,7 @@ const awsProvider = await providerAws({
 
 // terminateAllVpcsWithoutDependencies()
 
-// for (let i = 0; i < 4; i++){
+// for (let i = 1; i < 2; i++){
 //   const vpc = await awsProvider.createResource({
 //     type: "vpc",
 //     CidrBlock: "10.0.1.0/24",

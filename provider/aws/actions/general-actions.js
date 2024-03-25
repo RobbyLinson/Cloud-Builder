@@ -4,28 +4,28 @@ import { describeInstancesWithState } from "./instance-actions.js";
 import { describeNatGateways } from "./natgateway-actions.js";
 
 export async function describeAllResources(ec2Client) {
-    try {
-        const allResources = {};
-        
-        // Describe VPCs
-        const vpcs = await describeVpcs(ec2Client);
-        allResources['vpcs'] = vpcs.Vpcs;
+  try {
+    const allResources = {};
 
-        // Describe Subnets
-        const subnets = await describeSubnets(ec2Client);
-        allResources['subnets'] = subnets.Subnets;
+    // Describe VPCs
+    const vpcs = await describeVpcs(ec2Client);
+    allResources['vpcs'] = vpcs.Vpcs;
 
-        // Describe Instances
-        const instances = await describeInstancesWithState(ec2Client, ['pending', 'running']);
-        allResources['instances'] = instances;
+    // Describe Subnets
+    const subnets = await describeSubnets(ec2Client);
+    allResources['subnets'] = subnets.Subnets;
 
-        // Describe NAT Gateways
-        const natGateways = await describeNatGateways(ec2Client);
-        allResources['natGateways'] = natGateways.NatGateways;
+    // Describe Instances
+    const instances = await describeInstancesWithState(ec2Client, ['pending', 'running']);
+    allResources['instances'] = instances;
 
-        return allResources;
-    } catch (err) {
-        console.error(`Failed to describe all resources.`, err);
-        return {};
-    }
+    // Describe NAT Gateways
+    const natGateways = await describeNatGateways(ec2Client);
+    allResources['natGateways'] = natGateways.NatGateways;
+
+    return allResources;
+  } catch (err) {
+    console.error(`Failed to describe all resources.`, err);
+    return {};
+  }
 }
