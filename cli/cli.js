@@ -169,4 +169,5 @@ yargs(hideBin(process.argv))
       console.error('Error deleting resource:', error.message);
     }
   })
+  .command('update', 'Updates state file', async => { updateStateFile()})
   .parse();
