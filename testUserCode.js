@@ -9,6 +9,10 @@ const awsProvider = await providerAws({
   stateFile: process.cwd() + '/cli/instances.json'
 });
 
+const newInternetGateway = await awsProvider.createResource({
+  type: 'internetgateway'
+});
+
 // // ------------------
 // // Scenario 1
 
@@ -42,24 +46,40 @@ const mainVpc = await awsProvider.createResource({
   Name: "MainVPC"
 });
 
-
-const publicSubnet = await awsProvider.createResource({
-  type: 'subnet',
-  VpcId: mainVpc,
-  CidrBlock: '10.0.1.1/24'
+await awsProvider.attach({
+  internetgatewayId: newInternetGateway,
+  vpcId: mainVpc
 });
 
-const newNatGateway = await awsProvider.createResource({
-  type: 'natgateway',
-  SubnetId: publicSubnet,
-  //AllocationId: 'eipalloc-0e37779e6f029dfb4',
-  ConnectivityType: 'private'
-})
+// const publicSubnet = await awsProvider.createResource({
+//   type: 'subnet',
+//   VpcId: mainVpc,
+//   CidrBlock: '10.0.1.1/24'
+// });
 
-// await awsProvider.terminateResource({
-//     type: "natgateway",
-//     instanceId: newNatGateway
+// const newNatGateway = await awsProvider.createResource({
+//   type: 'natgateway',
+//   SubnetId: publicSubnet,
+//   //AllocationId: 'eipalloc-0e37779e6f029dfb4',
+//   ConnectivityType: 'private'
 // })
+
+// const internetgatewayDescription = await awsProvider.describeResources({
+//   type: 'internetgateway',
+//   resourceIds: [newInternetGateway]
+// })
+
+// console.log(internetgatewayDescription);
+
+await awsProvider.detach({
+  internetgatewayId: newInternetGateway,
+  vpcId: mainVpc
+});
+
+await awsProvider.terminateResource({
+    type: "internetgateway",
+    instanceId: newInternetGateway
+});
 
 // const newNatGateway = await awsProvider.createResource({
 //   type: 'natgateway',
@@ -81,20 +101,20 @@ const newNatGateway = await awsProvider.createResource({
 //     type: "instance",
 //     instanceId: newInstance
 // })
-const natgatewayDescription = await awsProvider.describeResources({
-  type: 'natgateway',
-  resourceIds: [newNatGateway]
-})
+// const natgatewayDescription = await awsProvider.describeResources({
+//   type: 'natgateway',
+//   resourceIds: [newNatGateway]
+// })
 
-console.log(natgatewayDescription);
-await awsProvider.terminateResource({
-  type: "natgateway",
-  instanceId: newNatGateway
-})
-await awsProvider.terminateResource({
-    type: "subnet",
-    instanceId: publicSubnet
-})
+// console.log(natgatewayDescription);
+// await awsProvider.terminateResource({
+//   type: "natgateway",
+//   instanceId: newNatGateway
+// })
+// await awsProvider.terminateResource({
+//     type: "subnet",
+//     instanceId: publicSubnet
+// })
 await awsProvider.terminateResource({
   type: "vpc",
   instanceId: mainVpc
@@ -117,7 +137,7 @@ await awsProvider.terminateResource({
 
 // // Describe a VPC
 // const vpcDescription = await awsProvider.describeResources({
-// 	type: 'vpc', resourceIds: [mainVpc]
+//  type: 'vpc', resourceIds: [mainVpc]
 // });
 
 // // Read some VPC info after describing.
@@ -126,8 +146,8 @@ await awsProvider.terminateResource({
 
 // // Describe a Subnet
 // const subnetDescription = await awsProvider.describeResources({
-// 	type: 'subnet', resourceIds: [publicSubnet]
-// });	
+//  type: 'subnet', resourceIds: [publicSubnet]
+// });  
 
 // // Read some Subnet info after describing.
 // console.log(subnetDescription.Subnets[0].CidrBlock);
