@@ -7,9 +7,28 @@
 }
 
 .team__item{
-    width: 25%;
+    width: 100%;
     background: var(--team-card-bg);
     border-radius: 5px;
+}
+
+.home-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    background: var(--icon-bg); /* Fallback color */
+    color: var(--primary-color); /* Fallback color */
+    border: none;
+    border-radius: 5px;
+    text-decoration: none; /* Remove underlines from the link */
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+.home-button:hover {
+    background-color: blue; /* Fallback color */
+    cursor: pointer;
 }
 
 .team__img{
@@ -71,10 +90,14 @@ p {
 }
 
 .team__wrapper {
-    display: flex;
-    align-items: center;
-    column-gap: 2rem;
-}
+    display: grid;
+    width: 100%; /* Stretch to the full width of the parent */
+    grid-template-columns: repeat(4, 1fr); /* Three columns */
+    gap: 20px; /* Space between the cards */
+    justify-content: center; /* Center the grid inside the container */
+    align-items: start; /* Align items to the start of the container */
+    padding: 20px; /* Padding inside the container */
+  }
 
 @media only screen and (max-width: 768px) {
     .team__item {
@@ -99,8 +122,14 @@ p {
     }
 }
 
-@media only screen and (max-width: 576px) {
-    .team__item{
-        width: 100%;
+@media (max-width: 768px) {
+    .team__wrapper {
+      grid-template-columns: repeat(2, 1fr); /* Two columns for smaller screens */
     }
-}
+  }
+  
+  @media (max-width: 480px) {
+    .team__wrapper {
+      grid-template-columns: 1fr; /* One column for very small screens */
+    }
+  }
