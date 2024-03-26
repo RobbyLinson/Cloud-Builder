@@ -8,13 +8,18 @@ import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
 import { execSync } from 'child_process';
 
-//state related imports
+// State related imports
 import { updateStateFile, compareCounts  } from '../provider/aws/state/state.js';
 import { previewFileContent, userFileCountNumberOfResourcesByType } from '../provider/aws/state/userFileParsers.js';
 import { stateCountNumberOfResourcesByType, getResourceTypeAndIdByName } from '../provider/aws/state/stateFileParsers.js';
 
+// Create new Provider Manager to handle importing available providers.
+const providers = await new ProviderManager();
 
-//make logo
+// Create Provider object based on current active provider.
+const activeProvider = await providers.returnActiveProvider();
+
+// Make logo
 console.log(chalk.blueBright("  ____ _                 _   _           _ _     _           "));
 console.log(chalk.blueBright(" / ___| | ___  _   _  __| | | |__  _   _(_) | __| | ___ _ __ "));
 console.log(chalk.blueBright("| |   | |/ _ \\| | | |/ _` | | '_ \\| | | | | |/ _` |/ _ \\ '__|"));
@@ -24,12 +29,6 @@ console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|
 console.log("\nWelcome to Cloud-Builder\n");
 
 console.log("clb help     for list of commands!");
-
-// 
-const providers = await new ProviderManager();
-await providers.loadProviderConfig();
-
-const activeProvider = await providers.returnActiveProvider();
 
 // Use yargs to define commands and their callbacks
 yargs(hideBin(process.argv))

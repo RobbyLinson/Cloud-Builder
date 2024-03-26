@@ -3,7 +3,13 @@ import fs from 'fs';
 import { pathToFileURL } from 'url'
 
 export class ProviderManager {
-	 
+  constructor() {
+    return (async () => {
+	  await this.loadProviderConfig();
+      return this;
+    })();
+  }
+  
   async loadProviderConfig(path=process.cwd() + '/providers.json') {
     const config = JSON.parse(fs.readFileSync(path)).available;
 	
