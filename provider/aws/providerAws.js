@@ -6,6 +6,7 @@ import { createSubnet, describeSubnets, deleteSubnet } from './actions/subnet-ac
 import { createInstance, describeInstances, deleteInstance } from './actions/instance-actions.js';
 import { createNatGateway, describeNatGateways, deleteNatGateway } from "./actions/natgateway-actions.js";
 import { createInternetGateway, describeInternetGateways, deleteInternetGateway, attachInternetGatewayToVpc, detachInternetGatewayFromVpc } from "./actions/internetgateway-actions.js";
+import { createRouteTable, describeRouteTables, deleteRouteTable} from './actions/routetable-actions.js';
 import { readMapFromFile, writeMapToFile } from '../../cli/state.js';
 
 async function providerAws({
@@ -38,6 +39,8 @@ async function providerAws({
             return describeNatGateways(ec2Client, resourceIds);
         case 'internetgateway':
             return describeInternetGateways(ec2Client, resourceIds);
+		case 'routetable':
+            return describeRouteTables(ec2Client, resourceIds);
         default:
             return {
                 error: `Unknown resource type: ${type}`
@@ -74,6 +77,9 @@ async function providerAws({
             case 'internetgateway':
                 await deleteInternetGateway(ec2Client, instanceId);
                 break;
+			case 'routetable':
+				await deleteRouteTable(ec2Client, instanceId);
+				break;
             default:
                 return {
                     error: `Unknown resource type: ${type}`
@@ -129,6 +135,11 @@ async function providerAws({
                 Name, ...options
             });
             break;
+		case 'routetable':
+			newId = await createRouteTable(ec2Client, {
+				Name, ...options
+			});
+			break;
         default:
             return {
                 error: `Unknown resource type: ${type}`

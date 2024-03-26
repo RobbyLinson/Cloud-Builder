@@ -9,9 +9,25 @@ const awsProvider = await providerAws({
   stateFile: process.cwd() + '/cli/instances.json'
 });
 
-const newInternetGateway = await awsProvider.createResource({
-  type: 'internetgateway'
+const mainVpc = await awsProvider.createResource({
+  type: 'vpc',
+  CidrBlock: '10.0.1.0/24',
+  Name: "MainVPC"
 });
+
+const newRouteTable = await awsProvider.createResource({
+  type: 'routetable',
+  VpcId: mainVpc,
+});
+
+// await awsProvider.terminateResource({
+//     type: "routetable",
+//     instanceId: newRouteTable
+// })
+
+// const newInternetGateway = await awsProvider.createResource({
+//   type: 'internetgateway'
+// });
 
 // // ------------------
 // // Scenario 1
@@ -40,16 +56,17 @@ const newInternetGateway = await awsProvider.createResource({
 // ------------------
 // Scenario 2
 
-const mainVpc = await awsProvider.createResource({
-  type: 'vpc',
-  CidrBlock: '10.0.1.0/24',
-  Name: "MainVPC"
-});
+// const mainVpc = await awsProvider.createResource({
+//   type: 'vpc',
+//   CidrBlock: '10.0.1.0/24',
+//   Name: "MainVPC"
+// });
 
-await awsProvider.attach({
-  internetgatewayId: newInternetGateway,
-  vpcId: mainVpc
-});
+
+// await awsProvider.attach({
+//   internetgatewayId: newInternetGateway,
+//   vpcId: mainVpc
+// });
 
 // const publicSubnet = await awsProvider.createResource({
 //   type: 'subnet',
@@ -71,15 +88,15 @@ await awsProvider.attach({
 
 // console.log(internetgatewayDescription);
 
-await awsProvider.detach({
-  internetgatewayId: newInternetGateway,
-  vpcId: mainVpc
-});
+// await awsProvider.detach({
+//   internetgatewayId: newInternetGateway,
+//   vpcId: mainVpc
+// });
 
-await awsProvider.terminateResource({
-    type: "internetgateway",
-    instanceId: newInternetGateway
-});
+// await awsProvider.terminateResource({
+//     type: "internetgateway",
+//     instanceId: newInternetGateway
+// });
 
 // const newNatGateway = await awsProvider.createResource({
 //   type: 'natgateway',
@@ -115,9 +132,13 @@ await awsProvider.terminateResource({
 //     type: "subnet",
 //     instanceId: publicSubnet
 // })
+// await awsProvider.terminateResource({
+//   type: "vpc",
+//   instanceId: mainVpc
+// })
 await awsProvider.terminateResource({
-  type: "vpc",
-  instanceId: mainVpc
+    type: "routetable",
+    instanceId: newRouteTable
 })
 
 
