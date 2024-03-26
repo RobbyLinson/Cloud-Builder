@@ -1,11 +1,11 @@
 
 import fs from 'fs';
 import { pathToFileURL } from 'url'
- 
+
 export class ProviderManager {
 	 
   async loadProviderConfig(path=process.cwd() + '/providers.json') {
-    const config = JSON.parse(fs.readFileSync(path));
+    const config = JSON.parse(fs.readFileSync(path)).available;
 	
 	if (config.length <= 0) {
 		console.log(`No providers have been installed.`);
@@ -27,6 +27,11 @@ export class ProviderManager {
       console.log(`Failed to load '${provider}'`)
 	  console.log(e);
     }
+  }
+  
+  async returnActiveProvider(path=process.cwd() + '/providers.json') {
+	  const config = JSON.parse(fs.readFileSync(path));
+	  return this[config.active]();
   }
 }
  

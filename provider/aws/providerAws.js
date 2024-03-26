@@ -4,19 +4,19 @@ import { createSubnet, describeSubnets, deleteSubnet } from './actions/subnet-ac
 import { createInstance, describeInstances, deleteInstance } from './actions/instance-actions.js';
 import { createNatGateway, describeNatGateways, deleteNatGateway } from "./actions/natgateway-actions.js";
 import { describeAllResources } from "./actions/general-actions.js";
+import { checkAwsFolder, getCredentials } from './credentialsAws.js';
 
 
-async function providerAws({
-	region,
-	accessKeyId,
-	secretAccessKey
-}) {
+async function providerAws() {
 	
+	await checkAwsFolder();
+	const awsCredentials = await getCredentials();
+
 	const ec2Client = new EC2Client({
-		region,
+		region: awsCredentials.region,
 		credentials: {
-			accessKeyId,
-			secretAccessKey
+			accessKeyId: awsCredentials.accessKeyId,
+			secretAccessKey: awsCredentials.secretAccessKey
 		}
 	});
 	

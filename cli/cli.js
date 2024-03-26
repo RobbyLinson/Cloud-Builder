@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
-//import providerAws from '../provider/aws/providerAws.js';
 import { ProviderManager } from '../provider/providerManager.js';
-import { checkAwsFolder, getCredentials } from './awsConfig.js';
 
 // Import the yargs library
 import yargs from 'yargs/yargs';
@@ -15,9 +13,6 @@ import { updateStateFile, compareCounts  } from '../provider/aws/state/state.js'
 import { previewFileContent, userFileCountNumberOfResourcesByType } from '../provider/aws/state/userFileParsers.js';
 import { stateCountNumberOfResourcesByType, getResourceTypeAndIdByName } from '../provider/aws/state/stateFileParsers.js';
 
-// 
-const providers = await new ProviderManager();
-await providers.loadProviderConfig();
 
 //make logo
 console.log(chalk.blueBright("  ____ _                 _   _           _ _     _           "));
@@ -26,33 +21,20 @@ console.log(chalk.blueBright("| |   | |/ _ \\| | | |/ _` | | '_ \\| | | | | |/ _
 console.log(chalk.blueBright("| |___| | (_) | |_| | (_| | | |_) | |_| | | | (_| |  __/ |   "));
 console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|\\__,_|\\___|_|   "));
 
-
-
-
-
 console.log("\nWelcome to Cloud-Builder\n");
-
-// console.log("\nCommands:\ncloud-builder greet <name>           Gives you a little greeting!")
-// console.log("cloud-builder run <file name>        Runs given builder script.");
-// console.log("cloud-builder create <type> <name>   Creates aws resource of given type.");
-// console.log("cloud-builder delete <name>          Deletes aws resource of given name.\n");
 
 console.log("clb help     for list of commands!");
 
-await checkAwsFolder();
-const awsCredentials = await getCredentials();
+// 
+const providers = await new ProviderManager();
+await providers.loadProviderConfig();
 
-// Temporary: load hardcoded provider credentials file
-const awsProvider = await providers.aws({
-	region: awsCredentials.region,
-	accessKeyId: awsCredentials.accessKeyId,
-	secretAccessKey: awsCredentials.secretAccessKey
-});
+const activeProvider = await providers.returnActiveProvider();
 
 // Use yargs to define commands and their callbacks
 yargs(hideBin(process.argv))
   .scriptName("clb")
-  .command('greet <name>', 'greet a user by name', (yargs) => {
+  .command('greet <name>', 'Greet a user by name', (yargs) => {
     console.clear();
     return yargs.positional('name', {
       describe: 'name to greet',
@@ -62,7 +44,7 @@ yargs(hideBin(process.argv))
   }, (argv) => {
     console.log(`Hello, ${argv.name}!`);
   })
-  .command('run <file>', 'executes a JavaScript file', (yargs) => {
+  .command('run <file>', 'Executes a JavaScript file', (yargs) => {
     return yargs.positional('file', {
       describe: 'executes js file',
       type: 'string'
@@ -113,7 +95,7 @@ yargs(hideBin(process.argv))
       }
     }
   })
-  .command('create <type> <name> [options..]', 'Create AWS resource', (yargs) => {
+  .command('create <type> <name> [options..]', 'Creates a new resource', (yargs) => {
     yargs.positional('type', {
       describe: 'Type of resource to create (e.g., vpc, subnet, instance)',
       type: 'string'
@@ -132,7 +114,7 @@ yargs(hideBin(process.argv))
         split_options[key] = value;
       });
 	
-      const result = await awsProvider.createResource({
+      const result = await activeProvider.createResource({
         type: argv.type,
         Name: argv.name,
         ...split_options
@@ -145,7 +127,7 @@ yargs(hideBin(process.argv))
       console.error('Error creating resource:', error.message);
     }
   })
-  .command('delete <name>', 'Deletes AWS resource', (yargs)=> {
+  .command('delete <name>', 'Deletes a resource by name', (yargs)=> {
     yargs.positional('name', {
       describe: 'Name of resource to delete (e.g., mainVpc, mainSubnet, linuxInstance)',
       type: 'string'
@@ -155,9 +137,9 @@ yargs(hideBin(process.argv))
 
       const data = await getResourceTypeAndIdByName(argv.name);
       
-      // Call awsProvider.terminateResource to destroy the AWS resource
+      // Call activeProvider.terminateResource to destroy the resource
       if (data){
-        const result = await awsProvider.terminateResource({
+        const result = await activeProvider.terminateResource({
           type: data.type,
 		      instanceId: data.id
         });
