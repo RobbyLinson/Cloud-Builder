@@ -11,8 +11,10 @@ import chalk from 'chalk';
 import { execSync } from 'child_process';
 
 //state related imports
-import { previewFileContent, updateStateFile, userFileCountNumberOfResourcesByType, StateCountNumberOfResourcesByType, compareCounts, getResourceTypeAndIdByName } from './state.js';
+import { updateStateFile, compareCounts  } from '../provider/aws/state/state.js';
 
+import { previewFileContent, userFileCountNumberOfResourcesByType } from '../provider/aws/state/userFileParsers.js';
+import { stateCountNumberOfResourcesByType, getResourceTypeAndIdByName } from '../provider/aws/state/stateFileParsers.js';
 //make logo
 
 const providers = await new ProviderManager();
@@ -70,7 +72,7 @@ yargs(hideBin(process.argv))
 
     // get objects with number of resources on ec2 client and in user defined file
     const userFileCounts = await userFileCountNumberOfResourcesByType(argv.file);
-    const stateFileCounts = await StateCountNumberOfResourcesByType();
+    const stateFileCounts = await stateCountNumberOfResourcesByType();
   
     // Compare counts from user file and state file
     const matchCounts = compareCounts(userFileCounts, stateFileCounts);
