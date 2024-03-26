@@ -1,4 +1,4 @@
-import { CreateRouteTableCommand, DescribeRouteTablesCommand, DeleteRouteTableCommand} from "@aws-sdk/client-ec2";
+import { CreateRouteTableCommand, DescribeRouteTablesCommand, DeleteRouteTableCommand, AssociateRouteTableCommand} from "@aws-sdk/client-ec2";
 
 export async function createRouteTable(ec2Client, {
     name,
@@ -39,3 +39,15 @@ export async function deleteRouteTable(ec2Client,routetableId) {
       console.warn(`Failed to terminate instance ${routetableId}.`, err);
     }
 };
+
+export async function attachRouteTable(ec2Client, routetableId, subnetId ) {
+	const command = new AssociateRouteTableCommand({RouteTableId: routetableId,
+	SubnetId: subnetId
+	});
+	try {
+		const response = await ec2Client.send(command);
+		console.log(`Attached routetable ${routetableId} to subnet ${subnetId}\n`);
+	} catch (err) {
+		console.warn(`Failed to attach subnet to routetable.`, err);
+	}
+}

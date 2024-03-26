@@ -9,16 +9,12 @@ const awsProvider = await providerAws({
   stateFile: process.cwd() + '/cli/instances.json'
 });
 
-const mainVpc = await awsProvider.createResource({
-  type: 'vpc',
-  CidrBlock: '10.0.1.0/24',
-  Name: "MainVPC"
-});
+// const mainVpc = await awsProvider.createResource({
+//   type: 'vpc',
+//   CidrBlock: '10.0.1.0/24',
+//   Name: "MainVPC"
+// });
 
-const newRouteTable = await awsProvider.createResource({
-  type: 'routetable',
-  VpcId: mainVpc,
-});
 
 // await awsProvider.terminateResource({
 //     type: "routetable",
@@ -56,23 +52,36 @@ const newRouteTable = await awsProvider.createResource({
 // ------------------
 // Scenario 2
 
-// const mainVpc = await awsProvider.createResource({
-//   type: 'vpc',
-//   CidrBlock: '10.0.1.0/24',
-//   Name: "MainVPC"
-// });
+const mainVpc = await awsProvider.createResource({
+  type: 'vpc',
+  CidrBlock: '10.0.1.0/24',
+  Name: "MainVPC"
+});
 
+const publicSubnet = await awsProvider.createResource({
+  type: 'subnet',
+  VpcId: mainVpc,
+  CidrBlock: '10.0.1.1/24'
+});
 
-// await awsProvider.attach({
-//   internetgatewayId: newInternetGateway,
-//   vpcId: mainVpc
-// });
+const newInternetGateway = await awsProvider.createResource({
+  type: 'internetgateway'
+});
 
-// const publicSubnet = await awsProvider.createResource({
-//   type: 'subnet',
-//   VpcId: mainVpc,
-//   CidrBlock: '10.0.1.1/24'
-// });
+const newRouteTable = await awsProvider.createResource({
+  type: 'routetable',
+  VpcId: mainVpc,
+});
+
+await awsProvider.attach({
+  internetgatewayId: newInternetGateway,
+  vpcId: mainVpc
+});
+
+await awsProvider.associate({
+  routetableId: newRouteTable,
+  subnetId: publicSubnet,
+});
 
 // const newNatGateway = await awsProvider.createResource({
 //   type: 'natgateway',
@@ -136,10 +145,10 @@ const newRouteTable = await awsProvider.createResource({
 //   type: "vpc",
 //   instanceId: mainVpc
 // })
-await awsProvider.terminateResource({
-    type: "routetable",
-    instanceId: newRouteTable
-})
+// await awsProvider.terminateResource({
+//     type: "routetable",
+//     instanceId: newRouteTable
+// })
 
 
 // ------------------

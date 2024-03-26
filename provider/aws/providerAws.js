@@ -6,7 +6,7 @@ import { createSubnet, describeSubnets, deleteSubnet } from './actions/subnet-ac
 import { createInstance, describeInstances, deleteInstance } from './actions/instance-actions.js';
 import { createNatGateway, describeNatGateways, deleteNatGateway } from "./actions/natgateway-actions.js";
 import { createInternetGateway, describeInternetGateways, deleteInternetGateway, attachInternetGatewayToVpc, detachInternetGatewayFromVpc } from "./actions/internetgateway-actions.js";
-import { createRouteTable, describeRouteTables, deleteRouteTable} from './actions/routetable-actions.js';
+import { createRouteTable, describeRouteTables, deleteRouteTable, attachRouteTable} from './actions/routetable-actions.js';
 import { readMapFromFile, writeMapToFile } from '../../cli/state.js';
 
 async function providerAws({
@@ -58,6 +58,12 @@ async function providerAws({
         internetgatewayId, vpcId
     }) {
         return detachInternetGatewayFromVpc(ec2Client, internetgatewayId, vpcId);
+    }
+
+    async function associate({
+        routetableId, subnetId
+    }) {
+        return attachRouteTable(ec2Client, routetableId, subnetId);
     }
 
     async function terminateResource({type, instanceId, name=""}){
@@ -177,6 +183,7 @@ async function providerAws({
         createResource: createResource, 
         attach: attach,
         detach: detach,
+        associate: associate,
         describeResources: describeResources,
         terminateResource: terminateResource,
         updateResource: updateResource
