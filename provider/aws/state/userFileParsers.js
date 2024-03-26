@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import fs from "fs";
+import read from 'readline';
 
 // specify the maximum number of empty lines allowed between code lines
 const MAX_NUMBER_OF_EMPTY_LINES = 2;

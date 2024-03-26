@@ -1,12 +1,7 @@
 import providerAws from './provider/aws/providerAws.js';
-import { accessKeyId, secretAccessKey } from './credentials.js'; // temporary, replace this asap
 // Creation testing //
 
-const awsProvider = await providerAws({
-  region: 'eu-west-1',
-  accessKeyId: accessKeyId,
-  secretAccessKey: secretAccessKey
-});
+const awsProvider = await providerAws();
 
 
 // restrictions for clb run <file> in mode 2 ( when we care about the state)
