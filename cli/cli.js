@@ -12,11 +12,10 @@ import { execSync } from 'child_process';
 
 //state related imports
 import { updateStateFile, compareCounts  } from '../provider/aws/state/state.js';
-
 import { previewFileContent, userFileCountNumberOfResourcesByType } from '../provider/aws/state/userFileParsers.js';
 import { stateCountNumberOfResourcesByType, getResourceTypeAndIdByName } from '../provider/aws/state/stateFileParsers.js';
-//make logo
 
+// 
 const providers = await new ProviderManager();
 await providers.loadProviderConfig();
 

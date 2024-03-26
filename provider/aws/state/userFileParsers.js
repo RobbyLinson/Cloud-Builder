@@ -132,6 +132,7 @@ function processFileContent(fileContent){
   return nonCommentedContent;
 }
 
+// currLine must be a for loop init, evaluates the number of iterations
 function getNumberOfIterations(currLine){
   // Regular expression to match the for loop initialization and condition
   const regex = /for\s*\(([^;]*);([^;]*);[^)]*\)/;
@@ -150,6 +151,7 @@ function getNumberOfIterations(currLine){
   }
 }
 
+// function that modifies counts in a resource count object passed ↓
 function handleCountIncrease(currLine, allLines, insideLoop, resourceCounts){
   // Keep parsing the line until we find the "type" parameter
   let currentLine = currLine;
@@ -177,6 +179,7 @@ function handleCountIncrease(currLine, allLines, insideLoop, resourceCounts){
   }
 }
 
+// function that modifies counts in a resource count object passed ↓
 function handleCountDecrease(currLine, allLines, insideLoop, resourceCounts){
   // Keep parsing the line until we find the "type" parameter
   let currentLine = currLine;
