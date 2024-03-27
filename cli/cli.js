@@ -13,6 +13,7 @@ import { execSync } from 'child_process';
 import { updateStateFile, compareCounts  } from '../provider/aws/state/state.js';
 import { previewFileContent, userFileCountNumberOfResourcesByType } from '../provider/aws/state/userFileParsers.js';
 import { stateCountNumberOfResourcesByType, getResourceTypeAndIdByName } from '../provider/aws/state/stateFileParsers.js';
+import { checkAwsFolder } from '../provider/aws/credentialsAws.js';
 
 // Create new Provider Manager to handle importing available providers.
 const providers = await new ProviderManager();
@@ -32,6 +33,7 @@ console.log(chalk.blueBright("| |___| | (_) | |_| | (_| | | |_) | |_| | | | (_| 
 console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|\\__,_|\\___|_|   "));
 
 import util from 'util';
+import { checkAwsFolder } from '../provider/aws/credentialsAws.js';
 
 // Session time for logs
 const sessionTime = new Date();
@@ -64,6 +66,8 @@ console.log = function () {
 console.error = console.log;
 
 console.log("\nWelcome to Cloud-Builder\n");
+
+checkAwsFolder();
 
 // Use yargs to define commands and their callbacks
 yargs(hideBin(process.argv))
