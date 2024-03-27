@@ -172,6 +172,10 @@ function handleCountIncrease(currLine, allLines, insideLoop, resourceCounts, loo
         resourceCounts.instances += (insideLoop ? loopIterations : 1);
       } else if (resourceType === "'natGateway'" || resourceType === '"natGateway"') {
         resourceCounts.natGateways += (insideLoop ? loopIterations : 1);
+      } else if (resourceType === "'internetGateways'" || resourceType === '"internetGateways"') {
+        resourceCounts.internetGateways += (insideLoop ? loopIterations : 1);
+      } else if (resourceType === "'routeTables'" || resourceType === '"routeTables"') {
+        resourceCounts.routeTables += (insideLoop ? loopIterations : 1);
       }
       break; // Exit the loop once the "type" parameter is found
     }
@@ -200,6 +204,10 @@ function handleCountDecrease(currLine, allLines, insideLoop, resourceCounts, loo
         resourceCounts.instances += (insideLoop ? -loopIterations : -1);
       } else if (resourceType === "'natGateway'" || resourceType === '"natGateway"') {
         resourceCounts.natGateways += (insideLoop ? -loopIterations : -1);
+      } else if (resourceType === "'internetGateways'" || resourceType === '"internetGateways"') {
+        resourceCounts.internetGateways += (insideLoop ? loopIterations : -1);
+      } else if (resourceType === "'routeTables'" || resourceType === '"routeTables"') {
+        resourceCounts.routeTables += (insideLoop ? loopIterations : -1);
       }
       break; // Exit the loop once the "type" parameter is found
     }

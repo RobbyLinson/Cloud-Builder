@@ -49,17 +49,19 @@ if (!fs.existsSync(folderPath)) {
             console.log('Folder created successfully!');
         }
     });
-} else {
-  var logPath = process.cwd() + '/cli/logs/' + sessionTimeString + '.txt'; 
-  var logFile = fs.createWriteStream(logPath, { flags: 'a' });
-  var logStdout = process.stdout;
-  
-  console.log = function () {
-    logFile.write(util.format.apply(null, arguments) + '\n');
-    logStdout.write(util.format.apply(null, arguments) + '\n');
-  }
-  console.error = console.log;
 }
+
+// Create log file
+var logPath = process.cwd() + '/cli/logs/' + sessionTimeString + '.txt'; 
+var logFile = fs.createWriteStream(logPath, { flags: 'a' });
+var logStdout = process.stdout;
+
+// Override console.log to write to logs
+console.log = function () {
+   logFile.write(util.format.apply(null, arguments) + '\n');
+   logStdout.write(util.format.apply(null, arguments) + '\n');
+}
+console.error = console.log;
 
 console.log("\nWelcome to Cloud-Builder\n");
 
