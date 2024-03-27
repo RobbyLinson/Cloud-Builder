@@ -13,7 +13,6 @@ import { execSync } from 'child_process';
 import { updateStateFile, compareCounts  } from '../provider/aws/state/state.js';
 import { previewFileContent, userFileCountNumberOfResourcesByType } from '../provider/aws/state/userFileParsers.js';
 import { stateCountNumberOfResourcesByType, getResourceTypeAndIdByName } from '../provider/aws/state/stateFileParsers.js';
-import { checkAwsFolder } from '../provider/aws/credentialsAws.js';
 
 // Create new Provider Manager to handle importing available providers.
 const providers = await new ProviderManager();
@@ -21,14 +20,8 @@ const providers = await new ProviderManager();
 // Create Provider object based on current active provider.
 const activeProvider = await providers.returnActiveProvider();
 
-// Make logo
+// Import filesystem library
 import fs from 'fs';
-
-const sessionTime = new Date();
-
-const sessionTimeString = sessionTime.getDate() + "_" + (sessionTime.getMonth()+1) + "_" + sessionTime.getFullYear();
-console.log(sessionTimeString);
-
 
 //make logo
 
@@ -39,6 +32,11 @@ console.log(chalk.blueBright("| |___| | (_) | |_| | (_| | | |_) | |_| | | | (_| 
 console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|\\__,_|\\___|_|   "));
 
 import util from 'util';
+
+// Session time for logs
+const sessionTime = new Date();
+const sessionTimeString = sessionTime.getDate() + "_" + (sessionTime.getMonth()+1) + "_" + sessionTime.getFullYear();
+//console.log(sessionTimeString);
 
 const folderPath = './cli/logs';
 // Check if the folder exists
@@ -62,10 +60,6 @@ if (!fs.existsSync(folderPath)) {
   }
   console.error = console.log;
 }
-
-console.log("\nclb help     for list of commands!\n");
-
-checkAwsFolder();
 
 console.log("\nWelcome to Cloud-Builder\n");
 
