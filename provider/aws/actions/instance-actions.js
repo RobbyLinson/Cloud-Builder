@@ -72,7 +72,7 @@ export async function deleteInstance(ec2Client,instanceId) {
 		currentState = await getInstanceState(ec2Client, instanceId);
 	}
     
-	console.log(`\n🧹 Instance with ID ${instanceId} terminated.\n`);
+	console.log(`🧹 Instance with ID ${instanceId} terminated.\n`);
   } catch (err) {
     console.warn(`Failed to terminate instance ${instanceId}.`, err);
   }

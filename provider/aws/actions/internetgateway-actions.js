@@ -20,7 +20,6 @@ export async function attachInternetGatewayToVpc(ec2Client, internetgatewayId, v
         VpcId: vpcId});
 	try {
 		await ec2Client.send(command);
-		// the response for this command is {} which doesn't tell us much
 		console.log(`🤝 InternetGateway with ID ${internetgatewayId} attached to VPC with ID ${vpcId} .\n`);
 	} catch(err) {
 		console.warn("Could not attach InternetGateway and VPC", err);
@@ -33,8 +32,7 @@ export async function detachInternetGatewayFromVpc(ec2Client, internetgatewayId,
         VpcId: vpcId});
 	try {
 		await ec2Client.send(command);
-		// the response for this command is {} which doesn't tell us much
-		console.log(`🙌 Internet Gateway with ID ${internetgatewayId} has been detached from VPC with ID ${vpcId} .\n`);
+		console.log(`✂️ Detached internet gateway ${internetgatewayId} from VPC with ID ${vpcId}\n`);
 	} catch(err) {
 		console.warn("Could not detach VPC and InternetGateway", err);
 	}
@@ -59,7 +57,7 @@ export async function deleteInternetGateway(ec2Client,internetgatewayId) {
 
     try {
         await ec2Client.send(command);
-      console.log(`\n🧹 InternetGateway with ID ${internetgatewayId} terminated.\n`);
+      console.log(`🧹 InternetGateway with ID ${internetgatewayId} terminated.\n`);
     } catch (err) {
       console.warn(`Failed to terminate instance ${internetgatewayId}.`, err);
     }

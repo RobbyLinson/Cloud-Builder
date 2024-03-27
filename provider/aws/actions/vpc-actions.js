@@ -54,12 +54,8 @@ export async function deleteVPC(ec2Client,vpcId) {
 	});
 
 	try {
-	  	await ec2Client.send(command);
-	//   	await waitUntilVpc??ConnectionDeleted( doesn't work for vpc, find an alternative, please
-	// 		{ client: ec2Client },
-	// 		{ InstanceIds: [instanceI] },
-	//   );
-	  console.log(`\n🧹 VPC with ID ${vpcId} terminated.\n`);
+	  await ec2Client.send(command);
+	  console.log(`🧹 VPC with ID ${vpcId} terminated.\n`);
 	} catch (err) {
 	  console.warn(`Failed to terminate VPC ${vpcId}.`, err);
 	}

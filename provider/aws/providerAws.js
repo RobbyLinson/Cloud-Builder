@@ -6,7 +6,7 @@ import { createSubnet, describeSubnets, deleteSubnet } from './actions/subnet-ac
 import { createInstance, describeInstances, deleteInstance } from './actions/instance-actions.js';
 import { createNatGateway, describeNatGateways, deleteNatGateway } from "./actions/natgateway-actions.js";
 import { createInternetGateway, describeInternetGateways, deleteInternetGateway, attachInternetGatewayToVpc, detachInternetGatewayFromVpc } from "./actions/internetgateway-actions.js";
-import { createRouteTable, describeRouteTables, deleteRouteTable, attachRouteTable} from './actions/routetable-actions.js';
+import { createRouteTable, describeRouteTables, deleteRouteTable, attachRouteTableToSubnet, attachRouteTableToGateway, detachRouteTableFromGateway, detachRouteTableFromSubnet} from './actions/routetable-actions.js';
 import { readMapFromFile, writeMapToFile } from '../../cli/state.js';
 
 async function providerAws({
@@ -48,22 +48,40 @@ async function providerAws({
         }
     }
 
-    async function attach({
+    async function attachInternetGatewayAndVpc({
         internetgatewayId, vpcId
     }) {
         return attachInternetGatewayToVpc(ec2Client, internetgatewayId, vpcId);
     }
 
-    async function detach({
+    async function detachInternetGatewayAndVpc({
         internetgatewayId, vpcId
     }) {
         return detachInternetGatewayFromVpc(ec2Client, internetgatewayId, vpcId);
     }
 
-    async function associate({
+    async function attachRouteTableAndSubnet({
         routetableId, subnetId
     }) {
-        return attachRouteTable(ec2Client, routetableId, subnetId);
+        return attachRouteTableToSubnet(ec2Client, routetableId, subnetId);
+    }
+
+    async function detachRouteTableAndSubnet({
+        routetableId, subnetId
+    }) {
+        return detachRouteTableFromSubnet(ec2Client, routetableId, subnetId);
+    }
+
+    async function attachInternetGatewayAndRouteTable({
+        destinationcidrblock, gatewayId, routetableId
+    }) {
+        return attachRouteTableToGateway(ec2Client, destinationcidrblock, gatewayId, routetableId);
+    }
+
+    async function detachInternetGatewayAndRouteTable({
+        destinationcidrblock, routetableId
+    }) {
+        return detachRouteTableFromGateway(ec2Client, destinationcidrblock, routetableId);
     }
 
     async function terminateResource({type, instanceId, name=""}){
@@ -181,9 +199,12 @@ async function providerAws({
 
     return {
         createResource: createResource, 
-        attach: attach,
-        detach: detach,
-        associate: associate,
+        attachInternetGatewayAndVpc: attachInternetGatewayAndVpc,
+        detachInternetGatewayAndVpc: detachInternetGatewayAndVpc,
+        attachRouteTableAndSubnet: attachRouteTableAndSubnet,
+        detachRouteTableAndSubnet: detachRouteTableAndSubnet,
+        attachInternetGatewayAndRouteTable: attachInternetGatewayAndRouteTable,
+        detachInternetGatewayAndRouteTable: detachInternetGatewayAndRouteTable,
         describeResources: describeResources,
         terminateResource: terminateResource,
         updateResource: updateResource

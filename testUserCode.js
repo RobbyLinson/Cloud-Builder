@@ -73,14 +73,55 @@ const newRouteTable = await awsProvider.createResource({
   VpcId: mainVpc,
 });
 
-await awsProvider.attach({
+await awsProvider.attachInternetGatewayAndVpc({
   internetgatewayId: newInternetGateway,
   vpcId: mainVpc
 });
 
-await awsProvider.associate({
+await awsProvider.attachRouteTableAndSubnet({
   routetableId: newRouteTable,
   subnetId: publicSubnet,
+});
+
+await awsProvider.attachInternetGatewayAndRouteTable({
+  destinationcidrblock: "0.0.0.0/0",
+  gatewayId: newInternetGateway,
+  routetableId: newRouteTable
+});
+
+await awsProvider.detachInternetGatewayAndRouteTable({
+  destinationcidrblock: "0.0.0.0/0",
+  routetableId: newRouteTable
+});
+
+await awsProvider.detachRouteTableAndSubnet({
+  routetableId: newRouteTable,
+  subnetId: publicSubnet
+});
+
+await awsProvider.detachInternetGatewayAndVpc({
+  internetgatewayId: newInternetGateway,
+  vpcId: mainVpc
+});
+
+await awsProvider.terminateResource({
+  type: 'routetable',
+  instanceId: newRouteTable
+});
+
+await awsProvider.terminateResource({
+    type: "internetgateway",
+    instanceId: newInternetGateway
+});
+
+await awsProvider.terminateResource({
+    type: "subnet",
+    instanceId: publicSubnet
+});
+
+await awsProvider.terminateResource({
+  type: "vpc",
+  instanceId: mainVpc
 });
 
 // const newNatGateway = await awsProvider.createResource({
@@ -102,10 +143,6 @@ await awsProvider.associate({
 //   vpcId: mainVpc
 // });
 
-// await awsProvider.terminateResource({
-//     type: "internetgateway",
-//     instanceId: newInternetGateway
-// });
 
 // const newNatGateway = await awsProvider.createResource({
 //   type: 'natgateway',
@@ -136,14 +173,6 @@ await awsProvider.associate({
 // await awsProvider.terminateResource({
 //   type: "natgateway",
 //   instanceId: newNatGateway
-// })
-// await awsProvider.terminateResource({
-//     type: "subnet",
-//     instanceId: publicSubnet
-// })
-// await awsProvider.terminateResource({
-//   type: "vpc",
-//   instanceId: mainVpc
 // })
 // await awsProvider.terminateResource({
 //     type: "routetable",
