@@ -47,7 +47,7 @@ const teamMembers = [
         imgUrl: yuuv,
         name: 'Yuuv Jauhari',
         position: 'Senior Developer',
-        linkedin: '',
+        linkedin: 'https://www.linkedin.com/in/yuuv-jauhari-66923a168/?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
         github: '' 
     },
     {
@@ -68,7 +68,7 @@ const teamMembers = [
         imgUrl: michal,
         name: 'Michał Naklicki',
         position: 'Provider Developer',
-        linkedin: '',
+        linkedin: ' https://www.linkedin.com/in/michał-naklicki-863611254',
         github: '' 
     },
     {

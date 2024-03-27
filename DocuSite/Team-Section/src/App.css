@@ -1,5 +1,5 @@
 /* google fonts */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Comfortaa');
 
 /* css variables */
 :root {
@@ -30,7 +30,7 @@
     rgba(14, 9, 56, 1) 100%
   );
   --testimonial-bg: #1a0f4f;
-  --font-name: "Poppins", sans-serif;
+  --font-name: "Comfortaa", sans-serif;
   --small-text-color: rgba(255, 255, 255, 0.774);
   --icon-bg:#151e4f;
 }

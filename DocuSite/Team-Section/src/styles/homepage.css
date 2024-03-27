@@ -6,9 +6,7 @@
     justify-content: center;
     height: 100vh; /* Full height */
     text-align: center;
-    background-color: #1C2331; /* Dark background, adjust the color as needed */
     color: white; /* Text color */
-    font-family: 'Arial', sans-serif; /* Adjust to match your font */
     gap: 20px;
   }
   
@@ -20,8 +18,8 @@
   .home-page button {
     padding: 1rem 2rem;
     font-size: 1rem;
-    color: #1C2331; /* Button text color */
-    background-color: #ffffff; /* Button background color */
+    color: var(--primary-color); /* Fallback color */
+    background: var(--icon-bg); /* Fallback color */
     border: none;
     border-radius: 5px;
     cursor: pointer;
