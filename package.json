@@ -20,6 +20,7 @@
     "chalk": "^4.1.2",
     "expect-type": "^0.17.3",
     "fs": "^0.0.1-security",
+    "pdf-lib": "^1.17.1",
     "yargs": "^17.7.2"
   },
   "devDependencies": {

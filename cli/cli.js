@@ -21,11 +21,43 @@ const providers = await new ProviderManager();
 const activeProvider = await providers.returnActiveProvider();
 
 // Make logo
+import fs from 'fs';
+import path from 'path';
+
+const stateFile = process.cwd() + '/cli/instances.json';  //it'll make this file for you if it isn't there.
+const sessionTime = new Date();
+
+const sessionTimeString = sessionTime.getDate() + "_" + (sessionTime.getMonth()+1) + "_" + sessionTime.getFullYear();
+console.log(sessionTimeString);
+
+
+//make logo
+
 console.log(chalk.blueBright("  ____ _                 _   _           _ _     _           "));
 console.log(chalk.blueBright(" / ___| | ___  _   _  __| | | |__  _   _(_) | __| | ___ _ __ "));
 console.log(chalk.blueBright("| |   | |/ _ \\| | | |/ _` | | '_ \\| | | | | |/ _` |/ _ \\ '__|"));
 console.log(chalk.blueBright("| |___| | (_) | |_| | (_| | | |_) | |_| | | | (_| |  __/ |   "));
 console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|\\__,_|\\___|_|   "));
+
+import util from 'util';
+var logPath = process.cwd() + '/cli/logs/' + sessionTimeString + '.txt'; 
+var logFile = fs.createWriteStream(logPath, { flags: 'a' });
+var logStdout = process.stdout;
+
+console.log = function () {
+  logFile.write(util.format.apply(null, arguments) + '\n');
+  logStdout.write(util.format.apply(null, arguments) + '\n');
+}
+console.error = console.log;
+
+
+console.log("\nWelcome to Cloud-Builder\n");
+
+
+console.log("\nclb help     for list of commands!\n");
+
+
+checkAwsFolder();
 
 console.log("\nWelcome to Cloud-Builder\n");
 
@@ -39,8 +71,9 @@ yargs(hideBin(process.argv))
       type: 'string',
       default: 'World'
     });
-  }, (argv) => {
-    console.log(`Hello, ${argv.name}!`);
+  },  async (argv) => {
+
+      console.log(`\nHello, ${argv.name}!`);
   })
   .command('run <file>', 'Executes a JavaScript file', (yargs) => {
     return yargs.positional('file', {
@@ -92,6 +125,9 @@ yargs(hideBin(process.argv))
         console.error(error.message);
       }
     }
+
+    
+    
   })
   .command('create <type> <name> [options..]', 'Creates a new resource', (yargs) => {
     yargs.positional('type', {
@@ -124,6 +160,9 @@ yargs(hideBin(process.argv))
     } catch (error) {
       console.error('Error creating resource:', error.message);
     }
+     
+
+     
   })
   .command('delete <name>', 'Deletes a resource by name', (yargs)=> {
     yargs.positional('name', {
@@ -149,7 +188,85 @@ yargs(hideBin(process.argv))
     } catch (error) {
       console.error('Error deleting resource:', error.message);
     }
+   
+
   })
   .command('update', 'Updates state file', async => { updateStateFile()})
   .demandCommand(1, "").recommendCommands().strict()
   .parse();
+
+
+
+//   //WIP PDF LOGGING CODE
+//   import { PDFDocument } from 'pdf-lib';
+// import { execSync } from 'childprocess';
+
+// // Prepare an array to hold console output
+// let consoleOutput = [];
+
+// // Override console.log to capture output
+// const originalConsoleLog = console.log;
+// console.log = function (...args) {
+//   consoleOutput.push(args.join(' '));
+//   originalConsoleLog.apply(console, args);
+// };
+
+// // Function to save output to PDF
+// async function saveOutputToPDF(output, filename) {
+//   const pdfDoc = await PDFDocument.create();
+//   const page = pdfDoc.addPage();
+//   const { width, height } = page.getSize();
+//   const fontSize = 12;
+//   let text = output.join('\n');
+//   page.drawText(text, {
+//     x: 50,
+//     y: height - 50 - fontSize,
+//     size: fontSize,
+//     maxWidth: width - 100,
+//   });
+//   const pdfBytes = await pdfDoc.save();
+//   fs.writeFileSync(filename, pdfBytes);
+// }
+
+// // Display CLI banner and welcome message
+// console.log("  __                                                 ");
+// console.log(" / | |        | | | |     () | | | __    ");
+// console.log("| |   | |/  \| | | |/  | | ' \\| | | | | |/  |/  \ '|");
+// console.log("| || | () |  | (| | | |) |  | | | (| |  / |    ");
+// console.log(" \||_/ \,|\,| |./ \,|||\,|\||    ");
+// console.log("Welcome to cloud builder");
+// console.log("\nCommands:");
+// console.log(" greet-Cli greet yourNameHere       Gives you a little greeting!");
+// console.log("greet-Cli run testFileNameHere                  Runs given file.");
+// // Configure yargs
+// yargs(hideBin(process.argv))
+//   .command('greet [name]', 'greet a user by name', (yargs) => {
+//     return yargs.positional('name', {
+//       describe: 'name to greet',
+//       type: 'string',
+//       default: 'World',
+//     });
+//   }, async (argv) => {
+//     console.log(Hello, ${argv.name}!);
+//     // Save the output to PDF
+//     await saveOutputToPDF(consoleOutput, 'greetingOutput.pdf');
+//   })
+//   .command('run <file>', 'execute a JavaScript file', (yargs) => {
+//     return yargs.positional('file', {
+//       describe: 'executes js file',
+//       type: 'string',
+//     });
+//   }, async (argv) => {
+//     // Execute the provided JavaScript file
+//     try {
+//       execSync(node ${argv.file}, { stdio: 'inherit' });
+//     } catch (error) {
+//       console.error(error.message);
+//     }
+//     // Save the output to PDF
+//     await saveOutputToPDF(consoleOutput, 'executionOutput.pdf');
+//   })
+//   .parse();
+
+
+

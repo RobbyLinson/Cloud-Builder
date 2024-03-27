@@ -28,19 +28,67 @@ const awsProvider = await providerAws();
 // ------------------
 // Scenario 2
 
-// const mainVpc = await awsProvider.createResource({
-//   type: 'vpc',
-//   Name: "MainVPC",
-//   CidrBlock: '10.0.1.0/24'
+const mainVpc = await awsProvider.createResource({
+  type: 'vpc',
+  CidrBlock: '10.0.1.0/24',
+  Name: "MainVPC"
+});
+
+const publicSubnet = await awsProvider.createResource({
+  type: 'subnet',
+  VpcId: mainVpc,
+  CidrBlock: '10.0.1.1/24'
+});
+
+const newInternetGateway = await awsProvider.createResource({
+  type: 'internetgateway'
+});
+
+const newRouteTable = await awsProvider.createResource({
+  type: 'routetable',
+  VpcId: mainVpc,
+});
+
+await awsProvider.attach({
+  internetgatewayId: newInternetGateway,
+  vpcId: mainVpc
+});
+
+await awsProvider.associate({
+  routetableId: newRouteTable,
+  subnetId: publicSubnet,
+});
+
+// const newNatGateway = await awsProvider.createResource({
+//   type: 'natgateway',
+//   SubnetId: publicSubnet,
+//   //AllocationId: 'eipalloc-0e37779e6f029dfb4',
+//   ConnectivityType: 'private'
+// })
+
+// const internetgatewayDescription = await awsProvider.describeResources({
+//   type: 'internetgateway',
+//   resourceIds: [newInternetGateway]
+// })
+
+// console.log(internetgatewayDescription);
+
+// await awsProvider.detach({
+//   internetgatewayId: newInternetGateway,
+//   vpcId: mainVpc
 // });
 
-
-// const publicSubnet = await awsProvider.createResource({
-//   type: 'subnet',
-//   Name: 'privateSub',
-//   VpcId: mainVpc,
-//   CidrBlock: '10.0.1.1/24'
+// await awsProvider.terminateResource({
+//     type: "internetgateway",
+//     instanceId: newInternetGateway
 // });
+
+// const newNatGateway = await awsProvider.createResource({
+//   type: 'natgateway',
+//   SubnetId: publicSubnet,
+//   // no AllocationId needed if ConnectivityType: 'private'
+//   ConnectivityType: 'private'
+// })
 
 // const newInstance = await awsProvider.createResource({
 //   type: 'instance',
@@ -56,7 +104,16 @@ const awsProvider = await providerAws();
 //     type: "instance",
 //     instanceId: newInstance
 // })
+// const natgatewayDescription = await awsProvider.describeResources({
+//   type: 'natgateway',
+//   resourceIds: [newNatGateway]
+// })
 
+// console.log(natgatewayDescription);
+// await awsProvider.terminateResource({
+//   type: "natgateway",
+//   instanceId: newNatGateway
+// })
 // await awsProvider.terminateResource({
 //     type: "subnet",
 //     instanceId: publicSubnet
@@ -64,6 +121,10 @@ const awsProvider = await providerAws();
 // await awsProvider.terminateResource({
 //   type: "vpc",
 //   instanceId: mainVpc
+// })
+// await awsProvider.terminateResource({
+//     type: "routetable",
+//     instanceId: newRouteTable
 // })
 
 
