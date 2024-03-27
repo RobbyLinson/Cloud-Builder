@@ -3,3 +3,4 @@ db
 credentials.js
 instances.json
 state.json
+logs

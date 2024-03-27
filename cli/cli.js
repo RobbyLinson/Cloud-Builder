@@ -13,6 +13,7 @@ import { execSync } from 'child_process';
 import { updateStateFile, compareCounts  } from '../provider/aws/state/state.js';
 import { previewFileContent, userFileCountNumberOfResourcesByType } from '../provider/aws/state/userFileParsers.js';
 import { stateCountNumberOfResourcesByType, getResourceTypeAndIdByName } from '../provider/aws/state/stateFileParsers.js';
+import { checkAwsFolder } from '../provider/aws/credentialsAws.js';
 
 // Create new Provider Manager to handle importing available providers.
 const providers = await new ProviderManager();
@@ -22,9 +23,7 @@ const activeProvider = await providers.returnActiveProvider();
 
 // Make logo
 import fs from 'fs';
-import path from 'path';
 
-const stateFile = process.cwd() + '/cli/instances.json';  //it'll make this file for you if it isn't there.
 const sessionTime = new Date();
 
 const sessionTimeString = sessionTime.getDate() + "_" + (sessionTime.getMonth()+1) + "_" + sessionTime.getFullYear();
@@ -40,16 +39,29 @@ console.log(chalk.blueBright("| |___| | (_) | |_| | (_| | | |_) | |_| | | | (_| 
 console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|\\__,_|\\___|_|   "));
 
 import util from 'util';
-var logPath = process.cwd() + '/cli/logs/' + sessionTimeString + '.txt'; 
-var logFile = fs.createWriteStream(logPath, { flags: 'a' });
-var logStdout = process.stdout;
 
-console.log = function () {
-  logFile.write(util.format.apply(null, arguments) + '\n');
-  logStdout.write(util.format.apply(null, arguments) + '\n');
+const folderPath = './cli/logs';
+// Check if the folder exists
+if (!fs.existsSync(folderPath)) {
+    // If it doesn't exist, create it
+    fs.mkdirSync(folderPath, { recursive: true }, (err) => {
+        if (err) {
+            console.error('Error creating folder:', err);
+        } else {
+            console.log('Folder created successfully!');
+        }
+    });
+} else {
+  var logPath = process.cwd() + '/cli/logs/' + sessionTimeString + '.txt'; 
+  var logFile = fs.createWriteStream(logPath, { flags: 'a' });
+  var logStdout = process.stdout;
+  
+  console.log = function () {
+    logFile.write(util.format.apply(null, arguments) + '\n');
+    logStdout.write(util.format.apply(null, arguments) + '\n');
+  }
+  console.error = console.log;
 }
-console.error = console.log;
-
 
 console.log("\nWelcome to Cloud-Builder\n");
 
