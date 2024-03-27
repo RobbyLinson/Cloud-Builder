@@ -1,0 +1,49 @@
+/* Assuming a structure similar to your Team page for consistency */
+.home-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Full height */
+    text-align: center;
+    color: white; /* Text color */
+    gap: 20px;
+  }
+  
+  .home-page h1 {
+    margin-bottom: 2rem;
+    font-size: 2.5rem; /* Large font size for the heading */
+  }
+  
+  .home-page button {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    color: var(--primary-color); /* Fallback color */
+    background: var(--icon-bg); /* Fallback color */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .home-page button:hover {
+    background-color: #eaeaea; /* Lighter background on hover */
+  }
+  
+  /* You might want to add more specific styles for your link if needed */
+  .home-page a {
+    text-decoration: none;
+  }
+  
+  /* If you are using icons like in the Team page, you might add styles for them as well */
+  .home-page .icon {
+    font-size: 1.5rem; /* Large icons */
+    margin-right: 0.5rem;
+  }
+  
+  /* For responsiveness */
+  @media (max-width: 768px) {
+    .home-page h1 {
+      font-size: 2rem; /* Slightly smaller font size for smaller screens */
+    }
+}
