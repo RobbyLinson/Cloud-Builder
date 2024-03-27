@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+// Import the Provider Manager
 import { ProviderManager } from '../provider/providerManager.js';
 
 // Import the yargs library
@@ -28,12 +29,10 @@ console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|
 
 console.log("\nWelcome to Cloud-Builder\n");
 
-console.log("clb help     for list of commands!");
-
 // Use yargs to define commands and their callbacks
 yargs(hideBin(process.argv))
   .scriptName("clb")
-  .command('greet <name>', 'Greet a user by name', (yargs) => {
+  .command('greet <name>', 'Greets a user by name', (yargs) => {
     console.clear();
     return yargs.positional('name', {
       describe: 'name to greet',
@@ -152,4 +151,5 @@ yargs(hideBin(process.argv))
     }
   })
   .command('update', 'Updates state file', async => { updateStateFile()})
+  .demandCommand(1, "").recommendCommands().strict()
   .parse();
