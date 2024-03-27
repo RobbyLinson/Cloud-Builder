@@ -63,11 +63,7 @@ if (!fs.existsSync(folderPath)) {
   console.error = console.log;
 }
 
-console.log("\nWelcome to Cloud-Builder\n");
-
-
 console.log("\nclb help     for list of commands!\n");
-
 
 checkAwsFolder();
 
