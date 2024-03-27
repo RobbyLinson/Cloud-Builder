@@ -13,7 +13,6 @@ import { execSync } from 'child_process';
 import { updateStateFile, compareCounts  } from '../provider/aws/state/state.js';
 import { previewFileContent, userFileCountNumberOfResourcesByType } from '../provider/aws/state/userFileParsers.js';
 import { stateCountNumberOfResourcesByType, getResourceTypeAndIdByName } from '../provider/aws/state/stateFileParsers.js';
-import { checkAwsFolder } from '../provider/aws/credentialsAws.js';
 
 // Create new Provider Manager to handle importing available providers.
 const providers = await new ProviderManager();
