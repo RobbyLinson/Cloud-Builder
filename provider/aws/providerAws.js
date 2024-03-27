@@ -13,7 +13,7 @@ async function providerAws() {
 	
 	await checkAwsFolder();
 	const awsCredentials = await getCredentials();
-
+	
 	const ec2Client = new EC2Client({
 		region: awsCredentials.region,
 		credentials: {

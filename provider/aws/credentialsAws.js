@@ -1,19 +1,9 @@
 import fs from 'fs';
+import fsp from 'fs/promises';
 import os from 'os';
 import read from 'readline';
 
 const filePath = os.homedir();
-
-function readDir(filePath,callback){
-    fs.readdir(filePath,(err,file) =>{
-        if(err)
-        {
-            console.error("Error while reading directory: ",err)
-            callback([]);
-        }
-        callback(file);
-    });
-}
 
 async function createObjectForIni (){
     const readLine = read.Interface({
@@ -68,56 +58,42 @@ async function populateAwsFolder(){
     }
 }
 
-function createAwsFolder(){
+async function createAwsFolder(){
     const folderPath = filePath+(os.type()==='Windows_NT' ? "\\.aws" : "/.aws");
     fs.mkdir(folderPath,(err)=>{
-        if(err)
-        {
-            return console.error(err);
-        }
+        if(err) return console.error(err);
     });
 }
 
 export async function checkAwsFolder()
 { 
-    readDir(filePath,function(files){
+		const files = await fsp.readdir(filePath);
         let exists = false;
-        for(const val of files)
+        for await (const val of files)
         {
-            if(val == '.aws')
-            {
-                exists = true;
-            }
+            if(val == '.aws') exists = true;
         }
         if(!exists)
         {
-            createAwsFolder();
-            populateAwsFolder();
+            await createAwsFolder();
+            await populateAwsFolder();
         }
         else
         {
             const awsFolderPath = filePath + (os.type()==='Windows_NT' ? "\\.aws" : "/.aws");
-            readDir(awsFolderPath, function(filesInAWS){
-                let config = false;
-                let cred = false;
-                for (const val of filesInAWS)
-                {
-                    if(val == 'credentials')
-                    {
-                        cred = true;
-                    }
-                    else if (val == 'config')
-                    {
-                        config = true;
-                    }
-                }
-                if(!cred && !config)
-                {
-                    populateAwsFolder();
-                }
-            });
+            const filesInAws = await fsp.readdir(awsFolderPath);
+			
+            let config = false;
+            let cred = false;
+			
+            for await (const val of filesInAws)
+            {
+                if(val == 'credentials') cred = true;
+                else if (val == 'config') config = true;
+            }
+			
+            if(!cred && !config) await populateAwsFolder();
         }
-    });
 }
 
 export async function getCredentials() {
