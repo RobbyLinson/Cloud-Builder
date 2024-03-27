@@ -71,13 +71,13 @@ export async function userFileCountNumberOfResourcesByType(filePath){
       // Check if the line contains a resource creation
       if (trimmedLine.includes('awsProvider.createResource')) {
         // modify counts in a resource count object passed
-        handleCountIncrease(trimmedLine, lines, insideLoop, resourceCounts)
+        handleCountIncrease(trimmedLine, lines, insideLoop, resourceCounts, loopIterations)
       }
   
       // Check if the line contains a resource termination
       if (trimmedLine.includes('awsProvider.terminateResource')) {
         // modify counts in a resource count object passed
-        handleCountDecrease(trimmedLine, lines, insideLoop, resourceCounts);
+        handleCountDecrease(trimmedLine, lines, insideLoop, resourceCounts, loopIterations);
       }
   
       // Check if the line ends a loop
@@ -153,7 +153,7 @@ function getNumberOfIterations(currLine){
 }
 
 // function that modifies counts in a resource count object passed ↓
-function handleCountIncrease(currLine, allLines, insideLoop, resourceCounts){
+function handleCountIncrease(currLine, allLines, insideLoop, resourceCounts, loopIterations){
   // Keep parsing the line until we find the "type" parameter
   let currentLine = currLine;
   let currentIndex = allLines.indexOf(currentLine); // Get the initial index
@@ -181,7 +181,7 @@ function handleCountIncrease(currLine, allLines, insideLoop, resourceCounts){
 }
 
 // function that modifies counts in a resource count object passed ↓
-function handleCountDecrease(currLine, allLines, insideLoop, resourceCounts){
+function handleCountDecrease(currLine, allLines, insideLoop, resourceCounts, loopIterations){
   // Keep parsing the line until we find the "type" parameter
   let currentLine = currLine;
   let currentIndex = allLines.indexOf(currentLine); // Get the initial index

@@ -23,7 +23,7 @@ export async function updateStateFile() {
         } else {
           console.log('\nFile state.json was updated');
           stateCountNumberOfResourcesByType().then((counts) => {
-            console.log('\tCurrent number of active resources:', counts);
+            console.log(`\tCurrent number of active resources:${formatCounts(counts)}`);
           });
         }
     });
@@ -32,12 +32,22 @@ export async function updateStateFile() {
   }
 }
 
+function formatCounts(counts) {
+  return `
+    \t\t- vpcs: ${counts.vpcs},
+    \t\t- subnets: ${counts.subnets},
+    \t\t- instances: ${counts.instances},
+    \t\t- natGateways: ${counts.natGateways},
+    \t\t- internetGateways: ${counts.internetGateways},
+    \t\t- routeTables: ${counts.routeTables}
+  `;
+}
+
 // Function to compare objects with number of resources from user file and state file
 export function compareCounts(userCounts, stateCounts) {
   
   const userKeys = Object.keys(userCounts);
   const stateKeys = Object.keys(stateCounts);
-  
 
   // Check if the keys (resource types) match
   if (userKeys.length !== stateKeys.length || !userKeys.every(key => stateKeys.includes(key))) {

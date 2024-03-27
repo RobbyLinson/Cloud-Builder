@@ -2,6 +2,8 @@ import { describeVpcs } from "./vpc-actions.js";
 import { describeSubnets } from "./subnet-actions.js";
 import { describeInstancesWithState } from "./instance-actions.js";
 import { describeNatGateways } from "./natgateway-actions.js";
+import { describeInternetGateways } from "./internetgateway-actions.js";
+import { describeRouteTables } from "./routetable-actions.js";
 
 export async function describeAllResources(ec2Client) {
   try {
@@ -22,6 +24,12 @@ export async function describeAllResources(ec2Client) {
     // Describe NAT Gateways
     const natGateways = await describeNatGateways(ec2Client);
     allResources['natGateways'] = natGateways.NatGateways;
+
+    const internetGateways = await describeInternetGateways(ec2Client);
+    allResources['internetGateways'] = internetGateways.InternetGateways;
+
+    const routeTables = await describeRouteTables(ec2Client);
+    allResources['routeTables'] = routeTables.RouteTables;
 
     return allResources;
   } catch (err) {
