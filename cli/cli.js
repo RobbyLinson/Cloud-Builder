@@ -87,20 +87,20 @@ yargs(hideBin(process.argv))
     // get objects with number of resources on ec2 client and in user defined file
     const userFileCounts = await userFileCountNumberOfResourcesByType(argv.file);
     const stateFileCounts = await stateCountNumberOfResourcesByType();
-  
+    
     // Compare counts from user file and state file
     const matchCounts = compareCounts(userFileCounts, stateFileCounts);
     
     // for now we don't care if state differs from filename from clb run <filename>
     if (matchCounts) {
       console.log(chalk.gray('------------------------------------------------'));
-      console.log(chalk.green('The number of resources match, which means we do some action later'));
+      console.log(chalk.green('The number of resources match.\n\tDo you want to initialize same resources again?'));
       console.log(chalk.gray('------------------------------------------------'));
       try {
         if (await previewFileContent(argv.file)) {
           execSync(`node ${argv.file}`, { stdio: 'inherit' });
           // creates a state.json, which should represent list of all resources in a ec2 client in a current working directory
-          writeResourceStateToFile();
+          updateStateFile();
         } else {
           console.log(chalk.gray('------------------------------------------------'));
           console.log(chalk.red('Action cancelled by user.'));

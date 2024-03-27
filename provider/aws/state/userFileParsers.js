@@ -50,7 +50,9 @@ export async function userFileCountNumberOfResourcesByType(filePath){
       vpcs: 0,
       subnets: 0,
       instances: 0,
-      natGateways: 0
+      natGateways: 0,
+      internetGateways: 0,
+      routeTables: 0
     };
   
     // loops handling
@@ -166,6 +168,7 @@ function handleCountIncrease(currLine, allLines, insideLoop, resourceCounts, loo
       // Increment counts based on the resource type
       if (resourceType === "'vpc'" || resourceType === '"vpc"') {
         resourceCounts.vpcs += (insideLoop ? loopIterations : 1);
+        resourceCounts.routeTables += (insideLoop ? loopIterations : 1);
       } else if (resourceType === "'subnet'" || resourceType === '"subnet"') {
         resourceCounts.subnets += (insideLoop ? loopIterations : 1);
       } else if (resourceType === "'instance'" || resourceType === '"instance"') {
@@ -175,7 +178,7 @@ function handleCountIncrease(currLine, allLines, insideLoop, resourceCounts, loo
       } else if (resourceType === "'internetGateways'" || resourceType === '"internetGateways"') {
         resourceCounts.internetGateways += (insideLoop ? loopIterations : 1);
       } else if (resourceType === "'routeTables'" || resourceType === '"routeTables"') {
-        resourceCounts.routeTables += (insideLoop ? loopIterations : 1);
+        // resourceCounts.routeTables += (insideLoop ? loopIterations : 1);
       }
       break; // Exit the loop once the "type" parameter is found
     }
@@ -198,6 +201,7 @@ function handleCountDecrease(currLine, allLines, insideLoop, resourceCounts, loo
       // Decrement counts based on the resource type
       if (resourceType === "'vpc'" || resourceType === '"vpc"') {
         resourceCounts.vpcs += (insideLoop ? -loopIterations : -1);
+        resourceCounts.routeTables += (insideLoop ? loopIterations : -1);
       } else if (resourceType === "'subnet'" || resourceType === '"subnet"') {
         resourceCounts.subnets += (insideLoop ? -loopIterations : -1);
       } else if (resourceType === "'instance'" || resourceType === '"instance"') {
