@@ -22,7 +22,18 @@ const activeProvider = await providers.returnActiveProvider();
 
 // Import filesystem library
 import fs from 'fs';
+import path from 'path';
+import prompt from 'syncprompt';
 
+//const stateFile = process.cwd() + '/cli/instances.json';  //it'll make this file for you if it isn't there.
+const credentialsFilePath = './user_credentials.json';
+const sessionTime = new Date();
+const sessionTimeString = sessionTime.getDate() + "_" + (sessionTime.getMonth()+1) + "_" + sessionTime.getFullYear();
+
+console.log(sessionTimeString);
+
+
+import { region, accessKeyId, secretAccessKey } from '../credentials.js'; // temporary, replace this asap
 //make logo
 
 console.log(chalk.blueBright("  ____ _                 _   _           _ _     _           "));
@@ -32,11 +43,6 @@ console.log(chalk.blueBright("| |___| | (_) | |_| | (_| | | |_) | |_| | | | (_| 
 console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|\\__,_|\\___|_|   "));
 
 import util from 'util';
-
-// Session time for logs
-const sessionTime = new Date();
-const sessionTimeString = sessionTime.getDate() + "_" + (sessionTime.getMonth()+1) + "_" + sessionTime.getFullYear();
-//console.log(sessionTimeString);
 
 const folderPath = './cli/logs';
 // Check if the folder exists
@@ -63,8 +69,56 @@ console.log = function () {
 }
 console.error = console.log;
 
+function loadCredentials() {
+  if (!fs.existsSync(credentialsFilePath)) return {};
+  return JSON.parse(fs.readFileSync(credentialsFilePath, 'utf8'));
+}
+
+function saveCredentials(credentials) {
+  fs.writeFileSync(credentialsFilePath, JSON.stringify(credentials, null, 2));
+}
+
+function register() {
+  const userId = prompt('Enter user ID (1, 2, or 3): ').trim();
+  const password = prompt('Enter password: ').trim();
+  const credentials = loadCredentials();
+  if (credentials[userId]) {
+    console.log(chalk.red('User ID already exists.'));
+    return;
+  }
+  credentials[userId] = password;
+  saveCredentials(credentials);
+  console.log(chalk.green('Registration successful.'));
+}
+
+function login() {
+  const userId = prompt('Enter user ID (1, 2, or 3): ').trim();
+  const password = prompt('Enter password: ').trim();
+  const credentials = loadCredentials();
+  if (credentials[userId] === password) {
+    console.log(chalk.green('Login successful.'));
+    return userId;
+  } else {
+    console.log(chalk.red('Invalid user ID or password.'));
+    process.exit(1);
+  }
+}
+
+// Add a check for the 'register' or 'login' command before proceeding with other commands
+if (process.argv.includes('register')) {
+  register();
+  process.exit(0);
+}
+
+const userId = login(); // Ensure user is logged in before continuing
+
 console.log("\nWelcome to Cloud-Builder\n");
 
+
+console.log("\nclb help     for list of commands!\n");
+
+
+//checkAwsFolder();
 // Use yargs to define commands and their callbacks
 yargs(hideBin(process.argv))
   .scriptName("clb")

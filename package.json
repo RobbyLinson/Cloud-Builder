@@ -21,6 +21,7 @@
     "expect-type": "^0.17.3",
     "fs": "^0.0.1-security",
     "pdf-lib": "^1.17.1",
+    "syncprompt": "^2.0.0",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
