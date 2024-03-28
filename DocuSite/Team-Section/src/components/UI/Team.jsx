@@ -12,6 +12,8 @@ import yuuv from '../../images/Yuuv.jpg'
 import vansh from '../../images/Vansh.jpg'
 import nandini from '../../images/Nandini.jpg'
 import sarah from '../../images/Sarah.png'
+import logo from '../../images/Cloud-Builder-Logo.png'
+
 
 
 const teamMembers = [
@@ -33,7 +35,7 @@ const teamMembers = [
         imgUrl: rohn,
         name: 'Rohn Allen Santiago',
         position: 'CI/CD Lead',
-        linkedin: '',
+        linkedin: 'https://www.linkedin.com/in/rohn-allen-santiago-359a812b7/',
         github: 'https://github.com/rohn-allen-santiago' 
     },
     {
@@ -100,7 +102,7 @@ const Team = () => {
             <Link to="/" className="home-button">Home</Link>
             <div className='container'>
                 <div className='team__content'>
-                    <h6 className='subtitle'>Cloud Builder</h6>
+                    <img src={logo} alt="Cloud Builder" className="logo" />
                     <h2>
                         Meet the <span className='highlight'> Team</span>
                     </h2>

@@ -1,6 +1,7 @@
 .our__team {
     padding-top: 3rem;
 }
+
 .team__content{
     text-align: center;
     margin-bottom: 50px;
@@ -17,17 +18,17 @@
     top: 20px;
     left: 20px;
     padding: 10px 20px;
-    background: var(--icon-bg); /* Fallback color */
-    color: var(--primary-color); /* Fallback color */
+    background: var(--btn-primary-bg);
+    color: var(--text-color);
     border: none;
     border-radius: 5px;
-    text-decoration: none; /* Remove underlines from the link */
+    text-decoration: none;
     font-size: 1rem;
     transition: background-color 0.3s;
 }
 
 .home-button:hover {
-    background-color: blue; /* Fallback color */
+    background-color: var(--btn-primary-hover-bg);
     cursor: pointer;
 }
 
@@ -35,7 +36,7 @@
     width: 100%;
     height: 200px;
     border-radius: 5px;
-    background: white;
+    background: var(--background-color);
     overflow: hidden;
     padding-top: 10px;
 }
@@ -58,14 +59,7 @@
     margin-bottom: 0.4rem;
 }
 
-h4 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    column-gap: 1rem;
-    margin-top: 10px;
-}
-p {
+h4, p {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -84,21 +78,27 @@ p {
 .team__member-social span i{
     padding: 5px;
     background: var(--icon-bg);
-    color: white;
+    color: var(--text-color);
     border-radius: 3px;
     cursor: pointer;
 }
 
-.team__wrapper {
-    display: grid;
-    width: 100%; /* Stretch to the full width of the parent */
-    grid-template-columns: repeat(4, 1fr); /* Three columns */
-    gap: 20px; /* Space between the cards */
-    justify-content: center; /* Center the grid inside the container */
-    align-items: start; /* Align items to the start of the container */
-    padding: 20px; /* Padding inside the container */
+.logo {
+    width: 100px; /* or any size you want */
+    height: auto;
   }
 
+.team__wrapper {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    justify-content: center;
+    align-items: start;
+    padding: 20px;
+}
+
+/* Responsive adjustments */
 @media only screen and (max-width: 768px) {
     .team__item {
         width: 30%;
@@ -106,7 +106,7 @@ p {
     }
 
     .team__wrapper {
-        flex-wrap: wrap;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .team__content h2 {
@@ -121,15 +121,9 @@ p {
         font-size: 0.8rem;
     }
 }
-
-@media (max-width: 768px) {
-    .team__wrapper {
-      grid-template-columns: repeat(2, 1fr); /* Two columns for smaller screens */
-    }
-  }
   
-  @media (max-width: 480px) {
+@media (max-width: 480px) {
     .team__wrapper {
-      grid-template-columns: 1fr; /* One column for very small screens */
+      grid-template-columns: 1fr;
     }
-  }
+}
