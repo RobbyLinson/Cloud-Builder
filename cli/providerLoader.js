@@ -2,7 +2,7 @@
 import fs from 'fs';
 import { pathToFileURL } from 'url'
 
-export class ProviderManager {
+export class ProviderLoader {
   constructor() {
     return (async () => {
 	  await this.loadProviderConfig();

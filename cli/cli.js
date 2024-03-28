@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-// Import the Provider Manager
-import { ProviderManager } from '../provider/providerManager.js';
+// Import the Provider Loader
+import { ProviderLoader } from './providerLoader.js';
 
 // Import the yargs library
 import yargs from 'yargs/yargs';
@@ -14,8 +14,8 @@ import { updateStateFile, compareCounts  } from '../provider/aws/state/state.js'
 import { previewFileContent, userFileCountNumberOfResourcesByType } from '../provider/aws/state/userFileParsers.js';
 import { stateCountNumberOfResourcesByType, getResourceTypeAndIdByName } from '../provider/aws/state/stateFileParsers.js';
 
-// Create new Provider Manager to handle importing available providers.
-const providers = await new ProviderManager();
+// Create new Provider Loader to handle importing available providers.
+const providers = await new ProviderLoader();
 
 // Create Provider object based on current active provider.
 const activeProvider = await providers.returnActiveProvider();
