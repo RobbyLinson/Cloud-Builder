@@ -35,9 +35,9 @@ export class ProviderLoader {
     }
   }
   
-  async returnActiveProvider(path=process.cwd() + '/providers.json') {
+  async returnActiveProvider(userId, path=process.cwd() + '/providers.json') {
 	  const config = JSON.parse(fs.readFileSync(path));
-	  return this[config.active]();
+	  return this[config.active](userId);
   }
 }
  

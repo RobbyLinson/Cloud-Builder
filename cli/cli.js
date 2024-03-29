@@ -14,28 +14,19 @@ import { updateStateFile, compareCounts  } from '../provider/aws/state/state.js'
 import { previewFileContent, userFileCountNumberOfResourcesByType } from '../provider/aws/state/userFileParsers.js';
 import { stateCountNumberOfResourcesByType, getResourceTypeAndIdByName } from '../provider/aws/state/stateFileParsers.js';
 
-// Create new Provider Loader to handle importing available providers.
-const providers = await new ProviderLoader();
-
-// Create Provider object based on current active provider.
-const activeProvider = await providers.returnActiveProvider();
-
 // Import filesystem library
 import fs from 'fs';
 import path from 'path';
 import prompt from 'syncprompt';
 
-//const stateFile = process.cwd() + '/cli/instances.json';  //it'll make this file for you if it isn't there.
+// CLI user credentials path.
 const credentialsFilePath = './user_credentials.json';
+
+// Gets current time for logging.
 const sessionTime = new Date();
 const sessionTimeString = sessionTime.getDate() + "_" + (sessionTime.getMonth()+1) + "_" + sessionTime.getFullYear();
 
-console.log(sessionTimeString);
-
-
-import { region, accessKeyId, secretAccessKey } from '../credentials.js'; // temporary, replace this asap
-//make logo
-
+//Make logo
 console.log(chalk.blueBright("  ____ _                 _   _           _ _     _           "));
 console.log(chalk.blueBright(" / ___| | ___  _   _  __| | | |__  _   _(_) | __| | ___ _ __ "));
 console.log(chalk.blueBright("| |   | |/ _ \\| | | |/ _` | | '_ \\| | | | | |/ _` |/ _ \\ '__|"));
@@ -99,6 +90,7 @@ function login() {
     console.log(chalk.green('Login successful.'));
     return userId;
   } else {
+	console.log(credentials);
     console.log(chalk.red('Invalid user ID or password.'));
     process.exit(1);
   }
@@ -112,13 +104,14 @@ if (process.argv.includes('register')) {
 
 const userId = login(); // Ensure user is logged in before continuing
 
+// Create new Provider Loader to handle importing available providers.
+const providers = await new ProviderLoader();
+
+// Create Provider object based on current active provider.
+const activeProvider = await providers.returnActiveProvider(userId);
+
 console.log("\nWelcome to Cloud-Builder\n");
 
-
-console.log("\nclb help     for list of commands!\n");
-
-
-//checkAwsFolder();
 // Use yargs to define commands and their callbacks
 yargs(hideBin(process.argv))
   .scriptName("clb")

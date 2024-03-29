@@ -9,10 +9,10 @@ import { describeAllResources } from "./actions/general-actions.js";
 import { checkAwsFolder, getCredentials } from './credentialsAws.js';
 
 
-async function providerAws() {
+async function providerAws(userId) {
 	
-	await checkAwsFolder();
-	const awsCredentials = await getCredentials();
+	await checkAwsFolder(userId);
+	const awsCredentials = await getCredentials(userId);
 	
 	const ec2Client = new EC2Client({
 		region: awsCredentials.region,
