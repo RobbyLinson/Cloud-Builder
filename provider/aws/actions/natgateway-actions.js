@@ -1,4 +1,5 @@
 import { CreateNatGatewayCommand, DescribeNatGatewaysCommand, DeleteNatGatewayCommand} from "@aws-sdk/client-ec2";
+import { handleName } from "../validation/validation.js";
 
 export async function createNatGateway(ec2Client, {
 	...options
