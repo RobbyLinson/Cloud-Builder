@@ -5,7 +5,7 @@ name: Provider Test
 
 on:
   push:
-    branches: [ "CLI", "main" ]
+    branches: [ "CLI", "cli-state", "main" ]
     
   workflow_dispatch:
   
