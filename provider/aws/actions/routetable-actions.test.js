@@ -301,8 +301,5 @@ test("Determines if attachRouteTable attaches specified rtb to specified subnet"
         "VpcId": vpc
     })
 
-    console.log(subnet);
-    console.log(rtb);
-
     expect(() => attachRouteTable(ec2Mock, rtb, subnet)).not.toThrow();
 })
