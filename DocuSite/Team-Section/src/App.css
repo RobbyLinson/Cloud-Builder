@@ -3,36 +3,31 @@
 
 /* css variables */
 :root {
-  --primary-color: #379cf6;
-  --heading-color: #fff;
-  --btn-primary-bg: #379cf6;
-  --btn-secondary-bg: #090238;
-  --team-card-bg: #1b2352;
-  --link-color: #fff;
-  --link-active: #379cf6;
-  --card-bg: linear-gradient(
-    45deg,
-    rgba(15, 18, 61, 1) 33%,
-    rgba(15, 18, 61, 1) 52%,
-    rgba(11, 41, 69, 1) 84%
-  );
-  --counter-color: linear-gradient(
-    90deg,
-    #16a1c4 30%,
-    rgba(29, 129, 176, 1) 55%,
-    rgba(35, 93, 173, 1) 75%
-  );
-  --body-bg: rgba(6, 11, 26, 1);
-  --newsletter-bg: linear-gradient(
-    90deg,
-    rgba(27, 9, 115, 1) 20%,
-    rgba(23, 9, 96, 1) 38%,
-    rgba(14, 9, 56, 1) 100%
-  );
-  --testimonial-bg: #1a0f4f;
+  --primary-color: #38B6FF; /* Picton Blue - Used for buttons, links, and active states */
+  --secondary-color: #BD93D8; /* Wisteria - Used for secondary buttons and accents */
+  --tertiary-color: #B47AEA; /* Lavender (floral) - Used for tertiary accents and highlights */
+  --accent-color: #064789; /* Polynesian blue - Used for headers and important text */
+  --background-color: #FFFFFF; /* White - Used for backgrounds */
+
+  --text-color: #333333; /* Dark text for primary content */
+  --text-light: #666666; /* Lighter text for less important content */
+  --border-color: #EAEAEA; /* Light borders and separators */
+  --shadow-color: rgba(0, 0, 0, 0.1); /* Shadow for popovers, modals, etc. */
+
+  --btn-primary-bg: var(--primary-color);
+  --btn-primary-hover-bg: #2c99e0; /* Darker shade of primary for hover state */
+  --btn-secondary-bg: var(--secondary-color);
+  --btn-secondary-hover-bg: #a673c1; /* Darker shade of secondary for hover state */
+  
+  --team-card-bg: #f4f4f4; /* Light background for team cards */
+  --link-color: var(--primary-color);
+  --link-hover: var(--accent-color);
+  
+  --card-bg: #FFFFFF; /* White background for cards */
+  --body-bg: #f0f2f5; /* Light grey for page background */
   --font-name: "Comfortaa", sans-serif;
-  --small-text-color: rgba(255, 255, 255, 0.774);
-  --icon-bg:#151e4f;
+  
+  /* Additional color variables for specific components can be added here */
 }
 
 .light-theme {
