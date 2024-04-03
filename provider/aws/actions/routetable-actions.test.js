@@ -2,8 +2,8 @@ import { mockClient } from "aws-sdk-client-mock";
 import {
     CreateRouteTableCommand, DescribeRouteTablesCommand, AssociateRouteTableCommand,
     CreateVpcCommand, EC2Client, CreateSubnetCommand } from "@aws-sdk/client-ec2";
-import { createRouteTable, describeRouteTables, deleteRouteTable,
-    attachRouteTable } from "./routetable-actions.js";
+import { createRouteTable, describeRouteTables, deleteRouteTable, 
+    attachRouteTableToSubnet} from "./routetable-actions.js";
 import { createVpc } from "./vpc-actions.js";
 import { createSubnet } from "./subnet-actions.js";
 
@@ -301,5 +301,5 @@ test("Determines if attachRouteTable attaches specified rtb to specified subnet"
         "VpcId": vpc
     })
 
-    expect(() => attachRouteTable(ec2Mock, rtb, subnet)).not.toThrow();
+    expect(() => attachRouteTableToSubnet(ec2Mock, rtb, subnet)).not.toThrow();
 })
