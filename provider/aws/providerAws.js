@@ -4,7 +4,7 @@ import { createSubnet, describeSubnets, deleteSubnet } from './actions/subnet-ac
 import { createInstance, describeInstances, deleteInstance } from './actions/instance-actions.js';
 import { createNatGateway, describeNatGateways, deleteNatGateway } from "./actions/natgateway-actions.js";
 import { createInternetGateway, describeInternetGateways, deleteInternetGateway, attachInternetGatewayToVpc, detachInternetGatewayFromVpc } from "./actions/internetgateway-actions.js";
-import { createRouteTable, describeRouteTables, deleteRouteTable, attachRouteTable, attachRouteTableToGateway, detachRouteTableFromGateway, detachRouteTableFromSubnet, attachRouteTableToSubnet} from './actions/routetable-actions.js';
+import { createRouteTable, describeRouteTables, deleteRouteTable, attachRouteTableToGateway, detachRouteTableFromGateway, detachRouteTableFromSubnet, attachRouteTableToSubnet} from './actions/routetable-actions.js';
 import { describeAllResources } from "./actions/general-actions.js";
 import { checkAwsFolder, getCredentials } from './credentialsAws.js';
 
