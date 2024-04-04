@@ -8,7 +8,8 @@ const filePath = os.homedir() + (os.type()==='Windows_NT' ? "\\.aws\\" : "/.aws/
 async function createObjectForIni (){
     const readLine = read.Interface({
         input:process.stdin,
-        output:process.stdout
+        output:process.stdout,
+		terminal: false
     });
     let questionArr = [];
 
@@ -27,63 +28,52 @@ async function createObjectForIni (){
     return questionArr;
 }
 
-
-async function writeFileAsync(path,data){
-    return new Promise((resolve,reject)=>{
-        fs.writeFile(path,data,(err)=>{
-            if(err){
-                reject(err);
-            } else{
-                resolve();
-            }
-        });
-    });
-}
-
-async function populateAwsFolder(){
+async function populateAwsFolder(userId) {
     try{
         const arr= await createObjectForIni();
-        let duplicateArr = ["[default]","aws_access_key_id=","aws_secret_access_key="];
+        let duplicateArr = [`[${userId}]`, "aws_access_key_id=", "aws_secret_access_key="];
         for(let i =0; i<arr.length; i++)
         {
             duplicateArr[i+1]=duplicateArr[i+1] + arr[i];
         }
         const outputString = duplicateArr.join("\n");
-        await writeFileAsync(filePath+"credentials",outputString);
-        const stringToConfig="[default]\nregion=eu-west-1";
-        await writeFileAsync(filePath+"config",stringToConfig);
+        await fsp.writeFile(filePath + "credentials", outputString + "\n", { flag: 'a' });
+        const stringToConfig = `[${userId}]\nregion=eu-west-1\n`;
+        await fsp.writeFile(filePath + "config", stringToConfig, { flag: 'a' });
     } catch {
         console.error("Error while populating AWS folder.");
     }
 }
 
-async function createAwsFolder(){
-    fs.mkdir(filePath,(err)=>{
-        if(err) return console.error(err);
-    });
+async function createAwsFolder() {
+	await fsp.mkdir(filePath).catch(function() {
+		console.log('Failed to create AWS credentials directory.'); 
+	}); 
+	await fsp.writeFile(filePath + '/credentials', "");
+	await fsp.writeFile(filePath + '/config', "");
 }
 
-export async function checkAwsFolder(userId)
-{ 
-	//todo: implement users in this
-	if (fs.existsSync(filePath)) {
-		const filesInAws = await fsp.readdir(filePath);
-		
-		let config = false;
-		let cred = false;
-			
-		for await (const val of filesInAws)
-		{
-			if(val == 'credentials') cred = true;
-			else if (val == 'config') config = true;
-		}
-			
-		if(!cred && !config) await populateAwsFolder();
+async function checkUserExists(userId) {
+	const stream = await fs.createReadStream(filePath + '/config');
+	const rl = await read.createInterface({
+		input: stream,
+		crlfDelay: Infinity
+	});
+
+	const userIdLine = '[' + userId + ']';
+	for await (const line of rl) {
+		if (line === userIdLine) return;
 	}
-	else {
-        await createAwsFolder();
-		await populateAwsFolder();
-    }
+	await populateAwsFolder(userId);
+}
+
+export async function checkAwsFolder(userId) {
+	try{
+		await fsp.access(filePath);
+	} catch(e){
+		await createAwsFolder();
+	}
+	await checkUserExists(userId);
 }
 
 export async function getCredentials(userId) {

@@ -24,6 +24,7 @@ import fs from 'fs';
 const sessionTime = new Date();
 const sessionTimeString = sessionTime.getDate() + "_" + (sessionTime.getMonth()+1) + "_" + sessionTime.getFullYear();
 
+import readline from 'readline';
 
 import util from 'util';
 
@@ -52,6 +53,8 @@ console.log = function () {
 }
 console.error = console.log;
 
+const credentialsFilePath = process.cwd() + '/user_credentials.json';
+
 function loadCredentials() {
   if (!fs.existsSync(credentialsFilePath)) return {};
   return JSON.parse(fs.readFileSync(credentialsFilePath, 'utf8'));
@@ -61,23 +64,41 @@ function saveCredentials(credentials) {
   fs.writeFileSync(credentialsFilePath, JSON.stringify(credentials, null, 2));
 }
 
-function register() {
-  const userId = prompt('Enter user ID (1, 2, or 3): ').trim();
-  const password = prompt('Enter password: ').trim();
-  const credentials = loadCredentials();
+async function register() {
+  const rl = await readline.createInterface({
+	input: process.stdin,
+	output: process.stdout
+  });
+
+  const userId = await new Promise(resolve => {
+		rl.question("Enter user ID (1, 2, or 3): ", resolve);
+	});
+  const password = await new Promise(resolve => {
+		rl.question("Enter password: ", resolve);
+	});
+  const credentials = await loadCredentials();
   if (credentials[userId]) {
     console.log(chalk.red('User ID already exists.'));
     return;
   }
   credentials[userId] = password;
-  saveCredentials(credentials);
+  await saveCredentials(credentials);
   console.log(chalk.green('Registration successful.'));
 }
 
-function login() {
-  const userId = prompt('Enter user ID (1, 2, or 3): ').trim();
-  const password = prompt('Enter password: ').trim();
-  const credentials = loadCredentials();
+async function login() {
+  const rl = readline.createInterface({
+	input: process.stdin,
+	output: process.stdout
+  });
+	
+  const userId = await new Promise(resolve => {
+		rl.question("Enter user ID (1, 2, or 3): ", resolve);
+	});
+  const password = await new Promise(resolve => {
+		rl.question("Enter password: ", resolve);
+	});
+  const credentials = await loadCredentials();
   if (credentials[userId] === password) {
     console.log(chalk.green('Login successful.'));
     return userId;
@@ -94,13 +115,13 @@ if (process.argv.includes('register')) {
   process.exit(0);
 }
 
-// const userId = login(); // Ensure user is logged in before continuing
+const userId = await login(); // Ensure user is logged in before continuing
 
 // Create new Provider Loader to handle importing available providers.
 const providers = await new ProviderLoader();
 
 // Create Provider object based on current active provider.
-// const activeProvider = await providers.returnActiveProvider(userId);
+const activeProvider = await providers.returnActiveProvider(userId);
 
 drawLogo();
 
