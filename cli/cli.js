@@ -94,13 +94,13 @@ if (process.argv.includes('register')) {
   process.exit(0);
 }
 
-const userId = login(); // Ensure user is logged in before continuing
+// const userId = login(); // Ensure user is logged in before continuing
 
 // Create new Provider Loader to handle importing available providers.
-const providers = new ProviderLoader();
+const providers = await new ProviderLoader();
 
 // Create Provider object based on current active provider.
-const activeProvider = await providers.returnActiveProvider(userId);
+// const activeProvider = await providers.returnActiveProvider(userId);
 
 drawLogo();
 
