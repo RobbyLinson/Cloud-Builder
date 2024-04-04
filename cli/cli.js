@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-// Import the Provider Manager
-import { ProviderManager } from '../provider/providerManager.js';
+// Import the Provider Loader
+import { ProviderLoader } from './providerLoader.js';
 
 // Import the yargs library
 import yargs from 'yargs/yargs';
@@ -17,25 +17,14 @@ import { stateCountNumberOfResourcesByType, getResourceTypeAndIdByName } from '.
 // drawings
 import { drawActionCancelledByUser, drawLogo, drawResourcesDoesNotMatch, drawResourcesMatch } from './chalk-messages.js';
 
-// Create new Provider Manager to handle importing available providers.
-const providers = await new ProviderManager();
-
-// Create Provider object based on current active provider.
-const activeProvider = await providers.returnActiveProvider();
-
 // Import filesystem library
 import fs from 'fs';
 
-//make logo
-
-drawLogo();
-
-import util from 'util';
-
-// Session time for logs
+// Gets current time for logging.
 const sessionTime = new Date();
 const sessionTimeString = sessionTime.getDate() + "_" + (sessionTime.getMonth()+1) + "_" + sessionTime.getFullYear();
-//console.log(sessionTimeString);
+
+import util from 'util';
 
 const folderPath = './cli/logs';
 // Check if the folder exists
@@ -61,6 +50,56 @@ console.log = function () {
    logStdout.write(util.format.apply(null, arguments) + '\n');
 }
 console.error = console.log;
+
+function loadCredentials() {
+  if (!fs.existsSync(credentialsFilePath)) return {};
+  return JSON.parse(fs.readFileSync(credentialsFilePath, 'utf8'));
+}
+
+function saveCredentials(credentials) {
+  fs.writeFileSync(credentialsFilePath, JSON.stringify(credentials, null, 2));
+}
+
+function register() {
+  const userId = prompt('Enter user ID (1, 2, or 3): ').trim();
+  const password = prompt('Enter password: ').trim();
+  const credentials = loadCredentials();
+  if (credentials[userId]) {
+    console.log(chalk.red('User ID already exists.'));
+    return;
+  }
+  credentials[userId] = password;
+  saveCredentials(credentials);
+  console.log(chalk.green('Registration successful.'));
+}
+
+function login() {
+  const userId = prompt('Enter user ID (1, 2, or 3): ').trim();
+  const password = prompt('Enter password: ').trim();
+  const credentials = loadCredentials();
+  if (credentials[userId] === password) {
+    console.log(chalk.green('Login successful.'));
+    return userId;
+  } else {
+	console.log(credentials);
+    console.log(chalk.red('Invalid user ID or password.'));
+    process.exit(1);
+  }
+}
+
+// Add a check for the 'register' or 'login' command before proceeding with other commands
+if (process.argv.includes('register')) {
+  register();
+  process.exit(0);
+}
+
+const userId = login(); // Ensure user is logged in before continuing
+
+// Create new Provider Loader to handle importing available providers.
+const providers = await new ProviderLoader();
+
+// Create Provider object based on current active provider.
+const activeProvider = await providers.returnActiveProvider(userId);
 
 console.log("\nWelcome to Cloud-Builder\n");
 
