@@ -10,12 +10,12 @@ import chalk from 'chalk';
 import { execSync } from 'child_process';
 
 // State related imports
-import { updateStateFile, compareCounts  } from '../provider/aws/state/state.js';
-import { previewFileContent, userFileCountNumberOfResourcesByType } from '../provider/aws/state/userFileParsers.js';
-import { stateCountNumberOfResourcesByType, getResourceTypeAndIdByName } from '../provider/aws/state/stateFileParsers.js';
+import { updateStateFile } from '../provider/aws/state/state.js';
+import { previewFileContent } from '../provider/aws/state/userFileParsers.js';
+import { getResourceTypeAndIdByName } from '../provider/aws/state/stateFileParsers.js';
 
 // drawings
-import { drawActionCancelledByUser, drawLogo, drawResourcesDoesNotMatch, drawResourcesMatch } from './chalk-messages.js';
+import { drawActionCancelledByUser, drawLogo } from './chalk-messages.js';
 
 // Import filesystem library
 import fs from 'fs';
@@ -23,6 +23,7 @@ import fs from 'fs';
 // Gets current time for logging.
 const sessionTime = new Date();
 const sessionTimeString = sessionTime.getDate() + "_" + (sessionTime.getMonth()+1) + "_" + sessionTime.getFullYear();
+
 
 import util from 'util';
 
@@ -96,10 +97,12 @@ if (process.argv.includes('register')) {
 const userId = login(); // Ensure user is logged in before continuing
 
 // Create new Provider Loader to handle importing available providers.
-const providers = await new ProviderLoader();
+const providers = new ProviderLoader();
 
 // Create Provider object based on current active provider.
 const activeProvider = await providers.returnActiveProvider(userId);
+
+drawLogo();
 
 console.log("\nWelcome to Cloud-Builder\n");
 
