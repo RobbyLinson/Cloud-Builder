@@ -17,6 +17,10 @@ export const validateVPCOptions = ({ ...input }) => {
       "InstanceTenancy",
       "Name"
     ];
+
+    if (input === null) {
+      input = {};
+    }
     
     // list of inputs which don't match any known expected input, it is also case sensitive
     const unexpectedParams = Object.keys(input).filter((param) => !expectedParams.includes(param));
@@ -27,6 +31,10 @@ export const validateVPCOptions = ({ ...input }) => {
   
     let validatedInput = validateVPCOptionTypes({...input});
     validatedInput = handleName({type: 'vpc', input: input});
+
+    if (!validatedInput.hasOwnProperty("CidrBlock")) {
+      validatedInput.CidrBlock = "10.0.1.0/24";
+    }
   
     return validatedInput;
 };

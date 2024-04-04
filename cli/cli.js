@@ -14,6 +14,9 @@ import { updateStateFile, compareCounts  } from '../provider/aws/state/state.js'
 import { previewFileContent, userFileCountNumberOfResourcesByType } from '../provider/aws/state/userFileParsers.js';
 import { stateCountNumberOfResourcesByType, getResourceTypeAndIdByName } from '../provider/aws/state/stateFileParsers.js';
 
+// drawings
+import { drawActionCancelledByUser, drawLogo, drawResourcesDoesNotMatch, drawResourcesMatch } from './chalk-messages.js';
+
 // Create new Provider Manager to handle importing available providers.
 const providers = await new ProviderManager();
 
@@ -25,11 +28,7 @@ import fs from 'fs';
 
 //make logo
 
-console.log(chalk.blueBright("  ____ _                 _   _           _ _     _           "));
-console.log(chalk.blueBright(" / ___| | ___  _   _  __| | | |__  _   _(_) | __| | ___ _ __ "));
-console.log(chalk.blueBright("| |   | |/ _ \\| | | |/ _` | | '_ \\| | | | | |/ _` |/ _ \\ '__|"));
-console.log(chalk.blueBright("| |___| | (_) | |_| | (_| | | |_) | |_| | | | (_| |  __/ |   "));
-console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|\\__,_|\\___|_|   "));
+drawLogo();
 
 import util from 'util';
 
@@ -85,53 +84,17 @@ yargs(hideBin(process.argv))
       type: 'string'
     });
   }, async (argv) => {
-
-    // get objects with number of resources on ec2 client and in user defined file
-    const userFileCounts = await userFileCountNumberOfResourcesByType(argv.file);
-    const stateFileCounts = await stateCountNumberOfResourcesByType();
-    
-    // Compare counts from user file and state file
-    const matchCounts = compareCounts(userFileCounts, stateFileCounts);
-    
-    // for now we don't care if state differs from filename from clb run <filename>
-    if (matchCounts) {
-      console.log(chalk.gray('------------------------------------------------'));
-      console.log(chalk.green('The number of resources match.\n\tDo you want to initialize same resources again?'));
-      console.log(chalk.gray('------------------------------------------------'));
-      try {
-        if (await previewFileContent(argv.file)) {
-          execSync(`node ${argv.file}`, { stdio: 'inherit' });
-          // creates a state.json, which should represent list of all resources in a ec2 client in a current working directory
-          updateStateFile();
-        } else {
-          console.log(chalk.gray('------------------------------------------------'));
-          console.log(chalk.red('Action cancelled by user.'));
-          console.log(chalk.gray('------------------------------------------------'));
-        }
-      } catch (error) {
-        console.error(error.message);
+    try {
+      if (await previewFileContent(argv.file)) {
+        execSync(`node ${argv.file}`, { stdio: 'inherit' });
+        // creates a state.json, which should represent list of all resources in a ec2 client in a current working directory
+        updateStateFile();
+      } else {
+        drawActionCancelledByUser();
       }
-    } else {
-      console.log(chalk.gray('------------------------------------------------'));
-      console.log(chalk.yellow('The number of resources DOES NOT match, which means we do some action'));
-      console.log(chalk.gray('------------------------------------------------'));
-      try {
-        if (await previewFileContent(argv.file)) {
-          execSync(`node ${argv.file}`, { stdio: 'inherit' });
-          // creates a state.json, which should represent list of all resources in a ec2 client in a current working directory
-          updateStateFile();
-        } else {
-          console.log(chalk.gray('------------------------------------------------'));
-          console.log(chalk.red('Action cancelled by user.'));
-          console.log(chalk.gray('------------------------------------------------'));
-        }
-      } catch (error) {
-        console.error(error.message);
-      }
+    } catch (error) {
+      console.error(error.message);
     }
-
-    
-    
   })
   .command('create <type> <name> [options..]', 'Creates a new resource', (yargs) => {
     yargs.positional('type', {
@@ -184,11 +147,9 @@ yargs(hideBin(process.argv))
           type: data.type,
 		      instanceId: data.id
         });
+        // update state file
+        updateStateFile();
       }
-      
-      // update state file
-      updateStateFile();
-
     } catch (error) {
       console.error('Error deleting resource:', error.message);
     }
