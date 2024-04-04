@@ -1,7 +1,7 @@
 import providerAws from './provider/aws/providerAws.js';
 // Creation testing //
 
-const awsProvider = await providerAws();
+const awsProvider = await providerAws("default");
 
 
 // restrictions for clb run <file> in mode 2 ( when we care about the state)
