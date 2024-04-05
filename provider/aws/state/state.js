@@ -18,14 +18,14 @@ export async function updateStateFile() {
     const jsonString = JSON.stringify(jsonData, null, 2); // Convert object to JSON string
 
     fs.writeFile('state.json', jsonString, (err) => {
-        if (err) {
-          console.error('Error writing resource state JSON file:', err);
-        } else {
-          console.log('File state.json was updated');
-          stateCountNumberOfResourcesByType().then((counts) => {
-            console.log(`\tCurrent number of active resources:${formatCounts(counts)}`);
-          });
-        }
+      if (err) {
+        console.error('Error writing resource state JSON file:', err);
+      } else {
+        console.log('File state.json was updated');
+        stateCountNumberOfResourcesByType().then((counts) => {
+          console.log(`\tCurrent number of active resources:${formatCounts(counts)}`);
+        });
+      }
     });
   } catch (err) {
     console.error('Failed to fetch or write resource state:', err);

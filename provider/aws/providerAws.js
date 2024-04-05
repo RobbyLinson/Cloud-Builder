@@ -21,67 +21,66 @@ async function providerAws(userId) {
 			secretAccessKey: awsCredentials.secretAccessKey
 		}
 	});
-	
 
     async function describeResources({
-        type, resourceIds
+      type, resourceIds
     }) {
-        switch (type) {
+      switch (type) {
         case 'vpc':
-            return describeVpcs(ec2Client, resourceIds);
+          return describeVpcs(ec2Client, resourceIds);
         case 'subnet':
-            return describeSubnets(ec2Client, resourceIds);
+          return describeSubnets(ec2Client, resourceIds);
         case 'instance':
-            return describeInstances(ec2Client, resourceIds);
+          return describeInstances(ec2Client, resourceIds);
         case 'natgateway':
-            return describeNatGateways(ec2Client, resourceIds);
+          return describeNatGateways(ec2Client, resourceIds);
         case 'internetgateway':
-            return describeInternetGateways(ec2Client, resourceIds);
-		case 'routetable':
-            return describeRouteTables(ec2Client, resourceIds);
+          return describeInternetGateways(ec2Client, resourceIds);
+		    case 'routetable':
+          return describeRouteTables(ec2Client, resourceIds);
         case 'all': // describe all resources on ec2 client
-			return describeAllResources(ec2Client);
+			    return describeAllResources(ec2Client);
         default:
-            return {
-                error: `Unknown resource type: ${type}`
-            };
-        }
+          return {
+            error: `Unknown resource type: ${type}`
+          };
+      }
     }
 
     async function attachInternetGatewayAndVpc({
-        internetgatewayId, vpcId
+      internetgatewayId, vpcId
     }) {
-        return attachInternetGatewayToVpc(ec2Client, internetgatewayId, vpcId);
+      return attachInternetGatewayToVpc(ec2Client, internetgatewayId, vpcId);
     }
 
     async function detachInternetGatewayAndVpc({
-        internetgatewayId, vpcId
+      internetgatewayId, vpcId
     }) {
-        return detachInternetGatewayFromVpc(ec2Client, internetgatewayId, vpcId);
+      return detachInternetGatewayFromVpc(ec2Client, internetgatewayId, vpcId);
     }
 
     async function attachRouteTableAndSubnet({
-        routetableId, subnetId
+      routetableId, subnetId
     }) {
-        return attachRouteTableToSubnet(ec2Client, routetableId, subnetId);
+      return attachRouteTableToSubnet(ec2Client, routetableId, subnetId);
     }
 
     async function detachRouteTableAndSubnet({
-        routetableId, subnetId
+      routetableId, subnetId
     }) {
-        return detachRouteTableFromSubnet(ec2Client, routetableId, subnetId);
+      return detachRouteTableFromSubnet(ec2Client, routetableId, subnetId);
     }
 
     async function attachInternetGatewayAndRouteTable({
-        destinationcidrblock, gatewayId, routetableId
+      destinationcidrblock, gatewayId, routetableId
     }) {
-        return attachRouteTableToGateway(ec2Client, destinationcidrblock, gatewayId, routetableId);
+      return attachRouteTableToGateway(ec2Client, destinationcidrblock, gatewayId, routetableId);
     }
 
     async function detachInternetGatewayAndRouteTable({
-        destinationcidrblock, routetableId
+      destinationcidrblock, routetableId
     }) {
-        return detachRouteTableFromGateway(ec2Client, destinationcidrblock, routetableId);
+      return detachRouteTableFromGateway(ec2Client, destinationcidrblock, routetableId);
     }
 
 	async function terminateResource({type, instanceId}){
@@ -93,14 +92,14 @@ async function providerAws(userId) {
 				await deleteSubnet(ec2Client, instanceId);
 				break;
 			case 'instance':
-                await deleteInstance(ec2Client, instanceId);
-                break;
-            case 'natgateway':
-                await deleteNatGateway(ec2Client, instanceId);
-                break;
-            case 'internetgateway':
-                await deleteInternetGateway(ec2Client, instanceId);
-                break;
+        await deleteInstance(ec2Client, instanceId);
+        break;
+      case 'natgateway':
+        await deleteNatGateway(ec2Client, instanceId);
+        break;
+      case 'internetgateway':
+        await deleteInternetGateway(ec2Client, instanceId);
+        break;
 			case 'routetable':
 				await deleteRouteTable(ec2Client, instanceId);
 				break;
@@ -112,74 +111,74 @@ async function providerAws(userId) {
 	}
 
     async function createResource({
-        type,
-        Name,
-        ...options
+      type,
+      Name,
+      ...options
     }) {
-        var newId;
+      var newId;
         
-        switch (type) {
+      switch (type) {
         case 'vpc':
-            newId = await createVpc(ec2Client, {
-                Name, ...options
-            });
-            break;
+          newId = await createVpc(ec2Client, {
+            Name, ...options
+          });
+          break;
         case 'subnet':
-            newId = await createSubnet(ec2Client, {
-                Name, ...options
-            });
-            break;
+          newId = await createSubnet(ec2Client, {
+            Name, ...options
+          });
+          break;
         case 'instance':
-            newId = await createInstance(ec2Client, {
-                Name, ...options
-            });
-            break;
+          newId = await createInstance(ec2Client, {
+            Name, ...options
+          });
+          break;
         case 'natgateway':
-            newId = await createNatGateway(ec2Client, {
-                Name, ...options
-            });
-            break;
+          newId = await createNatGateway(ec2Client, {
+            Name, ...options
+          });
+          break;
         case 'internetgateway':
-            newId = await createInternetGateway(ec2Client, {
-                Name, ...options
-            });
-            break;
-		case 'routetable':
-			newId = await createRouteTable(ec2Client, {
-				Name, ...options
-			});
-			break;
-		default:
-			return {
-				error: `Unknown resource type: ${type}`
-			};
-		}
+          newId = await createInternetGateway(ec2Client, {
+            Name, ...options
+          });
+          break;
+		    case 'routetable':
+			    newId = await createRouteTable(ec2Client, {
+			    	Name, ...options
+			    });
+			    break;
+		    default:
+		    	return {
+		    		error: `Unknown resource type: ${type}`
+		    	};
+		  }
 		return newId;
 	}
 
-    async function updateResource({
-        type,
-        id,
-        name
+  async function updateResource({
+      type,
+      id,
+      name
     }){
-        switch (type){
-            case 'vpc':
-                return updateVpcName(ec2Client, {id, name})
-        }
+      switch (type){
+        case 'vpc':
+          return updateVpcName(ec2Client, {id, name})
+      }
     }
 
 
     return {
-        createResource: createResource, 
-        attachInternetGatewayAndVpc: attachInternetGatewayAndVpc,
-        detachInternetGatewayAndVpc: detachInternetGatewayAndVpc,
-        attachRouteTableAndSubnet: attachRouteTableAndSubnet,
-        detachRouteTableAndSubnet: detachRouteTableAndSubnet,
-        attachInternetGatewayAndRouteTable: attachInternetGatewayAndRouteTable,
-        detachInternetGatewayAndRouteTable: detachInternetGatewayAndRouteTable,
-        describeResources: describeResources,
-        terminateResource: terminateResource,
-        updateResource: updateResource
+      createResource: createResource, 
+      attachInternetGatewayAndVpc: attachInternetGatewayAndVpc,
+      detachInternetGatewayAndVpc: detachInternetGatewayAndVpc,
+      attachRouteTableAndSubnet: attachRouteTableAndSubnet,
+      detachRouteTableAndSubnet: detachRouteTableAndSubnet,
+      attachInternetGatewayAndRouteTable: attachInternetGatewayAndRouteTable,
+      detachInternetGatewayAndRouteTable: detachInternetGatewayAndRouteTable,
+      describeResources: describeResources,
+      terminateResource: terminateResource,
+      updateResource: updateResource
     };
 }
 
