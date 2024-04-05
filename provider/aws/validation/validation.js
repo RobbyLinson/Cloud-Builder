@@ -91,9 +91,9 @@ const validateVPCOptionTypes = ({ ...input }) => {
 export const handleName = (
   {
     type, // type of resource, the same as for awsProvider *Resource methods
-    input // inputed options inside our create* methods
+    input // inputted options inside our create* methods
   }) => {
-  if (input.hasOwnProperty("Name")) {
+  if (input.hasOwnProperty("Name") && input.Name != undefined) {
     if (typeof input.Name === "string") {
       input.TagSpecifications = [{
         ResourceType: type,

@@ -5,3 +5,4 @@ state.json
 logs
 node_modules
 user_credentials.json
+.vscode

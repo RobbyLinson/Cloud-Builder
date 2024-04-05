@@ -21,7 +21,11 @@ export async function describeNatGateways(ec2Client, nategatewayIds) {
 	const command = new DescribeNatGatewaysCommand({NatGatewayIds: nategatewayIds});
 	try {
 		const response = await ec2Client.send(command);
-		return response;
+		
+		// returns list of only active natGateways
+		const activeNatGateways = response.NatGateways.filter(natGateway => natGateway.State === "available");
+		
+		return activeNatGateways;
 	} catch (err) {
 		console.warn(`Failed to describe NatGateways.`, err);
 	}
@@ -30,12 +34,12 @@ export async function describeNatGateways(ec2Client, nategatewayIds) {
 export async function deleteNatGateway(ec2Client,natgatewayId) {      
     
     const command = new DeleteNatGatewayCommand({
-        NatGatewayId: natgatewayId
+			NatGatewayId: natgatewayId
     });
 
     try {
-        await ec2Client.send(command);
-      console.log(`\n🧹 NatGateway with ID ${natgatewayId} terminated.\n`);
+			const response = await ec2Client.send(command);
+			console.log(`\n🧹 NatGateway with ID ${response.NatGatewayId} terminated.\n`);
     } catch (err) {
       console.warn(`Failed to terminate instance ${natgatewayId}.`, err);
     }
