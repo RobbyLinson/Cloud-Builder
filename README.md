@@ -1,29 +1,52 @@
 # Cloud-Builder Code as Infrastructure Tool
 
-Cloud-Builder uses a command-line interface (CLI) tool designed to simplify the process of creating, running, and managing AWS resources using code instead of documentation. With an easy-to-use command set, users can quickly deploy infrastructure components on AWS.
+Cloud-Builder is a command-line interface (CLI) tool designed to simplify the process of creating, running, and managing AWS resources using code. With an easy-to-use command set, users can quickly deploy infrastructure components on AWS.
 
 ## Features
 
+- **Register/Login**: Secure user registration and login to manage AWS resources.
 - **Greet**: Offers a personalized greeting to users.
-- **Run**: Executes a specified builder script.
+- **Run**: Executes specified builder scripts to create or manage AWS resources.
 - **Create**: Facilitates the creation of AWS resources such as VPCs, subnets, and instances.
 - **Delete**: Allows for the deletion of specified AWS resources by name.
+- **Update**: Updates the state file to reflect current AWS resource status accurately.
 
 ## Installation
 
-Before you can use Cloud-Builder, you need to have Node.js installed on your system. Once Node.js is installed, follow these steps:
+To use Cloud-Builder, ensure Node.js is installed on your system. Follow these steps to install Cloud-Builder:
 
 1. Clone this repository to your local machine.
-2. Navigate to the cloned directory and run `npm install` to install the required dependencies.
+2. Navigate to the cloned directory.
+3. Run `npm install` to install the required dependencies.
+
+## Configuration
+
+Before using Cloud-Builder, configure your AWS credentials:
+
+1. Use the Cloud-Builder CLI to register as a new user by following the prompts to enter your details.
+2. Upon successful registration or login, you will be prompted to enter your AWS Access Key ID and Secret Access Key for AWS resource management.
+3. The CLI will store your credentials securely for future sessions.
 
 ## Usage
 
-Here's how to use the Cloud-Builder CLI:
+### Registering a New User
+
+```bash
+clb register
+```
+Follow the prompts ito create a new local user account
+
+### Logging in
+```bash
+clb login
+```
+Enter your registered user ID and password to log in.
+
 
 ### Greeting Command
 
 ```bash
-cloud-builder greet <name>
+clb greet <name>
 ```
 
 Replace <name> with your name to receive a personalized greeting.
@@ -31,7 +54,7 @@ Replace <name> with your name to receive a personalized greeting.
 ### Running a Builder Script
 
 ```bash
-cloud-builder run <file name>
+clb run <file name>
 ```
 
 Specify the file name of the builder script you wish to execute.
@@ -39,7 +62,7 @@ Specify the file name of the builder script you wish to execute.
 ### Creating AWS Resources
 
 ```bash
-cloud-builder create <type> <name>
+clb create <type> <name>
 ```
 
 Replace <type> with the type of AWS resource you want to create (e.g., vpc, subnet) and <name> with a name for your resource.
@@ -47,10 +70,18 @@ Replace <type> with the type of AWS resource you want to create (e.g., vpc, subn
 ### Deleting AWS Resources
 
 ```bash
-cloud-builder delete <name>
+clb delete <name>
 ```
-
 Specify the name of the AWS resource you wish to delete.
+
+### Updating State
+```bash
+clb update
+```
+Manually update the state file, reflecting the current status of AWS resources
+
+### Logging
+Operation logs are stored in the cli/logs directory for audit and troubleshooting purposes.
 
 ## Configuration
 
@@ -62,3 +93,10 @@ To use Cloud-Builder, you'll need to configure your AWS credentials. Follow thes
 ## Contributing
 
 This is an open source project, we welcome contributions to the Cloud-Builder project. Please feel free to submit issues or pull requests with improvements or new features.
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+
+The GNU General Public License v3.0 (GPLv3) is a free, copyleft license for software and other kinds of works, offering the users the freedom to use, study, share (copy), and modify the software. Software that ensures that these rights are preserved, not just for the original authors, but for all subsequent users. For more information on GPLv3, please visit [https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html).
+
