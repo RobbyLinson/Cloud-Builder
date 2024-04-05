@@ -73,7 +73,6 @@ export async function userFileCountNumberOfResourcesByType(filePath){
     let insideLoop = false;
     let loopIterations = 0;
   
-    // should be decoupled later
     for (const line of lines) {
       const trimmedLine = line.trim();
   
@@ -142,7 +141,6 @@ function processFileContent(fileContent){
     } else {
       consecutiveEmptyLines = 0; // Reset consecutive empty lines counter
     }
-  
     nonCommentedContent += line + '\n';
   }
   
@@ -215,7 +213,7 @@ function handleCountDecrease(currLine, allLines, insideLoop, resourceCounts, loo
       // Decrement counts based on the resource type
       if (resourceType === "'vpc'" || resourceType === '"vpc"') {
         resourceCounts.vpcs += (insideLoop ? -loopIterations : -1);
-        resourceCounts.routeTables += (insideLoop ? loopIterations : -1);
+        resourceCounts.routeTables += (insideLoop ? -loopIterations : -1);
       } else if (resourceType === "'subnet'" || resourceType === '"subnet"') {
         resourceCounts.subnets += (insideLoop ? -loopIterations : -1);
       } else if (resourceType === "'instance'" || resourceType === '"instance"') {
@@ -223,9 +221,9 @@ function handleCountDecrease(currLine, allLines, insideLoop, resourceCounts, loo
       } else if (resourceType === "'natGateway'" || resourceType === '"natGateway"') {
         resourceCounts.natGateways += (insideLoop ? -loopIterations : -1);
       } else if (resourceType === "'internetGateways'" || resourceType === '"internetGateways"') {
-        resourceCounts.internetGateways += (insideLoop ? loopIterations : -1);
+        resourceCounts.internetGateways += (insideLoop ? -loopIterations : -1);
       } else if (resourceType === "'routeTables'" || resourceType === '"routeTables"') {
-        resourceCounts.routeTables += (insideLoop ? loopIterations : -1);
+        resourceCounts.routeTables += (insideLoop ? -loopIterations : -1);
       }
       break; // Exit the loop once the "type" parameter is found
     }

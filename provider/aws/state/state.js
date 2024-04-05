@@ -21,7 +21,7 @@ export async function updateStateFile() {
         if (err) {
           console.error('Error writing resource state JSON file:', err);
         } else {
-          console.log('\nFile state.json was updated');
+          console.log('File state.json was updated');
           stateCountNumberOfResourcesByType().then((counts) => {
             console.log(`\tCurrent number of active resources:${formatCounts(counts)}`);
           });
