@@ -91,6 +91,7 @@ export async function getCredentials(userId) {
 			var correctUser = false;
 			var valsRead = 0;
 		
+			readloop:
 			for await (const line of rl) {
 				if (line[0] == '[') {
 					if (line === userIdLine) correctUser = true;
@@ -101,20 +102,20 @@ export async function getCredentials(userId) {
 						case 'aws_access_key_id':
 							credentials.accessKeyId = keyvalue[1];
 						
-							if (valsRead == 1) break;
+							if (valsRead == 1) break readloop;
 							valsRead++;
 						
 							break;
 						case 'aws_secret_access_key':
 							credentials.secretAccessKey = keyvalue[1];
 						
-							if (valsRead == 1) break;
+							if (valsRead == 1) break readloop;
 							valsRead++;
 						
 							break;
 						case 'region':
 							credentials.region = keyvalue[1];
-							break;
+							break readloop;
 						default:
 							break;
 					}
