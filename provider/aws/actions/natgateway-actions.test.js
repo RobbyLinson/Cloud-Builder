@@ -1,6 +1,5 @@
 import { mockClient } from "aws-sdk-client-mock";
-import { EC2Client, CreateNatGatewayCommand, DescribeNatGatewaysCommand,
-    DeleteNatGatewayCommand} from "@aws-sdk/client-ec2";
+import { EC2Client, CreateNatGatewayCommand, DescribeNatGatewaysCommand } from "@aws-sdk/client-ec2";
 import { createNatGateway, describeNatGateways, deleteNatGateway } from "./natgateway-actions.js"
 
 const ec2Mock = mockClient(EC2Client);
@@ -32,7 +31,8 @@ test("Determines if descibeNatGateways returns a list of NatGateways correspondi
     }).resolves({
         "NatGateway": {
             "NatGatewayId": "nat-abc123",
-            "SubnetId": "sub-abc123"
+            "SubnetId": "sub-abc123",
+            "State": "available"
         }
     })
 
@@ -44,7 +44,8 @@ test("Determines if descibeNatGateways returns a list of NatGateways correspondi
         "NatGateways": [
             {
                 "NatGatewayId": "nat-abc123",
-                "SubnetId": "sub-abc123"
+                "SubnetId": "sub-abc123",
+                "State": "available"
             }
         ]
     })
@@ -55,14 +56,13 @@ test("Determines if descibeNatGateways returns a list of NatGateways correspondi
 
     const natList = await describeNatGateways(ec2Mock, [nat])
 
-    expect(natList).toStrictEqual({
-        "NatGateways": [
-            {
-                "NatGatewayId": "nat-abc123",
-                "SubnetId": "sub-abc123"
-            }
-        ]
-    })
+    expect(natList).toStrictEqual([
+        {
+            "NatGatewayId": "nat-abc123",
+            "SubnetId": "sub-abc123",
+            "State": "available"
+        }
+    ])
 })
 
 test("Determines if deleteNatGateway returns successfully", async() => {
