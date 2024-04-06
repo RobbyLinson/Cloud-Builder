@@ -24,7 +24,7 @@ export async function describeAllResources(ec2Client) {
 
     // Describe NAT Gateways
     const natGateways = await describeNatGateways(ec2Client);
-    allResources['natGateways'] = natGateways.NatGateways;
+    allResources['natGateways'] = natGateways.NatGateways || [];
 
     const internetGateways = await describeInternetGateways(ec2Client);
     allResources['internetGateways'] = internetGateways.InternetGateways;

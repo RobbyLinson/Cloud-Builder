@@ -1,9 +1,6 @@
 import chalk from "chalk";
 import fs from "fs";
 import read from 'readline';
-import { compareCounts } from "./state.js";
-import { stateCountNumberOfResourcesByType } from "./stateFileParsers.js";
-import { drawResourcesDoesNotMatch, drawResourcesMatch } from "../../../cli/chalk-messages.js";
 
 // specify the maximum number of empty lines allowed between code lines
 const MAX_NUMBER_OF_EMPTY_LINES = 2;
@@ -20,19 +17,15 @@ export async function previewFileContent(filePath) {
     console.log(chalk.yellow('Preview of file content:'));
     console.log(chalk.gray('------------------------------------------------'));
     console.log(cleanContent);
-  
-
-    // get objects with number of resources on ec2 client and in user defined file
-    const userFileCounts = await userFileCountNumberOfResourcesByType(filePath);
-    const stateFileCounts = await stateCountNumberOfResourcesByType();
     
-    // Compare counts from user file and state file
-    const matchCounts = compareCounts(userFileCounts, stateFileCounts);
-    if(matchCounts){
-      drawResourcesMatch();
-    } else{
-      drawResourcesDoesNotMatch();
-    }
+    return;
+  } catch (error) {
+    console.error(chalk.red(`Error reading file '${filePath}':`), error.message);
+    return Promise.resolve(false);
+  }
+}
+
+export async function askUserToProceed(){
     // Confirm with the user to proceed
     const readlineInterface = read.createInterface({
       input: process.stdin,
@@ -44,10 +37,6 @@ export async function previewFileContent(filePath) {
         resolve(answer.toLowerCase() === 'y');
       });
     });
-  } catch (error) {
-    console.error(chalk.red(`Error reading file '${filePath}':`), error.message);
-    return Promise.resolve(false);
-  }
 }
 
 // counts the number of resources, which should be created after running clb run <filename> 

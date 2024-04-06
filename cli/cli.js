@@ -10,19 +10,19 @@ import chalk from 'chalk';
 import { execSync } from 'child_process';
 
 // State related imports
-import { updateStateFile } from '../provider/aws/state/state.js';
-import { previewFileContent } from '../provider/aws/state/userFileParsers.js';
-import { getResourceTypeAndIdByName } from '../provider/aws/state/stateFileParsers.js';
+import { updateStateFile, compareCounts, reinitializeInfrastructure } from '../provider/aws/state/state.js';
+import { askUserToProceed, previewFileContent, userFileCountNumberOfResourcesByType } from '../provider/aws/state/userFileParsers.js';
+import { getResourceTypeAndIdByName, stateCountNumberOfResourcesByType } from '../provider/aws/state/stateFileParsers.js';
 
 // drawings
-import { drawActionCancelledByUser, drawLogo } from './chalk-messages.js';
+import { drawActionCancelledByUser, drawResourcesDoesNotMatch, drawResourcesMatch, drawLogo } from './chalk-messages.js';
 
 // Import filesystem library
 import fs from 'fs';
 
 // Gets current time for logging.
 const sessionTime = new Date();
-const sessionTimeString = sessionTime.getDate() + "_" + (sessionTime.getMonth()+1) + "_" + sessionTime.getFullYear();
+const sessionTimeString = sessionTime.getDate() + "_" + (sessionTime.getMonth() + 1) + "_" + sessionTime.getFullYear();
 
 import readline from 'readline';
 
@@ -31,14 +31,14 @@ import util from 'util';
 const folderPath = './cli/logs';
 // Check if the folder exists
 if (!fs.existsSync(folderPath)) {
-    // If it doesn't exist, create it
-    fs.mkdirSync(folderPath, { recursive: true }, (err) => {
-        if (err) {
-            console.error('Error creating folder:', err);
-        } else {
-            console.log('Folder created successfully!');
-        }
-    });
+  // If it doesn't exist, create it
+  fs.mkdirSync(folderPath, { recursive: true }, (err) => {
+    if (err) {
+      console.error('Error creating folder:', err);
+    } else {
+      console.log('Folder created successfully!');
+    }
+  });
 }
 
 // Create log file
@@ -123,6 +123,7 @@ const providers = await new ProviderLoader();
 // Create Provider object based on current active provider.
 const activeProvider = await providers.returnActiveProvider(userId);
 
+// Draws Cloud-Builder Logo
 drawLogo();
 
 console.log("\nWelcome to Cloud-Builder\n");
@@ -138,23 +139,86 @@ yargs(hideBin(process.argv))
       default: 'World'
     });
   },  async (argv) => {
-
-      console.log(`\nHello, ${argv.name}!`);
+    console.log(`\nHello, ${argv.name}!`);
   })
-  .command('run <file>', 'Executes a JavaScript file', (yargs) => {
-    return yargs.positional('file', {
+  .command('run [-u] [-p] <file>', 'Executes a JavaScript file', (yargs) => {
+    return yargs
+    .positional('file', {
       describe: 'executes js file',
       type: 'string'
+    })
+    .option('u', {
+      describe: 'Use compare and update state feature',
+      type: 'boolean',
+      default: false
+    })
+    .option('p',{
+      describe: 'Enables file preview',
+      type: 'boolean',
+      default: false
     });
   }, async (argv) => {
     try {
-      if (await previewFileContent(argv.file)) {
-        execSync(`node ${argv.file}`, { stdio: 'inherit' });
-        // creates a state.json, which should represent list of all resources in a ec2 client in a current working directory
-        updateStateFile();
-      } else {
-        drawActionCancelledByUser();
+      if(argv.u){  // if flag -u (update) is set, we compare present and future infrastructure 
+        // get objects with number of resources on ec2 client and in user defined file
+        const userFileCounts = await userFileCountNumberOfResourcesByType(argv.file);
+        const stateFileCounts = await stateCountNumberOfResourcesByType();
+
+        // Compare counts from user file and state file
+        const matchCounts = compareCounts(userFileCounts, stateFileCounts);
+        
+        if(matchCounts){ 
+          // if the infrastructure is the same
+          
+          // we notify user about that
+          drawResourcesMatch();
+
+          // we ask whether user wants to reinitialize it 
+          if(!await askUserToProceed()){
+            // if user doesn't want to, we finish the execution
+            drawActionCancelledByUser();
+            return;
+          }
+          // otherwise we leave this if else part
+        } else{ 
+          // if the infrastructure differs, we check if user used other flags
+          if (argv.p){ 
+            // if flag -p (preview) is set
+            await previewFileContent(argv.file); 
+          }
+          // we notify user about that
+          drawResourcesDoesNotMatch();
+          // and we leave this if else part (related to counts)
+        }
+
+        // basically deletes everything from the current state
+        reinitializeInfrastructure();
+        // then we proceed to the last part running the user file and updating the state
+        // so we leave this if else part (related to -u)
+      
+      } else { // if flag -u (update) is not set, we create just the infrastructure
+        if (argv.p) {
+          // if flag -p (preview) is set we show file preview
+          await previewFileContent(argv.file);
+          // fix the cli ui
+          console.log(chalk.gray('------------------------------------------------')); // bad decision, but this fixes cli ui
+
+          // after looking at the preview we ask if user wants to proceed
+          if(!await askUserToProceed()){
+            // if user doesn't want to, we finish the execution
+            drawActionCancelledByUser();
+            return;
+          }
+          // if user wants to proceed, we leave this if else part (related to -p flag)
+        } 
       }
+
+      // run the user file
+      execSync(`node ${argv.file}`, { stdio: 'inherit' });
+      // update the stateFile
+      updateStateFile();
+
+
     } catch (error) {
       console.error(error.message);
     }

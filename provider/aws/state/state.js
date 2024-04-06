@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { EC2Client } from '@aws-sdk/client-ec2';
-import { describeAllResources } from '../actions/general-actions.js';
+import { describeAllResources, terminateAllResources } from '../actions/general-actions.js';
 import { stateCountNumberOfResourcesByType } from './stateFileParsers.js';
 
 export async function updateStateFile() {
@@ -42,6 +42,12 @@ function formatCounts(counts) {
     \t\t- routeTables: ${counts.routeTables}
   `;
 }
+
+export async function reinitializeInfrastructure(){
+  const ec2Client = new EC2Client();
+  terminateAllResources(ec2Client);
+}
+
 
 // Function to compare objects with number of resources from user file and state file
 export function compareCounts(userCounts, stateCounts) {

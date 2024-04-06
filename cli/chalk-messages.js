@@ -16,12 +16,12 @@ export function drawActionCancelledByUser(){
 
 export function drawResourcesMatch(){
   console.log(chalk.gray('------------------------------------------------'));
-  console.log(chalk.green('The number of resources match.\n\tDo you want to initialize same resources again?'));
+  console.log(chalk.green('This infrastructure is currently up.\n\tDo you want to reinitialize it?'));
   console.log(chalk.gray('------------------------------------------------'));
 }
 
 export function drawResourcesDoesNotMatch(){
   console.log(chalk.gray('------------------------------------------------'));
-  console.log(chalk.yellow('The number of resources DOES NOT match, which means we do some action'));
+  console.log(chalk.yellow('Current infrastructure differs from new one.\n\tPerforming update'));
   console.log(chalk.gray('------------------------------------------------'));
 }
