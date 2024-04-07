@@ -31,13 +31,13 @@ async function createObjectForIni (){
 async function populateAwsFolder(userId) {
   try{
     const arr= await createObjectForIni();
-    let duplicateArr = [`[${userId}]`, "aws_access_key_id=", "aws_secret_access_key="];
+    let duplicateArr = [`\n\n[${userId}]`, "aws_access_key_id=", "aws_secret_access_key="];
     for(let i =0; i<arr.length; i++){
       duplicateArr[i+1]=duplicateArr[i+1] + arr[i];
     }
     const outputString = duplicateArr.join("\n");
     await fsp.writeFile(filePath + "credentials", outputString + "\n", { flag: 'a' });
-    const stringToConfig = `[${userId}]\nregion=eu-west-1\n`;
+    const stringToConfig = `\n\n[${userId}]\nregion=eu-west-1\n`;
     await fsp.writeFile(filePath + "config", stringToConfig, { flag: 'a' });
   } catch {
     console.error("Error while populating AWS folder.");

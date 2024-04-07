@@ -53,7 +53,7 @@ console.log = function () {
 }
 console.error = console.log;
 
-const credentialsFilePath = process.cwd() + '/user_credentials.json';
+const credentialsFilePath = process.cwd() + '/user_profile.json';
 
 function loadCredentials() {
   if (!fs.existsSync(credentialsFilePath)) return {};
@@ -64,58 +64,36 @@ function saveCredentials(credentials) {
   fs.writeFileSync(credentialsFilePath, JSON.stringify(credentials, null, 2));
 }
 
-async function register() {
+async function changeUser() {
   const rl = await readline.createInterface({
 	input: process.stdin,
 	output: process.stdout
   });
 
   const userId = await new Promise(resolve => {
-		rl.question("Enter user ID (1, 2, or 3): ", resolve);
-	});
-  const password = await new Promise(resolve => {
-		rl.question("Enter password: ", resolve);
+		rl.question("Enter username: ", resolve);
 	});
   const credentials = await loadCredentials();
-  if (credentials[userId]) {
-    console.log(chalk.red('User ID already exists.'));
-    return;
-  }
-  credentials[userId] = password;
-  await saveCredentials(credentials);
-  console.log(chalk.green('Registration successful.'));
-}
-
-async function login() {
-  const rl = readline.createInterface({
-	input: process.stdin,
-	output: process.stdout
-  });
-	
-  const userId = await new Promise(resolve => {
-		rl.question("Enter user ID (1, 2, or 3): ", resolve);
-	});
-  const password = await new Promise(resolve => {
-		rl.question("Enter password: ", resolve);
-	});
-  const credentials = await loadCredentials();
-  if (credentials[userId] === password) {
-    console.log(chalk.green('Login successful.'));
+  if (credentials.current === userId) {
+    console.log(chalk.red('This is the current user already.'));
     return userId;
-  } else {
-	console.log(credentials);
-    console.log(chalk.red('Invalid user ID or password.'));
-    process.exit(1);
   }
+  credentials.current = userId;
+  await saveCredentials(credentials);
+  console.log(chalk.green('User successfully changed.'));
+  return userId;
 }
 
-// Add a check for the 'register' or 'login' command before proceeding with other commands
-if (process.argv.includes('register')) {
-  register();
+// Add a check for the 'user' command before proceeding with other commands
+if (process.argv.includes('user')) {
+  await changeUser();
   process.exit(0);
 }
 
-const userId = await login(); // Ensure user is logged in before continuing
+var userId = loadCredentials().current;
+if (userId == null) {
+	userId = await changeUser();
+}
 
 // Create new Provider Loader to handle importing available providers.
 const providers = await new ProviderLoader();
