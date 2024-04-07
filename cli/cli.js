@@ -73,14 +73,12 @@ async function changeUser() {
   const userId = await new Promise(resolve => {
 		rl.question("Enter username: ", resolve);
 	});
-  const credentials = await loadCredentials();
-  if (credentials.current === userId) {
-    console.log(chalk.red('This is the current user already.'));
-    return userId;
-  }
+
+  var credentials = {};
   credentials.current = userId;
   await saveCredentials(credentials);
-  console.log(chalk.green('User successfully changed.'));
+  console.log(chalk.green('User successfully set.'));
+  rl.close();
   return userId;
 }
 

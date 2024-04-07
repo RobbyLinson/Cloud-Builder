@@ -9,7 +9,6 @@ async function createObjectForIni (){
     const readLine = read.Interface({
       input:process.stdin,
       output:process.stdout,
-		terminal: false
     });
     let questionArr = [];
 
@@ -63,6 +62,7 @@ async function checkUserExists(userId) {
 	for await (const line of rl) {
 		if (line === userIdLine) return;
 	}
+	rl.close();
 	await populateAwsFolder(userId);
 }
 
@@ -82,45 +82,46 @@ export async function getCredentials(userId) {
 	const userIdLine = '[' + userId + ']';
 	
     for (const val of files){
-			const stream = await fs.createReadStream(filePath + '/' + val);
-			const rl = await read.createInterface({
-				input: stream,
-				crlfDelay: Infinity
-			});
+		const stream = await fs.createReadStream(filePath + '/' + val);
+		const rl = await read.createInterface({
+			input: stream,
+			crlfDelay: Infinity
+		});
 		
-			var correctUser = false;
-			var valsRead = 0;
+		var correctUser = false;
+		var valsRead = 0;
 		
-			readloop:
-			for await (const line of rl) {
-				if (line[0] == '[') {
-					if (line === userIdLine) correctUser = true;
-				}
-				else if (correctUser) {
-					let keyvalue = line.split('=');
-					switch (keyvalue[0]) {
-						case 'aws_access_key_id':
-							credentials.accessKeyId = keyvalue[1];
-						
-							if (valsRead == 1) break readloop;
-							valsRead++;
-						
-							break;
-						case 'aws_secret_access_key':
-							credentials.secretAccessKey = keyvalue[1];
-						
-							if (valsRead == 1) break readloop;
-							valsRead++;
-						
-							break;
-						case 'region':
-							credentials.region = keyvalue[1];
-							break readloop;
-						default:
-							break;
-					}
+		readloop:
+		for await (const line of rl) {
+			if (line[0] == '[') {
+				if (line === userIdLine) correctUser = true;
+			}
+			else if (correctUser) {
+				let keyvalue = line.split('=');
+				switch (keyvalue[0]) {
+					case 'aws_access_key_id':
+						credentials.accessKeyId = keyvalue[1];
+					
+						if (valsRead == 1) break readloop;
+						valsRead++;
+					
+						break;
+					case 'aws_secret_access_key':
+						credentials.secretAccessKey = keyvalue[1];
+					
+						if (valsRead == 1) break readloop;
+						valsRead++;
+					
+						break;
+					case 'region':
+						credentials.region = keyvalue[1];
+						break readloop;
+					default:
+						break;
 				}
 			}
+		}
+		rl.close();
     }
 	return credentials;
 }
