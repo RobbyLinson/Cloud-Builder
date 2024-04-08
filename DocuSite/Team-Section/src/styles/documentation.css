@@ -60,17 +60,29 @@
     gap: 20px;
     padding: 20px;
   }
+
+  .logo {
+    width: 100px; /* or any size you want */
+    height: auto;
+  }
   
   .method-card {
     border: 1px solid #ddd; /* Light border */
     border-radius: 5px;
     padding: 20px;
-    max-width: 300px; /* Set a maximum width for the card */
+    min-width: 200px; /* Minimum width to ensure it's not too small */
+    max-width: 350px; /* Set a maximum width for the card */
+    width: auto;
     margin: 0 auto; /* Center the card */
     box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: adds a subtle shadow */
     background-color: #f9f9f9; /* Light background */
-    word-wrap: break-word; /* Ensures text wraps within the card */
 }
+.method-parameters {
+    font-size: 0.8rem; /* Smaller font size for parameters */
+    color: var(--secondary-color); /* A secondary color if you wish to differentiate it */
+    margin-bottom: 10px; /* Space before the functionality description */
+  }
+  
 .method-card h3 {
     color: var(--primary-color);
     font-weight: 500;
