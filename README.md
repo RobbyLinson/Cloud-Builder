@@ -27,6 +27,8 @@ Before using Cloud-Builder, configure your AWS credentials:
 2. Upon successful login, you will be prompted to enter your AWS Access Key ID and Secret Access Key for AWS resource management.
 3. The CLI will store your credentials securely for future sessions.
 
+The CLI will automatically create the necessary .aws directory and configuration files in your home directory.
+
 ## Usage
 
 ### Changing User
@@ -42,23 +44,30 @@ Follow the prompts to change to a new user account.
 clb greet <name>
 ```
 
-Replace <name> with your name to receive a personalized greeting.
+Replace \<name\> with your name to receive a personalized greeting.
 
 ### Running a Builder Script
 
 ```bash
 clb run <file name>
 ```
-
 Specify the file name of the builder script you wish to execute.
+
+Add flags before \<file name\>:
+
+-p to preview the file content
+
+-u to update the current infrustructure
 
 ### Creating AWS Resources
 
 ```bash
-clb create <type> <name>
+clb create <type> <name> [options]
 ```
 
-Replace <type> with the type of AWS resource you want to create (e.g., vpc, subnet) and <name> with a name for your resource.
+Replace \<type\> with the type of AWS resource you want to create (e.g., vpc, subnet) and \<name\> with a name for your resource.
+
+\[options\] are additional parameters you want to specify, they are different for each resource (e.g vpc has a CidrBlock)
 
 ### Deleting AWS Resources
 
@@ -75,13 +84,6 @@ Manually update the state file, reflecting the current status of AWS resources
 
 ### Logging
 Operation logs are stored in the cli/logs directory for audit and troubleshooting purposes.
-
-## Configuration
-
-To use Cloud-Builder, you'll need to configure your AWS credentials. Follow these steps to set up:
-
-1. Run the Cloud-Builder CLI and follow the prompts to enter your AWS Access Key ID and Secret Access Key.
-2. The CLI will automatically create the necessary .aws directory and configuration files in your home directory.
 
 ## Contributing
 
