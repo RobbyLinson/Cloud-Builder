@@ -8,6 +8,10 @@ import { createRouteTable, describeRouteTables, deleteRouteTable, attachRouteTab
 import { describeAllResources } from "./actions/general-actions.js";
 import { checkAwsFolder, getCredentials } from './credentialsAws.js';
 
+// State related imports
+import { updateStateFile, compareCounts, reinitializeInfrastructure } from './state/state.js';
+import { askUserToProceed, previewFileContent, userFileCountNumberOfResourcesByType } from './state/userFileParsers.js';
+import { getResourceTypeAndIdByName, stateCountNumberOfResourcesByType } from './state/stateFileParsers.js';
 
 async function providerAws(userId) {
 	
@@ -169,16 +173,26 @@ async function providerAws(userId) {
 
 
     return {
-      createResource: createResource, 
-      attachInternetGatewayAndVpc: attachInternetGatewayAndVpc,
-      detachInternetGatewayAndVpc: detachInternetGatewayAndVpc,
-      attachRouteTableAndSubnet: attachRouteTableAndSubnet,
-      detachRouteTableAndSubnet: detachRouteTableAndSubnet,
-      attachInternetGatewayAndRouteTable: attachInternetGatewayAndRouteTable,
-      detachInternetGatewayAndRouteTable: detachInternetGatewayAndRouteTable,
-      describeResources: describeResources,
-      terminateResource: terminateResource,
-      updateResource: updateResource
+      createResource, 
+      attachInternetGatewayAndVpc,
+      detachInternetGatewayAndVpc,
+      attachRouteTableAndSubnet,
+      detachRouteTableAndSubnet,
+      attachInternetGatewayAndRouteTable,
+      detachInternetGatewayAndRouteTable,
+      describeResources,
+      terminateResource,
+      updateResource,
+	  state: {
+		  updateStateFile,
+		  compareCounts,
+		  reinitializeInfrastructure,
+		  askUserToProceed,
+		  previewFileContent,
+		  userFileCountNumberOfResourcesByType, 
+		  getResourceTypeAndIdByName,
+		  stateCountNumberOfResourcesByType
+	  }
     };
 }
 
