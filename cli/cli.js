@@ -112,10 +112,10 @@ yargs(hideBin(process.argv))
   },  async (argv) => {
     console.log(`\nHello, ${argv.name}!`);
   })
-  .command('run [-u] [-p] <file>', 'Executes a JavaScript file', (yargs) => {
+  .command('run [-u] [-p] <file>', 'Executes a Builder Script', (yargs) => {
     return yargs
     .positional('file', {
-      describe: 'executes js file',
+      describe: 'Executes given .js Builder Script',
       type: 'string'
     })
     .option('u', {
