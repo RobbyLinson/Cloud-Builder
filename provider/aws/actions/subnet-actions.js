@@ -38,8 +38,8 @@ export async function deleteSubnet(ec2Client,subnetId) {
 
     try {
         await ec2Client.send(command);
-      console.log(`\n🧹 Instance with ID ${subnetId} terminated.\n`);
+      console.log(`\n🧹 Subnet with ID ${subnetId} terminated.\n`);
     } catch (err) {
-      console.warn(`Failed to terminate instance ${subnetId}.`, err);
+      console.warn(`Failed to terminate subnet ${subnetId}.`, err);
     }
 };

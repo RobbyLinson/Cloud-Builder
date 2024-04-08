@@ -1,83 +1,207 @@
 #!/usr/bin/env node
 
-//import providerAws from '../provider/aws/providerAws.js';
-import { ProviderManager } from '../provider/providerManager.js';
-import { checkAwsFolder } from './awsConfig.js';
-import { readMapFromFile, writeMapToFile } from './state.js';
+// Import the Provider Loader
+import { ProviderLoader } from './providerLoader.js';
+
 // Import the yargs library
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
 import { execSync } from 'child_process';
-const stateFile = process.cwd() + '/cli/instances.json';  //it'll make this file for you if it isn't there.
 
-import { region, accessKeyId, secretAccessKey } from '../credentials.js'; // temporary, replace this asap
-//make logo
+// drawings
+import { drawActionCancelledByUser, drawResourcesDoesNotMatch, drawResourcesMatch, drawLogo } from './chalk-messages.js';
+
+// Import filesystem library
 import fs from 'fs';
-import read from 'readline';
 
-const providers = await new ProviderManager();
-await providers.loadProviderConfig();
+// Gets current time for logging.
+const sessionTime = new Date();
+const sessionTimeString = sessionTime.getDate() + "_" + (sessionTime.getMonth() + 1) + "_" + sessionTime.getFullYear();
 
-console.log(chalk.blueBright("  ____ _                 _   _           _ _     _           "));
-console.log(chalk.blueBright(" / ___| | ___  _   _  __| | | |__  _   _(_) | __| | ___ _ __ "));
-console.log(chalk.blueBright("| |   | |/ _ \\| | | |/ _` | | '_ \\| | | | | |/ _` |/ _ \\ '__|"));
-console.log(chalk.blueBright("| |___| | (_) | |_| | (_| | | |_) | |_| | | | (_| |  __/ |   "));
-console.log(chalk.blueBright(" \\____|_|\\___/ \\__,_|\\__,_| |_.__/ \\__,_|_|_|\\__,_|\\___|_|   "));
+import readline from 'readline';
 
+import util from 'util';
 
+const folderPath = './cli/logs';
+// Check if the folder exists
+if (!fs.existsSync(folderPath)) {
+  // If it doesn't exist, create it
+  fs.mkdirSync(folderPath, { recursive: true }, (err) => {
+    if (err) {
+      console.error('Error creating folder:', err);
+    } else {
+      console.log('Folder created successfully!');
+    }
+  });
+}
 
+// Create log file
+var logPath = process.cwd() + '/cli/logs/' + sessionTimeString + '.txt'; 
+var logFile = fs.createWriteStream(logPath, { flags: 'a' });
+var logStdout = process.stdout;
 
+// Override console.log to write to logs
+console.log = function () {
+   logFile.write(util.format.apply(null, arguments) + '\n');
+   logStdout.write(util.format.apply(null, arguments) + '\n');
+}
+console.error = console.log;
 
-console.log("Welcome to Cloud-Builder");
+const credentialsFilePath = process.cwd() + '/user_profile.json';
 
-// console.log("\nCommands:\ncloud-builder greet <name>           Gives you a little greeting!")
-// console.log("cloud-builder run <file name>        Runs given builder script.");
-// console.log("cloud-builder create <type> <name>   Creates aws resource of given type.");
-// console.log("cloud-builder delete <name>          Deletes aws resource of given name.\n");
+function loadCredentials() {
+  if (!fs.existsSync(credentialsFilePath)) return {};
+  return JSON.parse(fs.readFileSync(credentialsFilePath, 'utf8'));
+}
 
-console.log("clb help     for list of commands!");
+function saveCredentials(credentials) {
+  fs.writeFileSync(credentialsFilePath, JSON.stringify(credentials, null, 2));
+}
 
-checkAwsFolder();
+async function changeUser() {
+  const rl = await readline.createInterface({
+	input: process.stdin,
+	output: process.stdout
+  });
 
-// Temporary: load hardcoded provider credentials file
-const awsProvider = await providers.aws({
-	region: region,
-	accessKeyId: accessKeyId,
-	secretAccessKey: secretAccessKey,
-	stateFile: stateFile
-});
+  const userId = await new Promise(resolve => {
+		rl.question("Enter username: ", resolve);
+	});
+
+  var credentials = {};
+  credentials.current = userId;
+  await saveCredentials(credentials);
+  console.log(chalk.green('User successfully set.'));
+  rl.close();
+  return userId;
+}
+
+// Add a check for the 'user' command before proceeding with other commands
+if (process.argv.includes('user')) {
+  await changeUser();
+  process.exit(0);
+}
+
+var userId = loadCredentials().current;
+if (userId == null) {
+	userId = await changeUser();
+}
+
+// Create new Provider Loader to handle importing available providers.
+const providers = await new ProviderLoader();
+
+// Create Provider object based on current active provider.
+const activeProvider = await providers.returnActiveProvider(userId);
+
+// Draws Cloud-Builder Logo
+drawLogo();
+
+console.log("\nWelcome to Cloud-Builder\n");
 
 // Use yargs to define commands and their callbacks
 yargs(hideBin(process.argv))
   .scriptName("clb")
-  .command('greet <name>', 'greet a user by name', (yargs) => {
+  .command('greet <name>', 'Greets a user by name', (yargs) => {
     console.clear();
     return yargs.positional('name', {
       describe: 'name to greet',
       type: 'string',
       default: 'World'
     });
-  }, (argv) => {
-    console.log(`Hello, ${argv.name}!`);
+  },  async (argv) => {
+    console.log(`\nHello, ${argv.name}!`);
   })
-  .command('run <file>', 'executes a JavaScript file', (yargs) => {
-    return yargs.positional('file', {
-      describe: 'executes js file',
+  .command('run [-u] [-p] <file>', 'Executes a Builder Script', (yargs) => {
+    return yargs
+    .positional('file', {
+      describe: 'Executes given .js Builder Script',
       type: 'string'
+    })
+    .option('u', {
+      describe: 'Use compare and update state feature',
+      type: 'boolean',
+      default: false
+    })
+    .option('p',{
+      describe: 'Enables file preview',
+      type: 'boolean',
+      default: false
     });
   }, async (argv) => {
-    if (await previewFileContent(argv.file)) {
-      try {
-        execSync(`node ${argv.file}`, { stdio: 'inherit' });
-      } catch (error) {
-        console.error(error.message);
+    try {
+      if(argv.u){  // if flag -u (update) is set, we compare present and future infrastructure 
+        // get objects with number of resources on ec2 client and in user defined file
+        const userFileCounts = await activeProvider.state.userFileCountNumberOfResourcesByType(argv.file);
+        const stateFileCounts = await activeProvider.state.stateCountNumberOfResourcesByType();
+
+        // Compare counts from user file and state file
+        const matchCounts = activeProvider.state.compareCounts(userFileCounts, stateFileCounts);
+        
+        if(matchCounts){ 
+          // if the infrastructure is the same
+          
+          // we notify user about that
+          drawResourcesMatch();
+
+          // we ask whether user wants to reinitialize it 
+          if(!await activeProvider.state.askUserToProceed()){
+            // if user doesn't want to, we finish the execution
+            drawActionCancelledByUser();
+            return;
+          }
+          // otherwise we leave this if else part
+        } else{ 
+          // if the infrastructure differs, we check if user used other flags
+          if (argv.p){ 
+            // if flag -p (preview) is set
+            await activeProvider.state.previewFileContent(argv.file);
+            // fix the cli ui
+            console.log(chalk.gray('------------------------------------------------')); // bad decision, but this fixes cli ui
+            if(!await activeProvider.state.askUserToProceed()){
+              // if user doesn't want to, we finish the execution
+              drawActionCancelledByUser();
+              return;
+            }
+          }
+          // we notify user about that
+          drawResourcesDoesNotMatch();
+          // and we leave this if else part (related to counts)
+        }
+
+        // basically deletes everything from the current state
+        await activeProvider.state.reinitializeInfrastructure(userId);
+        // then we proceed to the last part running the user file and updating the state
+        // so we leave this if else part (related to -u)
+      
+      } else { // if flag -u (update) is not set, we create just the infrastructure
+        if (argv.p) {
+          // if flag -p (preview) is set we show file preview
+          await activeProvider.state.previewFileContent(argv.file);
+          // fix the cli ui
+          console.log(chalk.gray('------------------------------------------------')); // bad decision, but this fixes cli ui
+
+          // after looking at the preview we ask if user wants to proceed
+          if(!await activeProvider.state.askUserToProceed()){
+            // if user doesn't want to, we finish the execution
+            activeProvider.state.drawActionCancelledByUser();
+            return;
+          }
+          // if user wants to proceed, we leave this if else part (related to -p flag)
+        } 
       }
-    } else {
-      console.log('Action cancelled by user.');
+
+      // run the user file
+      execSync(`node ${argv.file}`, { stdio: 'inherit' });
+      // update the stateFile
+      activeProvider.state.updateStateFile(userId);
+
+
+    } catch (error) {
+      console.error(error.message);
     }
   })
-  .command('create <type> <name> [options..]', 'Create AWS resource', (yargs) => {
+  .command('create <type> <name> [options..]', 'Creates a new resource', (yargs) => {
     yargs.positional('type', {
       describe: 'Type of resource to create (e.g., vpc, subnet, instance)',
       type: 'string'
@@ -95,109 +219,48 @@ yargs(hideBin(process.argv))
         const [key, value] = opt.split('=');
         split_options[key] = value;
       });
-    console.log(split_options);
 	
-      const result = await awsProvider.createResource({
+      const result = await activeProvider.createResource({
         type: argv.type,
         Name: argv.name,
         ...split_options
       });
+
+      // updates state file
+      activeProvider.state.updateStateFile(userId);
   
-      
-	  	// These things are now handled in provider code for consistency
-		// with actions that are run through "builder scripts".
-		/*
-		//console.log('Resource creation result:', result);
-        // Read the map from file or create a new one if file doesn't exist
-        readMapFromFile(stateFile, (err, currentInstances) => {
-          if (err) {
-            console.error('Error reading map from file:', err);
-            return;
-          }
-  
-		  //
-          // Add/update data in the map based on user input
-          //currentInstances.set(argv.name, result);
-  
-          // Write the updated map back to the file
-          // writeMapToFile(currentInstances, stateFile);
-        });
-      */
     } catch (error) {
       console.error('Error creating resource:', error.message);
     }
+     
+
+     
   })
-  .command('delete <name>', 'Deletes AWS resource', (yargs)=> {
+  .command('delete <name>', 'Deletes a resource by name', (yargs)=> {
     yargs.positional('name', {
       describe: 'Name of resource to delete (e.g., mainVpc, mainSubnet, linuxInstance)',
       type: 'string'
     })
   }, async (argv) => {
     try {
-      // Read the map from file to get the instanceId
-      readMapFromFile(stateFile, async (err, currentInstances) => {
-        if (err) {
-          console.error('Error reading map from file:', err);
-          return;
-        }
 
-        // Check if the provided name exists in the map
-        if (!currentInstances.has(argv.name)) {
-          console.error(`Resource with name '${argv.name}' not found.`);
-          return;
-        }
-
-        // Get the instanceId from the map based on the name
-        const instanceId = currentInstances.get(argv.name);
-		let type = instanceId.split("-")[0];
-		if (type === "i") type = "instance";
-		
-        // Call awsProvider.terminateResource to destroy the AWS resource
-        const result = await awsProvider.terminateResource({
-          type: type,
-		  instanceId: instanceId,
-          name: argv.name
-        });
-
-		// These things are now handled in provider code for consistency
-		// with actions that are run through "builder scripts".
-		// 
-        // console.log('Resource deletion result:', result);
-        // Remove the entry from the map after destroying the resource
-        // currentInstances.delete(argv.name);
-		//
-        // Write the updated map back to the file
-        // writeMapToFile(currentInstances, stateFile);
-      });
+      const data = await activeProvider.state.getResourceTypeAndIdByName(argv.name);
       
+      // Call activeProvider.terminateResource to destroy the resource
+      if (data){
+        const result = await activeProvider.terminateResource({
+          type: data.type,
+		      instanceId: data.id
+        });
+        // update state file
+        activeProvider.state.updateStateFile(userId);
+      }
     } catch (error) {
       console.error('Error deleting resource:', error.message);
     }
+   
+
   })
+  .command('update', 'Updates state file', async => { activeProvider.state.updateStateFile(userId)})
+  .demandCommand(1, "").recommendCommands().strict()
   .parse();
-
-
-
-  function previewFileContent(filePath) {
-    try {
-      const content = fs.readFileSync(filePath, 'utf8');
-      console.log(chalk.yellow('Preview of file content:'));
-      console.log(chalk.gray('------------------------------------------------'));
-      console.log(content);
-      console.log(chalk.gray('------------------------------------------------'));
-      // Confirm with the user to proceed
-      const readlineInterface = read.createInterface({
-        input: process.stdin,
-        output: process.stdout
-      });
-      return new Promise((resolve) => {
-        readlineInterface.question(chalk.green('Do you want to proceed with this action? (y/n) '), (answer) => {
-          readlineInterface.close();
-          resolve(answer.toLowerCase() === 'y');
-        });
-      });
-    } catch (error) {
-      console.error(chalk.red(`Error reading file '${filePath}':`), error.message);
-      return Promise.resolve(false);
-    }
-  }

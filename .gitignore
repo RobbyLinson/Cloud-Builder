@@ -1,4 +1,9 @@
-node_modules
 db
 credentials.js
 instances.json
+state.json
+logs
+node_modules
+user_credentials.json
+user_profile.json
+.vscode

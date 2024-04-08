@@ -1,3 +1,6 @@
 {
-  "aws": "/aws/providerAws.js"
+  "active": "aws",
+  "available": {
+	"aws": "/aws/providerAws.js"
+  }
 }

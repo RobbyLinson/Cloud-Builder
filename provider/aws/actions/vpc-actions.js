@@ -17,6 +17,7 @@ export async function createVpc(ec2Client, {
 	}
 }
 
+// Will be deleted later, updates just a name of a specified vpc
 export async function updateVpcName(ec2Client, {id, name}){
 	
 	const input = {
