@@ -56,13 +56,15 @@ test("Determines if descibeNatGateways returns a list of NatGateways correspondi
 
     const natList = await describeNatGateways(ec2Mock, [nat])
 
-    expect(natList).toStrictEqual([
-        {
-            "NatGatewayId": "nat-abc123",
-            "SubnetId": "sub-abc123",
-            "State": "available"
-        }
-    ])
+    expect(natList).toStrictEqual({
+        "NatGateways": [
+            {
+                "NatGatewayId": "nat-abc123",
+                "SubnetId": "sub-abc123",
+                "State": "available"
+            }
+        ]
+    })
 })
 
 test("Determines if deleteNatGateway returns successfully", async() => {
