@@ -170,7 +170,7 @@ yargs(hideBin(process.argv))
         }
 
         // basically deletes everything from the current state
-        await activeProvider.state.reinitializeInfrastructure();
+        await activeProvider.state.reinitializeInfrastructure(userId);
         // then we proceed to the last part running the user file and updating the state
         // so we leave this if else part (related to -u)
       
@@ -194,7 +194,7 @@ yargs(hideBin(process.argv))
       // run the user file
       execSync(`node ${argv.file}`, { stdio: 'inherit' });
       // update the stateFile
-      activeProvider.state.updateStateFile();
+      activeProvider.state.updateStateFile(userId);
 
 
     } catch (error) {
@@ -227,7 +227,7 @@ yargs(hideBin(process.argv))
       });
 
       // updates state file
-      activeProvider.state.updateStateFile();
+      activeProvider.state.updateStateFile(userId);
   
     } catch (error) {
       console.error('Error creating resource:', error.message);
@@ -253,7 +253,7 @@ yargs(hideBin(process.argv))
 		      instanceId: data.id
         });
         // update state file
-        activeProvider.state.updateStateFile();
+        activeProvider.state.updateStateFile(userId);
       }
     } catch (error) {
       console.error('Error deleting resource:', error.message);
@@ -261,6 +261,6 @@ yargs(hideBin(process.argv))
    
 
   })
-  .command('update', 'Updates state file', async => { activeProvider.state.updateStateFile()})
+  .command('update', 'Updates state file', async => { activeProvider.state.updateStateFile(userId)})
   .demandCommand(1, "").recommendCommands().strict()
   .parse();

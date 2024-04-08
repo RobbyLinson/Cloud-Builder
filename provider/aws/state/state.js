@@ -2,10 +2,19 @@ import fs from 'fs';
 import { EC2Client } from '@aws-sdk/client-ec2';
 import { describeAllResources, terminateAllResources } from '../actions/general-actions.js';
 import { stateCountNumberOfResourcesByType } from './stateFileParsers.js';
+import { checkAwsFolder, getCredentials } from '../credentialsAws.js';
 
-export async function updateStateFile() {
+export async function updateStateFile(userId) {
   try {
-    const ec2Client = new EC2Client();
+	const awsCredentials = await getCredentials(userId);
+	
+	const ec2Client = new EC2Client({
+		region: awsCredentials.region,
+		credentials: {
+			accessKeyId: awsCredentials.accessKeyId,
+			secretAccessKey: awsCredentials.secretAccessKey
+		}
+	});
     const allResources = await describeAllResources(ec2Client);
 
     const jsonData = {
@@ -43,8 +52,16 @@ function formatCounts(counts) {
   `;
 }
 
-export async function reinitializeInfrastructure(){
-  const ec2Client = new EC2Client();
+export async function reinitializeInfrastructure(userId){
+  const awsCredentials = await getCredentials(userId);
+	
+  const ec2Client = new EC2Client({
+    region: awsCredentials.region,
+    credentials: {
+      accessKeyId: awsCredentials.accessKeyId,
+      secretAccessKey: awsCredentials.secretAccessKey
+    }
+  });
   await terminateAllResources(ec2Client);
 }
 
