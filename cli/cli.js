@@ -155,8 +155,8 @@ yargs(hideBin(process.argv))
           // if the infrastructure differs, we check if user used other flags
           if (argv.p){ 
             // if flag -p (preview) is set
-            await previewFileContent(argv.file); 
-            if(!await askUserToProceed()){
+            await activeProvider.state.previewFileContent(argv.file);
+            if(!await activeProvider.state.askUserToProceed()){
               // if user doesn't want to, we finish the execution
               drawActionCancelledByUser();
               return;
