@@ -59,7 +59,7 @@ const awsProvider = await providerAws("default");
 
 // const newNatGateway = await awsProvider.createResource({
 //   type: 'natgateway',
-//   SubnetId: subnetId,
+//   SubnetId: publicSubnet,
 //   //AllocationId: 'eipalloc-0e37779e6f029dfb4',
 //   ConnectivityType: 'private'
 // })
@@ -73,30 +73,6 @@ const awsProvider = await providerAws("default");
 //   MaxCount: 1,
 //   ImageId: 'ami-0766b4b472db7e3b9'
 // });
-
-// await awsProvider.terminateResource({
-//     type: "instance",
-//     instanceId: newInstance
-// })
-
-// console.log(natgatewayDescription);
-// await awsProvider.terminateResource({
-//   type: "natgateway",
-//   instanceId: "nat-09c0160581dd882ed"
-// })
-// await awsProvider.terminateResource({
-//     type: "subnet",
-//     instanceId: publicSubnet
-// })
-// await awsProvider.terminateResource({
-//   type: "vpc",
-//   instanceId: mainVpc
-// })
-// await awsProvider.terminateResource({
-//     type: "routetable",
-//     instanceId: newRouteTable
-// })
-
 
 // ------------------
 

@@ -80,12 +80,7 @@ export async function terminateAllResources(ec2Client){
               case "subnets":
                 await deleteSubnet(ec2Client, resource.SubnetId);
                 break;
-              case "routeTables":
-                
-                if(resource.Associations && resource.Associations.length != 0 && resource.Associations[0].SubnetId != null){
-                  await detachRouteTableFromSubnet(ec2Client, resource.RouteTableId, resource.Associations[0].SubnetId);
-                }
-                
+              case "routeTables":                
                 if(resource.Associations && resource.Associations.length != 0 && resource.Associations[0].Main){
                   //skipping deletion of routetables which are automatically created when creating a vpc
                 }else{

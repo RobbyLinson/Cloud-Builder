@@ -183,16 +183,16 @@ async function providerAws(userId) {
       describeResources,
       terminateResource,
       updateResource,
-	  state: {
-		  updateStateFile,
-		  compareCounts,
-		  reinitializeInfrastructure,
-		  askUserToProceed,
-		  previewFileContent,
-		  userFileCountNumberOfResourcesByType, 
-		  getResourceTypeAndIdByName,
-		  stateCountNumberOfResourcesByType
-	  }
+      state: {
+        updateStateFile,
+        compareCounts,
+        reinitializeInfrastructure,
+        askUserToProceed,
+        previewFileContent,
+        userFileCountNumberOfResourcesByType, 
+        getResourceTypeAndIdByName,
+        stateCountNumberOfResourcesByType
+      }
     };
 }
 

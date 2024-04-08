@@ -46,7 +46,7 @@ export async function attachRouteTableToSubnet(ec2Client, routetableId, subnetId
 	});
 	try {
 		const response = await ec2Client.send(command);
-		console.log(`Attached routetable ${routetableId} to subnet ${subnetId}\n`);
+		console.log(`🤝 Attached routetable ${routetableId} to subnet ${subnetId}\n`);
 	} catch (err) {
 		console.warn(`Failed to attach subnet to routetable.`, err);
 	}

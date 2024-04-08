@@ -156,6 +156,8 @@ yargs(hideBin(process.argv))
           if (argv.p){ 
             // if flag -p (preview) is set
             await activeProvider.state.previewFileContent(argv.file);
+            // fix the cli ui
+            console.log(chalk.gray('------------------------------------------------')); // bad decision, but this fixes cli ui
             if(!await activeProvider.state.askUserToProceed()){
               // if user doesn't want to, we finish the execution
               drawActionCancelledByUser();
