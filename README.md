@@ -18,6 +18,7 @@ To use Cloud-Builder, ensure Node.js is installed on your system. Follow these s
 1. Clone this repository to your local machine.
 2. Navigate to the cloned directory.
 3. Run `npm install` to install the required dependencies.
+4. Run `npm link` to make sure that clb command in command line works`
 
 ## Configuration
 
