@@ -45,7 +45,7 @@ function formatCounts(counts) {
 
 export async function reinitializeInfrastructure(){
   const ec2Client = new EC2Client();
-  terminateAllResources(ec2Client);
+  await terminateAllResources(ec2Client);
 }
 
 

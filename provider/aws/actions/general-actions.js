@@ -3,7 +3,7 @@ import { describeSubnets, deleteSubnet } from "./subnet-actions.js";
 import { describeInstancesWithState, deleteInstance } from "./instance-actions.js";
 import { describeNatGateways, deleteNatGateway } from "./natgateway-actions.js";
 import { describeInternetGateways, deleteInternetGateway, detachInternetGatewayFromVpc } from "./internetgateway-actions.js";
-import { describeRouteTables, deleteRouteTable } from "./routetable-actions.js";
+import { describeRouteTables, deleteRouteTable, detachRouteTableFromSubnet } from "./routetable-actions.js";
 import fs from 'fs';
 
 export async function describeAllResources(ec2Client) {
@@ -24,6 +24,10 @@ export async function describeAllResources(ec2Client) {
 
     // Describe NAT Gateways
     const natGateways = await describeNatGateways(ec2Client);
+
+    natGateways.NatGateways = natGateways.NatGateways.filter(
+      natGateway => natGateway.State === "available" || natGateway.State === "pending")
+
     allResources['natGateways'] = natGateways.NatGateways || [];
 
     const internetGateways = await describeInternetGateways(ec2Client);
@@ -62,11 +66,12 @@ export async function terminateAllResources(ec2Client){
             // Call the corresponding termination function based on resource type
             switch (resourceType) {
               case "internetGateways":
-                await detachInternetGatewayFromVpc(ec2Client, resource.InternetGatewayId, resource.Attachments[0].VpcId);
+                if(resource.Attachments[0] != null){
+                  await detachInternetGatewayFromVpc(ec2Client, resource.InternetGatewayId, resource.Attachments[0].VpcId);
+                }
                 await deleteInternetGateway(ec2Client, resource.InternetGatewayId);
                 break;
               case "natGateways":
-
                 await deleteNatGateway(ec2Client, resource.NatGatewayId);
                 break;
               case "instances":
@@ -76,6 +81,11 @@ export async function terminateAllResources(ec2Client){
                 await deleteSubnet(ec2Client, resource.SubnetId);
                 break;
               case "routeTables":
+                
+                if(resource.Associations && resource.Associations.length != 0 && resource.Associations[0].SubnetId != null){
+                  await detachRouteTableFromSubnet(ec2Client, resource.RouteTableId, resource.Associations[0].SubnetId);
+                }
+                
                 if(resource.Associations && resource.Associations.length != 0 && resource.Associations[0].Main){
                   //skipping deletion of routetables which are automatically created when creating a vpc
                 }else{

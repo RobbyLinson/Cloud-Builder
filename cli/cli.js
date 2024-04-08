@@ -161,6 +161,11 @@ yargs(hideBin(process.argv))
           if (argv.p){ 
             // if flag -p (preview) is set
             await previewFileContent(argv.file); 
+            if(!await askUserToProceed()){
+              // if user doesn't want to, we finish the execution
+              drawActionCancelledByUser();
+              return;
+            }
           }
           // we notify user about that
           drawResourcesDoesNotMatch();
@@ -168,7 +173,7 @@ yargs(hideBin(process.argv))
         }
 
         // basically deletes everything from the current state
-        reinitializeInfrastructure();
+        await reinitializeInfrastructure();
         // then we proceed to the last part running the user file and updating the state
         // so we leave this if else part (related to -u)
       
