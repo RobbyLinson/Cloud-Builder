@@ -43,16 +43,8 @@ async function populateAwsFolder(userId) {
   }
 }
 
-async function createAwsFolder() {
-	await fsp.mkdir(filePath).catch(function() {
-		console.log('Failed to create AWS credentials directory.'); 
-	}); 
-	await fsp.writeFile(filePath + '/credentials', "");
-	await fsp.writeFile(filePath + '/config', "");
-}
-
 async function checkUserExists(userId) {
-	const stream = await fs.createReadStream(filePath + '/config');
+	const stream = await fs.createReadStream(filePath + 'credentials');
 	const rl = await read.createInterface({
 		input: stream,
 		crlfDelay: Infinity
@@ -70,8 +62,23 @@ export async function checkAwsFolder(userId) {
 	try{
 		await fsp.access(filePath);
 	} catch(e){
-		await createAwsFolder();
+		await fsp.mkdir(filePath).catch(function() {
+			console.log('Failed to create AWS credentials directory.'); 
+		}); 
 	}
+	
+	try{
+		await fsp.access(filePath + 'credentials');
+	} catch(e){
+		await fsp.writeFile(filePath + 'credentials', "");
+	}
+
+	try{
+		await fsp.access(filePath + 'config');
+	} catch(e){
+		await fsp.writeFile(filePath + 'config', "");
+	}
+	
 	await checkUserExists(userId);
 }
 
@@ -82,7 +89,7 @@ export async function getCredentials(userId) {
 	const userIdLine = '[' + userId + ']';
 	
     for (const val of files){
-		const stream = await fs.createReadStream(filePath + '/' + val);
+		const stream = await fs.createReadStream(filePath + val);
 		const rl = await read.createInterface({
 			input: stream,
 			crlfDelay: Infinity
