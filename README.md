@@ -23,25 +23,18 @@ To use Cloud-Builder, ensure Node.js is installed on your system. Follow these s
 
 Before using Cloud-Builder, configure your AWS credentials:
 
-1. Use the Cloud-Builder CLI to register as a new user by following the prompts to enter your details.
-2. Upon successful registration or login, you will be prompted to enter your AWS Access Key ID and Secret Access Key for AWS resource management.
+1. Use the Cloud-Builder CLI to choose a username by following the prompts to enter your details.
+2. Upon successful login, you will be prompted to enter your AWS Access Key ID and Secret Access Key for AWS resource management.
 3. The CLI will store your credentials securely for future sessions.
 
 ## Usage
 
-### Registering a New User
+### Changing User
 
 ```bash
-clb register
+clb user
 ```
-Follow the prompts ito create a new local user account
-
-### Logging in
-```bash
-clb login
-```
-Enter your registered user ID and password to log in.
-
+Follow the prompts to change to a new user account.
 
 ### Greeting Command
 
