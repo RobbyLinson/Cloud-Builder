@@ -1,0 +1,107 @@
+  .documentation-page {
+    padding-top: 3rem;
+    text-align: center;
+    color: var(--text-color);
+  }
+  
+  .documentation-header {
+    margin-bottom: 50px;
+  }
+  
+  .documentation-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background: var(--team-card-bg);
+    border-radius: 5px;
+    margin-bottom: 20px; /* Spacing between items */
+  }
+  
+  .documentation-item h3 {
+    color: var(--primary-color);
+    font-weight: 500;
+    font-size: 1.5rem;
+    margin: 1rem 0;
+  }
+  
+  .documentation-item p {
+    color: var(--text-color);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Reusing the home button styles from team.css */
+  .home-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    background: var(--btn-primary-bg);
+    color: var(--text-color);
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+  }
+  
+  .home-button:hover {
+    background-color: var(--btn-primary-hover-bg);
+    cursor: pointer;
+  }
+  
+  /* Layout for the documentation items */
+  .methods-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .method-card {
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 5px;
+    padding: 20px;
+    max-width: 300px; /* Set a maximum width for the card */
+    margin: 0 auto; /* Center the card */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: adds a subtle shadow */
+    background-color: #f9f9f9; /* Light background */
+    word-wrap: break-word; /* Ensures text wraps within the card */
+}
+.method-card h3 {
+    color: var(--primary-color);
+    font-weight: 500;
+    font-size: 1.5rem;
+    margin: 1rem 0;
+  }
+.method-card .method-location {
+    color: var(--secondary-color); /* Secondary color for the subheading */
+    font-size: 1rem; /* Smaller than the title but still prominent */
+    margin-bottom: 10px; /* Space between subheading and the main content */
+}
+
+  /* Responsive adjustments */
+  @media only screen and (max-width: 768px) {
+    .methods-container {
+      flex-direction: column;
+    }
+    
+    .documentation-item {
+      width: auto; /* Adjust width to full container width */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .home-button {
+      position: fixed; /* Fixed position to ensure button remains visible */
+      z-index: 10; /* Ensure the button stays above other content */
+    }
+  
+    .documentation-header h1 {
+      font-size: 1.5rem;
+    }
+  }
+  

@@ -6,6 +6,8 @@ import './App.css';
 
 const HomePage = lazy(() => import('./components/UI/HomePage'));
 const Team = lazy(() => import('./components/UI/Team'));
+const Documentation = lazy(() => import('./components/UI/Documentation'));
+
 
 function App() {
   return (
@@ -14,6 +16,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/team" element={<Team />} />
+          <Route path="/documentation" element={<Documentation />} />
         </Routes>
       </Suspense>
     </Router>
